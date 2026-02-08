@@ -23,35 +23,35 @@
 
     /* Arrière-plans par thème */
     body.theme-zen {
-        background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%);
+        background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%) !important;
     }
 
     body.theme-plage {
-        background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+        background: linear-gradient(135deg, #ffd89b 0%, #f4a460 50%, #19547b 100%) !important;
     }
 
     body.theme-foret {
-        background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+        background: linear-gradient(135deg, #134e5e 0%, #3a7e6f 50%, #71b280 100%) !important;
     }
 
     body.theme-futuriste {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
     }
 
     body.theme-bonbon {
-        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff9a9e 100%);
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff9a9e 100%) !important;
     }
 
     body.theme-bar {
-        background: linear-gradient(135deg, #2c003e 0%, #4b0082 50%, #8b008b 100%);
+        background: linear-gradient(135deg, #2c003e 0%, #4b0082 50%, #8b008b 100%) !important;
     }
 
     body.theme-chasse {
-        background: linear-gradient(135deg, #3e2723 0%, #5d4037 50%, #795548 100%);
+        background: linear-gradient(135deg, #3e2723 0%, #5d4037 50%, #795548 100%) !important;
     }
 
     body.theme-aquarium {
-        background: linear-gradient(135deg, #00416a 0%, #799f0c 50%, #ffe000 100%);
+        background: linear-gradient(135deg, #00416a 0%, #1976d2 33%, #4caf50 66%, #ffe000 100%) !important;
     }
 
     /* Overlay pour image personnalisée */
@@ -926,13 +926,26 @@
 
     // Gestion des thèmes
     const themeButtons = document.querySelectorAll('.theme-btn');
+    const body = document.body;
+    
     themeButtons.forEach(btn => {
         btn.addEventListener('click', () => {
+            // Retirer toutes les classes de thème
+            body.classList.remove('theme-zen', 'theme-plage', 'theme-foret', 'theme-futuriste', 
+                                 'theme-bonbon', 'theme-bar', 'theme-chasse', 'theme-aquarium', 'custom-bg');
+            
+            // Retirer l'état actif de tous les boutons
             themeButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            
+            // Ajouter la nouvelle classe de thème
             const theme = btn.dataset.theme;
-            document.body.className = `theme-${theme}`;
-            document.body.classList.remove('custom-bg');
+            body.classList.add(`theme-${theme}`);
+            
+            // Marquer le bouton comme actif
+            btn.classList.add('active');
+            
+            // Retirer le background image personnalisé s'il existe
+            body.style.backgroundImage = '';
         });
     });
 
@@ -942,9 +955,18 @@
         if (file) {
             const reader = new FileReader();
             reader.onload = (event) => {
-                document.body.style.setProperty('--custom-bg', `url(${event.target.result})`);
-                document.body.className = 'custom-bg';
-                document.body.style.backgroundImage = `url(${event.target.result})`;
+                // Retirer toutes les classes de thème
+                body.classList.remove('theme-zen', 'theme-plage', 'theme-foret', 'theme-futuriste', 
+                                     'theme-bonbon', 'theme-bar', 'theme-chasse', 'theme-aquarium');
+                
+                // Appliquer l'image personnalisée
+                body.classList.add('custom-bg');
+                body.style.backgroundImage = `url(${event.target.result})`;
+                body.style.backgroundSize = 'cover';
+                body.style.backgroundPosition = 'center';
+                body.style.backgroundAttachment = 'fixed';
+                
+                // Désactiver tous les boutons de thème
                 themeButtons.forEach(b => b.classList.remove('active'));
             };
             reader.readAsDataURL(file);
