@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BubbleChat - Connexion</title>
+<style>
+* { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+}
+
+body {
+font-family: ‘Segoe UI’, Tahoma, Geneva, Verdana, sans-serif;
+height: 100vh;
+overflow: hidden;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+position: relative;
+}
+
+/* Thèmes de couleurs */
+body.theme-pink {
+background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff9a9e 100%);
+}
+
+body.theme-blue {
+background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+}
+
+body.theme-purple {
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+body.theme-mint {
+background: linear-gradient(135deg, #d299c2 0%, #fef9d7 50%, #a8edea 100%);
+}
+
+/* Fond animé avec particules flottantes */
+#particles-bg {
+position: absolute;
+width: 100%;
+height: 100%;
+overflow: hidden;
+z-index: 0;
+}
+
+.particle {
+position: absolute;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.1);
+animation: float linear infinite;
+backdrop-filter: blur(3px);
+}
+
+@keyframes float {
+0% {
+transform: translateY(100vh) translateX(0) rotate(0deg);
+opacity: 0;
+}
+10% {
+opacity: 0.3;
+}
+90% {
+opacity: 0.3;
+}
+100% {
+transform: translateY(-100px) translateX(100px) rotate(360deg);
+opacity: 0;
+}
+}
+
+/* Container principal */
+.login-container {
+position: relative;
+z-index: 10;
+width: 100%;
+height: 100vh;
+display: flex;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+}
+
+/* Carte glassmorphism */
+.login-card {
+background: rgba(255, 255, 255, 0.15);
+backdrop-filter: blur(20px);
+border-radius: 30px;
+padding: 50px 40px;
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+border: 1px solid rgba(255, 255, 255, 0.2);
+min-width: 400px;
+animation: slideIn 0.6s ease-out;
+position: relative;
+overflow: hidden;
+}
+
+@keyframes slideIn {
+from {
+opacity: 0;
+transform: translateY(50px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+
+/* Effet brillant animé sur la carte */
+.login-card::before {
+content: ‘’;
+position: absolute;
+top: -50%;
+left: -50%;
+width: 200%;
+height: 200%;
+background: linear-gradient(
+45deg,
+transparent,
+rgba(255, 255, 255, 0.1),
+transparent
+);
+transform: rotate(45deg);
+animation: shine 3s infinite;
+}
+
+@keyframes shine {
+0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+/* Logo central */
+.logo-circle {
+width: 120px;
+height: 120px;
+border-radius: 50%;
+margin: 0 auto 30px;
+background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+border: 3px solid rgba(255, 255, 255, 0.4);
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 48px;
+animation: pulse 2s ease-in-out infinite;
+box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+position: relative;
+overflow: hidden;
+}
+
+.logo-circle img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+border-radius: 50%;
+}
+
+@keyframes pulse {
+0%, 100% {
+transform: scale(1);
+box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+}
+50% {
+transform: scale(1.05);
+box-shadow: 0 0 50px rgba(255, 255, 255, 0.5);
+}
+}
+
+h2 {
+text-align: center;
+color: white;
+font-size: 32px;
+margin-bottom: 10px;
+text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+font-weight: 300;
+letter-spacing: 2px;
+}
+
+.subtitle {
+text-align: center;
+color: rgba(255, 255, 255, 0.8);
+font-size: 14px;
+margin-bottom: 30px;
+font-weight: 300;
+}
+
+/* Inputs */
+.input-group {
+margin-bottom: 20px;
+position: relative;
+}
+
+.input-group input {
+width: 100%;
+padding: 15px 20px;
+border: 2px solid rgba(255, 255, 255, 0.3);
+border-radius: 15px;
+background: rgba(255, 255, 255, 0.1);
+color: white;
+font-size: 16px;
+outline: none;
+transition: all 0.3s ease;
+backdrop-filter: blur(10px);
+}
+
+.input-group input::placeholder {
+color: rgba(255, 255, 255, 0.6);
+}
+
+.input-group input:focus {
+border-color: rgba(255, 255, 255, 0.6);
+background: rgba(255, 255, 255, 0.2);
+box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+/* Photo preview */
+.photo-preview-container {
+display: flex;
+align-items: center;
+gap: 15px;
+margin-bottom: 20px;
+}
+
+#profilePreview {
+width: 60px;
+height: 60px;
+border-radius: 50%;
+border: 3px solid rgba(255, 255, 255, 0.4);
+object-fit: cover;
+display: none;
+animation: popIn 0.3s ease-out;
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes popIn {
+from {
+transform: scale(0);
+opacity: 0;
+}
+to {
+transform: scale(1);
+opacity: 1;
+}
+}
+
+/* Boutons */
+.btn {
+width: 100%;
+padding: 15px;
+border: none;
+border-radius: 15px;
+font-size: 16px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+margin-bottom: 12px;
+position: relative;
+overflow: hidden;
+letter-spacing: 1px;
+}
+
+.btn-primary {
+background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
+color: white;
+border: 2px solid rgba(255, 255, 255, 0.4);
+backdrop-filter: blur(10px);
+}
+
+.btn-primary:hover {
+transform: translateY(-2px);
+box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.3));
+}
+
+.btn-secondary {
+background: rgba(255, 255, 255, 0.1);
+color: white;
+border: 2px solid rgba(255, 255, 255, 0.3);
+backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+background: rgba(255, 255, 255, 0.2);
+transform: translateY(-2px);
+}
+
+/* Sélecteur de thème */
+.theme-selector {
+display: flex;
+gap: 12px;
+justify-content: center;
+margin-top: 25px;
+padding-top: 25px;
+border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-option {
+width: 40px;
+height: 40px;
+border-radius: 50%;
+cursor: pointer;
+border: 3px solid transparent;
+transition: all 0.3s ease;
+position: relative;
+}
+
+.theme-option:hover {
+transform: scale(1.1);
+box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.theme-option.active {
+border-color: white;
+box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+}
+
+.theme-pink { background: linear-gradient(135deg, #ff9a9e, #fecfef); }
+.theme-blue { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); }
+.theme-purple { background: linear-gradient(135deg, #667eea, #764ba2); }
+.theme-mint { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+
+/* Modal */
+.modal {
+display: none;
+position: fixed;
+inset: 0;
+background: rgba(0, 0, 0, 0.5);
+backdrop-filter: blur(10px);
+justify-content: center;
+align-items: center;
+z-index: 1000;
+animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+from { opacity: 0; }
+to { opacity: 1; }
+}
+
+.modal-content {
+background: rgba(255, 255, 255, 0.15);
+backdrop-filter: blur(20px);
+border-radius: 25px;
+padding: 40px;
+border: 1px solid rgba(255, 255, 255, 0.2);
+text-align: center;
+animation: slideIn 0.4s ease-out;
+min-width: 300px;
+}
+
+.modal-content h3 {
+color: white;
+font-size: 28px;
+margin-bottom: 15px;
+font-weight: 300;
+}
+
+.modal-content p {
+color: rgba(255, 255, 255, 0.9);
+margin-bottom: 25px;
+font-size: 16px;
+}
+
+/* Mini cercle propriétaire */
+#ownerPhoto {
+width: 45px;
+height: 45px;
+border-radius: 50%;
+position: fixed;
+top: 20px;
+right: 20px;
+z-index: 10000;
+border: 3px solid rgba(255, 255, 255, 0.6);
+box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+display: none;
+animation: popIn 0.5s ease-out;
+background: rgba(255, 255, 255, 0.2);
+object-fit: cover;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+.login-card {
+min-width: 90%;
+padding: 40px 30px;
+}
+}
+</style>
+
+</head>
+<body class="theme-purple">
+
+<!-- Fond de particules -->
+
+<div id="particles-bg"></div>
+
+<!-- Container principal -->
+
+<div class="login-container">
+  <div class="login-card">
+    <!-- Logo -->
+    <div class="logo-circle">
+      <img src="Photoroom_20260107_185314.png" alt="BubbleChat" onerror="this.style.display='none'; this.parentElement.innerHTML='💬'">
+    </div>
+
+```
+<h2>BubbleChat</h2>
+<p class="subtitle">Conversations flottantes dans l'espace</p>
+
+<!-- Photo preview -->
+<div class="photo-preview-container">
+  <img id="profilePreview" alt="Photo de profil">
+  <button class="btn btn-secondary" id="photoBtn">📷 Choisir une photo</button>
+</div>
+<input type="file" id="photoInput" accept="image/*" style="display:none;">
+
+<!-- Inputs -->
+<div class="input-group">
+  <input type="text" id="prenom" placeholder="✨ Votre prénom" required>
+</div>
+
+<div class="input-group">
+  <input type="password" id="password" placeholder="🔐 Mot de passe">
+</div>
+
+<!-- Bouton connexion -->
+<button class="btn btn-primary" id="connexionBtn">Se connecter</button>
+
+<!-- Sélecteur de thème -->
+<div class="theme-selector">
+  <div class="theme-option theme-pink" data-theme="pink" title="Rose pastel"></div>
+  <div class="theme-option theme-blue" data-theme="blue" title="Bleu ciel"></div>
+  <div class="theme-option theme-purple active" data-theme="purple" title="Violet galaxie"></div>
+  <div class="theme-option theme-mint" data-theme="mint" title="Menthe douce"></div>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- Mini cercle propriétaire -->
+
+<img id="ownerPhoto" src="" alt="Owner">
+
+<!-- Modal choix admin -->
+
+<div id="choiceModal" class="modal">
+  <div class="modal-content">
+    <h3>👋 Bonjour Steph !</h3>
+    <p>Choisissez votre espace :</p>
+    <button class="btn btn-primary" id="creationBtn">🎨 Création</button>
+    <button class="btn btn-secondary" id="visiteBtn">👀 Visite</button>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+// ====== Supabase config ======
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5aGJhbWRjeG1wdmV1ampxamxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3MDA1MjAsImV4cCI6MjA1MjI3NjUyMH0.dDZL8v7tB_-6BkhWoLuQUXo63QKP7WyO3DX6DlrJSVk"
+);
+
+// ====== Éléments DOM ======
+const photoBtn = document.getElementById('photoBtn');
+const photoInput = document.getElementById('photoInput');
+const profilePreview = document.getElementById('profilePreview');
+const prenomInput = document.getElementById('prenom');
+const ownerPhoto = document.getElementById('ownerPhoto');
+
+// ====== Génération particules flottantes ======
+function createParticles() {
+  const container = document.getElementById('particles-bg');
+  for(let i = 0; i < 20; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    const size = Math.random() * 60 + 20;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+    particle.style.animationDelay = Math.random() * 5 + 's';
+    container.appendChild(particle);
+  }
+}
+createParticles();
+
+// ====== Sélecteur de thème ======
+document.querySelectorAll('.theme-option').forEach(option => {
+  option.addEventListener('click', () => {
+    const theme = option.dataset.theme;
+    document.body.className = 'theme-' + theme;
+    document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
+    option.classList.add('active');
+    localStorage.setItem('theme', theme);
+  });
+});
+
+// Charger thème sauvegardé
+const savedTheme = localStorage.getItem('theme');
+if(savedTheme) {
+  document.body.className = 'theme-' + savedTheme;
+  document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
+  document.querySelector(`[data-theme="${savedTheme}"]`).classList.add('active');
+}
+
+// ====== Upload photo ======
+photoBtn.onclick = () => photoInput.click();
+
+photoInput.onchange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const prenom = prenomInput.value.trim();
+  if(!prenom) {
+    alert("⚠️ Veuillez saisir votre prénom avant de choisir une photo");
+    photoInput.value = '';
+    return;
+  }
+
+  // Afficher preview immédiatement
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    profilePreview.src = e.target.result;
+    profilePreview.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+
+  // Upload vers Supabase
+  const filePath = `profile_${Date.now()}_${file.name}`;
+  const { error: uploadError } = await supabase.storage.from('images').upload(filePath, file);
+  
+  if(uploadError) {
+    alert("❌ Erreur upload: " + uploadError.message);
+    return;
+  }
+
+  const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+  if(!data?.publicUrl) {
+    alert("❌ Impossible de récupérer l'URL de l'image");
+    return;
+  }
+
+  // Sauvegarder dans la base
+  await supabase.from('profiles')
+    .upsert({ prenom, photo_url: data.publicUrl }, { onConflict: 'prenom' });
+
+  ownerPhoto.src = data.publicUrl;
+  ownerPhoto.style.display = 'block';
+};
+
+// ====== Connexion ======
+document.getElementById('connexionBtn').onclick = async () => {
+  const prenom = prenomInput.value.trim();
+  const password = document.getElementById('password').value;
+
+  if(!prenom) {
+    alert("⚠️ Veuillez saisir votre prénom");
+    return;
+  }
+
+  // Admin spécial
+  if(prenom === "Steph" && password === "Steph1511") {
+    localStorage.setItem('prenom', prenom);
+    document.getElementById('choiceModal').style.display = 'flex';
+    return;
+  }
+
+  // Utilisateur normal : vérifier ou créer profil
+  const { data: existing } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('prenom', prenom)
+    .single();
+
+  if(!existing) {
+    // Nouveau utilisateur
+    const photoUrl = profilePreview.src || null;
+    await supabase.from('profiles').insert({ 
+      prenom, 
+      password,
+      photo_url: photoUrl,
+      is_online: true 
+    });
+  } else {
+    // Vérifier mot de passe
+    if(existing.password && existing.password !== password) {
+      alert("❌ Mot de passe incorrect");
+      return;
+    }
+    // Mettre en ligne
+    await supabase.from('profiles')
+      .update({ is_online: true })
+      .eq('prenom', prenom);
+  }
+
+  localStorage.setItem('prenom', prenom);
+  window.location.href = 'chat.html';
+};
+
+// ====== Modal admin ======
+document.getElementById('creationBtn').onclick = () => {
+  window.location.href = 'owner.html';
+};
+
+document.getElementById('visiteBtn').onclick = () => {
+  window.location.href = 'chat.html';
+};
+
+document.getElementById('choiceModal').onclick = (e) => {
+  if(e.target === document.getElementById('choiceModal')) {
+    document.getElementById('choiceModal').style.display = 'none';
+  }
+};
+</script>
+
+</body>
+</html>
