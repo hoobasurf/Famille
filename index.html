@@ -20,21 +20,44 @@ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 position: relative;
 }
 
-/* Thèmes de couleurs */
-body.theme-pink {
-background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff9a9e 100%);
+/* Thèmes de couleurs - TOUS LES THÈMES DU CHAT */
+body.theme-zen {
+background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%);
 }
 
-body.theme-blue {
-background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+body.theme-plage {
+background: linear-gradient(135deg, #ffd89b 0%, #f4a460 50%, #19547b 100%);
 }
 
-body.theme-purple {
+body.theme-foret {
+background: linear-gradient(135deg, #134e5e 0%, #3a7e6f 50%, #71b280 100%);
+}
+
+body.theme-futuriste {
 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-body.theme-mint {
-background: linear-gradient(135deg, #d299c2 0%, #fef9d7 50%, #a8edea 100%);
+body.theme-bonbon {
+background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff9a9e 100%);
+}
+
+body.theme-bar {
+background: linear-gradient(135deg, #2c003e 0%, #4b0082 50%, #8b008b 100%);
+}
+
+body.theme-chasse {
+background: linear-gradient(135deg, #3e2723 0%, #5d4037 50%, #795548 100%);
+}
+
+body.theme-aquarium {
+background: linear-gradient(135deg, #00416a 0%, #1976d2 33%, #4caf50 66%, #ffe000 100%);
+}
+
+/* Pour image personnalisée */
+body.custom-bg {
+background-size: cover !important;
+background-position: center !important;
+background-attachment: fixed !important;
 }
 
 /* Fond animé avec particules flottantes */
@@ -83,14 +106,14 @@ align-items: center;
 flex-direction: column;
 }
 
-/* Carte glassmorphism */
+/* Carte glassmorphism - PLUS TRANSPARENTE */
 .login-card {
-background: rgba(255, 255, 255, 0.15);
-backdrop-filter: blur(20px);
+background: rgba(255, 255, 255, 0.05);
+backdrop-filter: blur(30px);
 border-radius: 30px;
 padding: 50px 40px;
 box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-border: 1px solid rgba(255, 255, 255, 0.2);
+border: 1px solid rgba(255, 255, 255, 0.15);
 min-width: 400px;
 animation: slideIn 0.6s ease-out;
 position: relative;
@@ -119,7 +142,7 @@ height: 200%;
 background: linear-gradient(
 45deg,
 transparent,
-rgba(255, 255, 255, 0.1),
+rgba(255, 255, 255, 0.05),
 transparent
 );
 transform: rotate(45deg);
@@ -137,14 +160,14 @@ width: 120px;
 height: 120px;
 border-radius: 50%;
 margin: 0 auto 30px;
-background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
-border: 3px solid rgba(255, 255, 255, 0.4);
+background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+border: 3px solid rgba(255, 255, 255, 0.3);
 display: flex;
 align-items: center;
 justify-content: center;
 font-size: 48px;
 animation: pulse 2s ease-in-out infinite;
-box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
 position: relative;
 overflow: hidden;
 }
@@ -159,11 +182,11 @@ border-radius: 50%;
 @keyframes pulse {
 0%, 100% {
 transform: scale(1);
-box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
 }
 50% {
 transform: scale(1.05);
-box-shadow: 0 0 50px rgba(255, 255, 255, 0.5);
+box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
 }
 }
 
@@ -179,7 +202,7 @@ letter-spacing: 2px;
 
 .subtitle {
 text-align: center;
-color: rgba(255, 255, 255, 0.8);
+color: rgba(255, 255, 255, 0.9);
 font-size: 14px;
 margin-bottom: 30px;
 font-weight: 300;
@@ -194,9 +217,9 @@ position: relative;
 .input-group input {
 width: 100%;
 padding: 15px 20px;
-border: 2px solid rgba(255, 255, 255, 0.3);
+border: 2px solid rgba(255, 255, 255, 0.2);
 border-radius: 15px;
-background: rgba(255, 255, 255, 0.1);
+background: rgba(255, 255, 255, 0.05);
 color: white;
 font-size: 16px;
 outline: none;
@@ -209,12 +232,12 @@ color: rgba(255, 255, 255, 0.6);
 }
 
 .input-group input:focus {
-border-color: rgba(255, 255, 255, 0.6);
-background: rgba(255, 255, 255, 0.2);
+border-color: rgba(255, 255, 255, 0.5);
+background: rgba(255, 255, 255, 0.1);
 box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
-/* Photo preview */
+/* Photo preview - VISIBLE MAINTENANT */
 .photo-preview-container {
 display: flex;
 align-items: center;
@@ -228,9 +251,14 @@ height: 60px;
 border-radius: 50%;
 border: 3px solid rgba(255, 255, 255, 0.4);
 object-fit: cover;
-display: none;
 animation: popIn 0.3s ease-out;
 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+background: rgba(255, 255, 255, 0.1);
+flex-shrink: 0;
+}
+
+#profilePreview.hidden {
+display: none;
 }
 
 @keyframes popIn {
@@ -261,27 +289,27 @@ letter-spacing: 1px;
 }
 
 .btn-primary {
-background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
+background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
 color: white;
-border: 2px solid rgba(255, 255, 255, 0.4);
+border: 2px solid rgba(255, 255, 255, 0.3);
 backdrop-filter: blur(10px);
 }
 
 .btn-primary:hover {
 transform: translateY(-2px);
 box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.3));
+background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
 }
 
 .btn-secondary {
-background: rgba(255, 255, 255, 0.1);
+background: rgba(255, 255, 255, 0.05);
 color: white;
-border: 2px solid rgba(255, 255, 255, 0.3);
+border: 2px solid rgba(255, 255, 255, 0.2);
 backdrop-filter: blur(10px);
 }
 
 .btn-secondary:hover {
-background: rgba(255, 255, 255, 0.2);
+background: rgba(255, 255, 255, 0.15);
 transform: translateY(-2px);
 }
 
@@ -292,7 +320,7 @@ gap: 12px;
 justify-content: center;
 margin-top: 25px;
 padding-top: 25px;
-border-top: 1px solid rgba(255, 255, 255, 0.2);
+border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .theme-option {
@@ -315,18 +343,42 @@ border-color: white;
 box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
 }
 
-.theme-pink { background: linear-gradient(135deg, #ff9a9e, #fecfef); }
-.theme-blue { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); }
-.theme-purple { background: linear-gradient(135deg, #667eea, #764ba2); }
-.theme-mint { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+.theme-btn-custom {
+width: 40px;
+height: 40px;
+border-radius: 50%;
+border: 3px solid rgba(255, 255, 255, 0.4);
+background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 18px;
+transition: all 0.3s ease;
+position: relative;
+}
 
-/* Modal */
+.theme-btn-custom:hover {
+transform: scale(1.1);
+box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+border-color: white;
+}
+
+.theme-btn-custom input[type=“file”] {
+position: absolute;
+opacity: 0;
+width: 100%;
+height: 100%;
+cursor: pointer;
+}
+
+/* Modal - PLUS TRANSPARENTE */
 .modal {
 display: none;
 position: fixed;
 inset: 0;
-background: rgba(0, 0, 0, 0.5);
-backdrop-filter: blur(10px);
+background: rgba(0, 0, 0, 0.4);
+backdrop-filter: blur(15px);
 justify-content: center;
 align-items: center;
 z-index: 1000;
@@ -339,8 +391,8 @@ to { opacity: 1; }
 }
 
 .modal-content {
-background: rgba(255, 255, 255, 0.15);
-backdrop-filter: blur(20px);
+background: rgba(255, 255, 255, 0.08);
+backdrop-filter: blur(30px);
 border-radius: 25px;
 padding: 40px;
 border: 1px solid rgba(255, 255, 255, 0.2);
@@ -362,23 +414,6 @@ margin-bottom: 25px;
 font-size: 16px;
 }
 
-/* Mini cercle propriétaire */
-#ownerPhoto {
-width: 45px;
-height: 45px;
-border-radius: 50%;
-position: fixed;
-top: 20px;
-right: 20px;
-z-index: 10000;
-border: 3px solid rgba(255, 255, 255, 0.6);
-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-display: none;
-animation: popIn 0.5s ease-out;
-background: rgba(255, 255, 255, 0.2);
-object-fit: cover;
-}
-
 /* Responsive */
 @media (max-width: 500px) {
 .login-card {
@@ -389,7 +424,7 @@ padding: 40px 30px;
 </style>
 
 </head>
-<body class="theme-purple">
+<body class="theme-futuriste">
 
 <!-- Fond de particules -->
 
@@ -400,18 +435,15 @@ padding: 40px 30px;
 <div class="login-container">
   <div class="login-card">
     <!-- Logo -->
-    <div class="logo-circle">
-      <img src="Photoroom_20260107_185314.png" alt="BubbleChat" onerror="this.style.display='none'; this.parentElement.innerHTML='💬'">
+    <div class="logo-circle" id="logoCircle">
+      💬
     </div>
 
 ```
-<h2>BubbleChat</h2>
-<p class="subtitle">Conversations flottantes dans l'espace</p>
-
 <!-- Photo preview -->
 <div class="photo-preview-container">
-  <img id="profilePreview" alt="Photo de profil">
-  <button class="btn btn-secondary" id="photoBtn">📷 Choisir une photo</button>
+  <img id="profilePreview" alt="Photo de profil" class="hidden">
+  <button class="btn btn-secondary" id="photoBtn" style="width: auto; flex: 1;">📷 Choisir une photo</button>
 </div>
 <input type="file" id="photoInput" accept="image/*" style="display:none;">
 
@@ -429,19 +461,23 @@ padding: 40px 30px;
 
 <!-- Sélecteur de thème -->
 <div class="theme-selector">
-  <div class="theme-option theme-pink" data-theme="pink" title="Rose pastel"></div>
-  <div class="theme-option theme-blue" data-theme="blue" title="Bleu ciel"></div>
-  <div class="theme-option theme-purple active" data-theme="purple" title="Violet galaxie"></div>
-  <div class="theme-option theme-mint" data-theme="mint" title="Menthe douce"></div>
+  <div class="theme-option theme-zen" data-theme="zen" style="background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);" title="Zen"></div>
+  <div class="theme-option theme-plage" data-theme="plage" style="background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);" title="Plage"></div>
+  <div class="theme-option theme-foret" data-theme="foret" style="background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);" title="Forêt"></div>
+  <div class="theme-option theme-futuriste active" data-theme="futuriste" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="Futuriste"></div>
+  <div class="theme-option theme-bonbon" data-theme="bonbon" style="background: linear-gradient(135deg, #ffecd2 0%, #ff9a9e 100%);" title="Bonbon"></div>
+  <div class="theme-option theme-bar" data-theme="bar" style="background: linear-gradient(135deg, #2c003e 0%, #8b008b 100%);" title="Bar"></div>
+  <div class="theme-option theme-chasse" data-theme="chasse" style="background: linear-gradient(135deg, #3e2723 0%, #795548 100%);" title="Chasse"></div>
+  <div class="theme-option theme-aquarium" data-theme="aquarium" style="background: linear-gradient(135deg, #00416a 0%, #ffe000 100%);" title="Aquarium"></div>
+  <div class="theme-btn-custom" title="Photo personnalisée">
+    📷
+    <input type="file" id="customBgInput" accept="image/*">
+  </div>
 </div>
 ```
 
   </div>
 </div>
-
-<!-- Mini cercle propriétaire -->
-
-<img id="ownerPhoto" src="" alt="Owner">
 
 <!-- Modal choix admin -->
 
@@ -468,7 +504,6 @@ const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
 const profilePreview = document.getElementById('profilePreview');
 const prenomInput = document.getElementById('prenom');
-const ownerPhoto = document.getElementById('ownerPhoto');
 
 // ====== Génération particules flottantes ======
 function createParticles() {
@@ -503,7 +538,34 @@ const savedTheme = localStorage.getItem('theme');
 if(savedTheme) {
   document.body.className = 'theme-' + savedTheme;
   document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
-  document.querySelector(`[data-theme="${savedTheme}"]`).classList.add('active');
+  document.querySelector(`[data-theme="${savedTheme}"]`)?.classList.add('active');
+}
+
+// ====== Thème personnalisé (image de fond) ======
+const customBgInput = document.getElementById('customBgInput');
+if(customBgInput) {
+  customBgInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const imageUrl = e.target.result;
+      document.body.style.backgroundImage = `url(${imageUrl})`;
+      document.body.className = 'custom-bg';
+      document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
+      localStorage.setItem('customBg', imageUrl);
+      localStorage.setItem('theme', 'custom');
+    };
+    reader.readAsDataURL(file);
+  };
+}
+
+// Charger fond personnalisé si sauvegardé
+const savedCustomBg = localStorage.getItem('customBg');
+if(savedCustomBg && savedTheme === 'custom') {
+  document.body.style.backgroundImage = `url(${savedCustomBg})`;
+  document.body.className = 'custom-bg';
 }
 
 // ====== Upload photo ======
@@ -520,19 +582,27 @@ photoInput.onchange = async (e) => {
     return;
   }
 
-  // Afficher preview immédiatement
+  // Afficher dans le preview ET dans le logo
   const reader = new FileReader();
   reader.onload = (e) => {
-    profilePreview.src = e.target.result;
-    profilePreview.style.display = 'block';
+    const imageUrl = e.target.result;
+    profilePreview.src = imageUrl;
+    profilePreview.classList.remove('hidden');
+    
+    // Afficher dans le logo en haut
+    const logoCircle = document.getElementById('logoCircle');
+    logoCircle.innerHTML = `<img src="${imageUrl}" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
   };
   reader.readAsDataURL(file);
 
   // Upload vers Supabase
-  const filePath = `profile_${Date.now()}_${file.name}`;
-  const { error: uploadError } = await supabase.storage.from('images').upload(filePath, file);
+  const filePath = `profiles/${prenom}_${Date.now()}.${file.name.split('.').pop()}`;
+  const { error: uploadError } = await supabase.storage.from('images').upload(filePath, file, {
+    upsert: true
+  });
   
   if(uploadError) {
+    console.error("Erreur upload:", uploadError);
     alert("❌ Erreur upload: " + uploadError.message);
     return;
   }
@@ -543,12 +613,9 @@ photoInput.onchange = async (e) => {
     return;
   }
 
-  // Sauvegarder dans la base
-  await supabase.from('profiles')
-    .upsert({ prenom, photo_url: data.publicUrl }, { onConflict: 'prenom' });
-
-  ownerPhoto.src = data.publicUrl;
-  ownerPhoto.style.display = 'block';
+  // Sauvegarder l'URL pour l'utiliser lors de la connexion
+  localStorage.setItem('pendingPhotoUrl', data.publicUrl);
+  console.log("Photo uploadée:", data.publicUrl);
 };
 
 // ====== Connexion ======
@@ -575,9 +642,10 @@ document.getElementById('connexionBtn').onclick = async () => {
     .eq('prenom', prenom)
     .single();
 
+  const photoUrl = localStorage.getItem('pendingPhotoUrl') || profilePreview.src || null;
+
   if(!existing) {
     // Nouveau utilisateur
-    const photoUrl = profilePreview.src || null;
     await supabase.from('profiles').insert({ 
       prenom, 
       password,
@@ -590,13 +658,18 @@ document.getElementById('connexionBtn').onclick = async () => {
       alert("❌ Mot de passe incorrect");
       return;
     }
-    // Mettre en ligne
+    // Mettre à jour photo et status
     await supabase.from('profiles')
-      .update({ is_online: true })
+      .update({ 
+        is_online: true,
+        photo_url: photoUrl || existing.photo_url
+      })
       .eq('prenom', prenom);
   }
 
   localStorage.setItem('prenom', prenom);
+  localStorage.setItem('userPhotoUrl', photoUrl);
+  localStorage.removeItem('pendingPhotoUrl');
   window.location.href = 'chat.html';
 };
 
