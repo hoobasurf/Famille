@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BubbleChat - Conversations</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+font-family: ‘Segoe UI’, Tahoma, Geneva, Verdana, sans-serif;
+height: 100vh;
+overflow: hidden;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+position: relative;
+}
+
+/* Thèmes */
+body.theme-pink { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff9a9e 100%); }
+body.theme-blue { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+body.theme-purple { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+body.theme-mint { background: linear-gradient(135deg, #d299c2 0%, #fef9d7 50%, #a8edea 100%); }
+
+/* Fond avec particules */
+#particles-bg {
+position: absolute;
+width: 100%;
+height: 100%;
+overflow: hidden;
+z-index: 0;
+}
+
+.particle {
+position: absolute;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.08);
+animation: float linear infinite;
+backdrop-filter: blur(2px);
+}
+
+@keyframes float {
+0% {
+transform: translateY(100vh) translateX(0) rotate(0deg);
+opacity: 0;
+}
+10% { opacity: 0.4; }
+90% { opacity: 0.4; }
+100% {
+transform: translateY(-100px) translateX(100px) rotate(360deg);
+opacity: 0;
+}
+}
+
+/* Container principal */
+.chat-container {
+position: relative;
+z-index: 10;
+width: 100%;
+height: 100vh;
+display: grid;
+grid-template-columns: 300px 1fr;
+gap: 0;
+}
+
+/* SIDEBAR - Liste utilisateurs */
+.sidebar {
+background: rgba(255, 255, 255, 0.1);
+backdrop-filter: blur(20px);
+border-right: 1px solid rgba(255, 255, 255, 0.2);
+display: flex;
+flex-direction: column;
+overflow: hidden;
+}
+
+.sidebar-header {
+padding: 25px 20px;
+border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-header h2 {
+color: white;
+font-size: 24px;
+font-weight: 300;
+letter-spacing: 1px;
+margin-bottom: 10px;
+}
+
+.current-user {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-top: 15px;
+padding: 12px;
+background: rgba(255, 255, 255, 0.1);
+border-radius: 15px;
+}
+
+.current-user img {
+width: 45px;
+height: 45px;
+border-radius: 50%;
+border: 2px solid rgba(255, 255, 255, 0.5);
+object-fit: cover;
+}
+
+.current-user-info {
+flex: 1;
+}
+
+.current-user-name {
+color: white;
+font-weight: 600;
+font-size: 15px;
+}
+
+.current-user-status {
+color: rgba(255, 255, 255, 0.7);
+font-size: 12px;
+display: flex;
+align-items: center;
+gap: 5px;
+}
+
+.status-dot {
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background: #4ade80;
+animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.5; }
+}
+
+/* Liste utilisateurs */
+.users-list {
+flex: 1;
+overflow-y: auto;
+padding: 15px;
+}
+
+.users-list::-webkit-scrollbar {
+width: 6px;
+}
+
+.users-list::-webkit-scrollbar-thumb {
+background: rgba(255, 255, 255, 0.3);
+border-radius: 10px;
+}
+
+.user-item {
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 12px;
+margin-bottom: 8px;
+background: rgba(255, 255, 255, 0.08);
+border-radius: 15px;
+cursor: pointer;
+transition: all 0.3s ease;
+position: relative;
+}
+
+.user-item:hover {
+background: rgba(255, 255, 255, 0.15);
+transform: translateX(5px);
+}
+
+.user-avatar {
+width: 45px;
+height: 45px;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.2);
+object-fit: cover;
+border: 2px solid rgba(255, 255, 255, 0.4);
+position: relative;
+}
+
+.online-indicator {
+position: absolute;
+bottom: 2px;
+right: 2px;
+width: 12px;
+height: 12px;
+border-radius: 50%;
+border: 2px solid white;
+}
+
+.online-indicator.online {
+background: #4ade80;
+}
+
+.online-indicator.offline {
+background: #ef4444;
+}
+
+.user-info {
+flex: 1;
+}
+
+.user-name {
+color: white;
+font-weight: 500;
+font-size: 15px;
+}
+
+.user-status-text {
+color: rgba(255, 255, 255, 0.6);
+font-size: 12px;
+}
+
+/* ZONE CHAT */
+.chat-area {
+display: flex;
+flex-direction: column;
+background: rgba(0, 0, 0, 0.05);
+}
+
+.chat-header {
+padding: 25px 30px;
+background: rgba(255, 255, 255, 0.1);
+backdrop-filter: blur(20px);
+border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.chat-title {
+color: white;
+font-size: 22px;
+font-weight: 300;
+letter-spacing: 1px;
+}
+
+.chat-actions {
+display: flex;
+gap: 10px;
+}
+
+.theme-btn {
+width: 35px;
+height: 35px;
+border-radius: 50%;
+border: 2px solid rgba(255, 255, 255, 0.3);
+cursor: pointer;
+transition: all 0.3s ease;
+}
+
+.theme-btn:hover {
+transform: scale(1.1);
+box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.theme-btn.active {
+border-color: white;
+box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+}
+
+/* Messages - Bulles flottantes */
+.messages-container {
+flex: 1;
+overflow-y: auto;
+padding: 30px;
+display: flex;
+flex-direction: column;
+gap: 20px;
+}
+
+.messages-container::-webkit-scrollbar {
+width: 8px;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+background: rgba(255, 255, 255, 0.3);
+border-radius: 10px;
+}
+
+.message-bubble {
+max-width: 60%;
+padding: 18px 22px;
+border-radius: 25px;
+background: rgba(255, 255, 255, 0.15);
+backdrop-filter: blur(20px);
+border: 1px solid rgba(255, 255, 255, 0.2);
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+animation: bubbleIn 0.4s ease-out;
+position: relative;
+word-wrap: break-word;
+}
+
+@keyframes bubbleIn {
+from {
+opacity: 0;
+transform: scale(0.8) translateY(20px);
+}
+to {
+opacity: 1;
+transform: scale(1) translateY(0);
+}
+}
+
+.message-bubble.own {
+align-self: flex-end;
+background: rgba(255, 255, 255, 0.25);
+border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.message-bubble.other {
+align-self: flex-start;
+}
+
+.message-header {
+display: flex;
+align-items: center;
+gap: 10px;
+margin-bottom: 8px;
+}
+
+.message-avatar {
+width: 30px;
+height: 30px;
+border-radius: 50%;
+border: 2px solid rgba(255, 255, 255, 0.4);
+object-fit: cover;
+}
+
+.message-sender {
+color: white;
+font-weight: 600;
+font-size: 14px;
+text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.message-text {
+color: white;
+font-size: 15px;
+line-height: 1.5;
+margin-bottom: 6px;
+}
+
+.message-time {
+color: rgba(255, 255, 255, 0.6);
+font-size: 11px;
+text-align: right;
+}
+
+/* Zone de saisie */
+.input-area {
+padding: 20px 30px;
+background: rgba(255, 255, 255, 0.1);
+backdrop-filter: blur(20px);
+border-top: 1px solid rgba(255, 255, 255, 0.2);
+display: flex;
+gap: 15px;
+align-items: center;
+}
+
+#messageInput {
+flex: 1;
+padding: 15px 20px;
+border: 2px solid rgba(255, 255, 255, 0.3);
+border-radius: 25px;
+background: rgba(255, 255, 255, 0.1);
+color: white;
+font-size: 15px;
+outline: none;
+transition: all 0.3s ease;
+backdrop-filter: blur(10px);
+}
+
+#messageInput::placeholder {
+color: rgba(255, 255, 255, 0.5);
+}
+
+#messageInput:focus {
+border-color: rgba(255, 255, 255, 0.5);
+background: rgba(255, 255, 255, 0.15);
+box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+#sendBtn {
+padding: 15px 30px;
+border: none;
+border-radius: 25px;
+background: rgba(255, 255, 255, 0.25);
+color: white;
+font-size: 15px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+backdrop-filter: blur(10px);
+border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+#sendBtn:hover {
+background: rgba(255, 255, 255, 0.35);
+transform: translateY(-2px);
+box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+#sendBtn:active {
+transform: translateY(0);
+}
+
+/* Bouton déconnexion */
+.logout-btn {
+position: fixed;
+top: 20px;
+right: 20px;
+padding: 10px 20px;
+background: rgba(239, 68, 68, 0.2);
+border: 2px solid rgba(239, 68, 68, 0.5);
+border-radius: 20px;
+color: white;
+cursor: pointer;
+backdrop-filter: blur(10px);
+transition: all 0.3s ease;
+z-index: 1000;
+font-weight: 600;
+}
+
+.logout-btn:hover {
+background: rgba(239, 68, 68, 0.4);
+transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+.chat-container {
+grid-template-columns: 1fr;
+}
+
+.sidebar {
+display: none;
+}
+
+.message-bubble {
+max-width: 80%;
+}
+}
+</style>
+
+</head>
+<body class="theme-purple">
+
+<!-- Particules de fond -->
+
+<div id="particles-bg"></div>
+
+<!-- Bouton déconnexion -->
+
+<button class="logout-btn" id="logoutBtn">🚪 Déconnexion</button>
+
+<!-- Container principal -->
+
+<div class="chat-container">
+
+  <!-- SIDEBAR -->
+
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>💬 BubbleChat</h2>
+
+```
+  <!-- Utilisateur actuel -->
+  <div class="current-user">
+    <img id="currentUserPhoto" src="" alt="Vous" onerror="this.style.display='none'">
+    <div class="current-user-info">
+      <div class="current-user-name" id="currentUserName">Vous</div>
+      <div class="current-user-status">
+        <span class="status-dot"></span>
+        En ligne
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Liste des utilisateurs -->
+<div class="users-list" id="usersList">
+  <!-- Rempli dynamiquement -->
+</div>
+```
+
+  </div>
+
+  <!-- ZONE DE CHAT -->
+
+  <div class="chat-area">
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="chat-title">✨ Conversations flottantes</div>
+
+```
+  <!-- Sélecteur de thème -->
+  <div class="chat-actions">
+    <div class="theme-btn theme-pink" data-theme="pink" title="Rose pastel" style="background: linear-gradient(135deg, #ff9a9e, #fecfef);"></div>
+    <div class="theme-btn theme-blue" data-theme="blue" title="Bleu ciel" style="background: linear-gradient(135deg, #a1c4fd, #c2e9fb);"></div>
+    <div class="theme-btn theme-purple active" data-theme="purple" title="Violet galaxie" style="background: linear-gradient(135deg, #667eea, #764ba2);"></div>
+    <div class="theme-btn theme-mint" data-theme="mint" title="Menthe douce" style="background: linear-gradient(135deg, #a8edea, #fed6e3);"></div>
+  </div>
+</div>
+
+<!-- Messages -->
+<div class="messages-container" id="messagesContainer">
+  <!-- Messages remplis dynamiquement -->
+</div>
+
+<!-- Zone de saisie -->
+<div class="input-area">
+  <input type="text" id="messageInput" placeholder="💭 Écrivez votre message..." maxlength="500">
+  <button id="sendBtn">Envoyer 🚀</button>
+</div>
+```
+
+  </div>
+
+</div>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+// ====== Supabase config ======
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5aGJhbWRjeG1wdmV1ampxamxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3MDA1MjAsImV4cCI6MjA1MjI3NjUyMH0.dDZL8v7tB_-6BkhWoLuQUXo63QKP7WyO3DX6DlrJSVk"
+);
+
+// ====== Variables globales ======
+const currentUser = localStorage.getItem('prenom');
+if(!currentUser) {
+  window.location.href = 'index.html';
+}
+
+document.getElementById('currentUserName').textContent = currentUser;
+
+// ====== Générer particules ======
+function createParticles() {
+  const container = document.getElementById('particles-bg');
+  for(let i = 0; i < 25; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    const size = Math.random() * 80 + 30;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDuration = (Math.random() * 15 + 20) + 's';
+    particle.style.animationDelay = Math.random() * 5 + 's';
+    container.appendChild(particle);
+  }
+}
+createParticles();
+
+// ====== Thèmes ======
+document.querySelectorAll('.theme-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const theme = btn.dataset.theme;
+    document.body.className = 'theme-' + theme;
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    localStorage.setItem('theme', theme);
+  });
+});
+
+// Charger thème
+const savedTheme = localStorage.getItem('theme') || 'purple';
+document.body.className = 'theme-' + savedTheme;
+document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+document.querySelector(`[data-theme="${savedTheme}"]`)?.classList.add('active');
+
+// ====== Charger photo utilisateur ======
+async function loadCurrentUserPhoto() {
+  const { data } = await supabase
+    .from('profiles')
+    .select('photo_url')
+    .eq('prenom', currentUser)
+    .single();
+  
+  if(data?.photo_url) {
+    document.getElementById('currentUserPhoto').src = data.photo_url;
+    document.getElementById('currentUserPhoto').style.display = 'block';
+  }
+}
+loadCurrentUserPhoto();
+
+// ====== Charger liste utilisateurs ======
+async function loadUsers() {
+  const { data: users } = await supabase
+    .from('profiles')
+    .select('*')
+    .order('is_online', { ascending: false });
+
+  const usersList = document.getElementById('usersList');
+  usersList.innerHTML = '';
+
+  users?.forEach(user => {
+    if(user.prenom === currentUser) return; // Ne pas afficher soi-même
+
+    const userItem = document.createElement('div');
+    userItem.className = 'user-item';
+    
+    const statusClass = user.is_online ? 'online' : 'offline';
+    const statusText = user.is_online ? 'En ligne' : 'Hors ligne';
+    
+    userItem.innerHTML = `
+      <div style="position: relative;">
+        <img class="user-avatar" src="${user.photo_url || ''}" alt="${user.prenom}" 
+             onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=user-avatar></div>'">
+        <div class="online-indicator ${statusClass}"></div>
+      </div>
+      <div class="user-info">
+        <div class="user-name">${user.prenom}</div>
+        <div class="user-status-text">${statusText}</div>
+      </div>
+    `;
+    
+    usersList.appendChild(userItem);
+  });
+}
+
+// ====== Charger messages ======
+async function loadMessages() {
+  const { data: messages } = await supabase
+    .from('messages')
+    .select('*, profiles(photo_url)')
+    .order('created_at', { ascending: true });
+
+  const container = document.getElementById('messagesContainer');
+  container.innerHTML = '';
+
+  messages?.forEach(msg => {
+    const isOwn = msg.prenom === currentUser;
+    const bubble = document.createElement('div');
+    bubble.className = `message-bubble ${isOwn ? 'own' : 'other'}`;
+    
+    const time = new Date(msg.created_at).toLocaleTimeString('fr-FR', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+
+    bubble.innerHTML = `
+      ${!isOwn ? `
+        <div class="message-header">
+          <img class="message-avatar" src="${msg.profiles?.photo_url || ''}" alt="${msg.prenom}" 
+               onerror="this.style.display='none'">
+          <div class="message-sender">${msg.prenom}</div>
+        </div>
+      ` : ''}
+      <div class="message-text">${msg.message}</div>
+      <div class="message-time">${time}</div>
+    `;
+    
+    container.appendChild(bubble);
+  });
+
+  // Scroll vers le bas
+  container.scrollTop = container.scrollHeight;
+}
+
+// ====== Envoyer message ======
+async function sendMessage() {
+  const input = document.getElementById('messageInput');
+  const message = input.value.trim();
+  
+  if(!message) return;
+
+  await supabase.from('messages').insert({
+    prenom: currentUser,
+    message: message
+  });
+
+  input.value = '';
+  loadMessages();
+}
+
+document.getElementById('sendBtn').onclick = sendMessage;
+document.getElementById('messageInput').onkeypress = (e) => {
+  if(e.key === 'Enter') sendMessage();
+};
+
+// ====== Mise à jour temps réel ======
+// Abonnement aux nouveaux messages
+supabase
+  .channel('messages')
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
+    loadMessages();
+  })
+  .subscribe();
+
+// Abonnement aux changements de statut
+supabase
+  .channel('profiles')
+  .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, () => {
+    loadUsers();
+  })
+  .subscribe();
+
+// ====== Mettre utilisateur en ligne ======
+async function setOnlineStatus(isOnline) {
+  await supabase
+    .from('profiles')
+    .update({ is_online: isOnline })
+    .eq('prenom', currentUser);
+  
+  if(isOnline) loadUsers();
+}
+
+setOnlineStatus(true);
+
+// ====== Déconnexion ======
+document.getElementById('logoutBtn').onclick = async () => {
+  await setOnlineStatus(false);
+  localStorage.removeItem('prenom');
+  window.location.href = 'index.html';
+};
+
+// Détecter fermeture de page
+window.addEventListener('beforeunload', () => {
+  setOnlineStatus(false);
+});
+
+// ====== Chargement initial ======
+loadUsers();
+loadMessages();
+</script>
+
+</body>
+</html>
