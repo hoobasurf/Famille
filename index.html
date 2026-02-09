@@ -272,6 +272,40 @@ opacity: 1;
 }
 }
 
+/* BOUTON PHOTO ROSE NÉON FUTURISTE */
+.photo-btn-neon {
+background: linear-gradient(135deg, #ff6b9d 0%, #c06fff 100%);
+border: none;
+color: white;
+padding: 12px 20px;
+border-radius: 15px;
+font-size: 16px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+box-shadow: 0 0 20px rgba(255, 107, 157, 0.5), 0 0 40px rgba(192, 111, 255, 0.3);
+display: flex;
+align-items: center;
+gap: 10px;
+justify-content: center;
+flex: 1;
+animation: neonPulse 2s ease-in-out infinite;
+}
+
+.photo-btn-neon:hover {
+transform: translateY(-3px);
+box-shadow: 0 0 30px rgba(255, 107, 157, 0.8), 0 0 60px rgba(192, 111, 255, 0.5);
+}
+
+@keyframes neonPulse {
+0%, 100% {
+box-shadow: 0 0 20px rgba(255, 107, 157, 0.5), 0 0 40px rgba(192, 111, 255, 0.3);
+}
+50% {
+box-shadow: 0 0 30px rgba(255, 107, 157, 0.8), 0 0 60px rgba(192, 111, 255, 0.5);
+}
+}
+
 /* Boutons */
 .btn {
 width: 100%;
@@ -362,25 +396,27 @@ border-color: white;
 box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
 }
 
+/* BOUTON PERSONNALISÉ ROSE NÉON AUSSI */
 .theme-btn-custom {
 width: 50px;
 height: 50px;
 border-radius: 50%;
-border: 3px solid rgba(255, 255, 255, 0.4);
-background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
+border: 3px solid rgba(255, 107, 157, 0.6);
+background: linear-gradient(135deg, #ff6b9d 0%, #c06fff 100%);
 cursor: pointer;
 display: flex;
 align-items: center;
 justify-content: center;
-font-size: 20px;
+font-size: 22px;
 transition: all 0.3s ease;
 position: relative;
 flex-shrink: 0;
+box-shadow: 0 0 15px rgba(255, 107, 157, 0.4);
 }
 
 .theme-btn-custom:hover {
 transform: scale(1.1);
-box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+box-shadow: 0 0 25px rgba(255, 107, 157, 0.7);
 border-color: white;
 }
 
@@ -463,7 +499,10 @@ padding: 40px 30px;
 <!-- Photo preview -->
 <div class="photo-preview-container">
   <img id="profilePreview" alt="Photo de profil" class="hidden">
-  <button class="btn btn-secondary" id="photoBtn" style="width: auto; flex: 1;">📷 Choisir une photo</button>
+  <button class="photo-btn-neon" id="photoBtn">
+    <span>✨</span>
+    <span>Ajouter Photo</span>
+  </button>
 </div>
 <input type="file" id="photoInput" accept="image/*" style="display:none;">
 
@@ -490,7 +529,7 @@ padding: 40px 30px;
   <div class="theme-option theme-chasse" data-theme="chasse" style="background: linear-gradient(135deg, #3e2723 0%, #795548 100%);" title="Chasse"></div>
   <div class="theme-option theme-aquarium" data-theme="aquarium" style="background: linear-gradient(135deg, #00416a 0%, #ffe000 100%);" title="Aquarium"></div>
   <div class="theme-btn-custom" title="Photo personnalisée">
-    📷
+    🌌
     <input type="file" id="customBgInput" accept="image/*">
   </div>
 </div>
@@ -515,8 +554,8 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 // ====== Supabase config ======
 const supabase = createClient(
-  "https://eeikriwrwuynwpzodbbt.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWtyaXdyd3V5bndwem9kYmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzQ3NjYsImV4cCI6MjA4NjE1MDc2Nn0.MJ6CSmrttEWcrdfy5C7nP4sE_pe19sGNE-WasASPDNc"
+  "https://lgduavepbznnzjfxlsnx.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxnZHVhdmVwYnpubnpqZnhsc254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NzgyODcsImV4cCI6MjA4NjA1NDI4N30.6yAmtLvG0t7ne3sV2DXMbsCfcK8JVAi5NujZsQUJ_Tk"
 );
 
 // ====== Éléments DOM ======
@@ -595,23 +634,20 @@ photoInput.onchange = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  // Afficher dans le preview ET dans le logo (SANS vérifier le prénom)
+  // Afficher dans le preview ET dans le logo
   const reader = new FileReader();
   reader.onload = (e) => {
     const imageUrl = e.target.result;
     profilePreview.src = imageUrl;
     profilePreview.classList.remove('hidden');
     
-    // Afficher dans le logo en haut
     const logoCircle = document.getElementById('logoCircle');
     logoCircle.innerHTML = `<img src="${imageUrl}" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
     
-    // Sauvegarder temporairement
     localStorage.setItem('tempPhotoPreview', imageUrl);
   };
   reader.readAsDataURL(file);
 
-  // Upload vers Supabase seulement si prénom est saisi
   const prenom = prenomInput.value.trim();
   if(!prenom) {
     console.log("Photo sélectionnée, en attente du prénom pour l'upload");
@@ -636,7 +672,6 @@ photoInput.onchange = async (e) => {
     return;
   }
 
-  // Sauvegarder l'URL pour l'utiliser lors de la connexion
   localStorage.setItem('pendingPhotoUrl', data.publicUrl);
   console.log("Photo uploadée:", data.publicUrl);
 };
@@ -693,6 +728,8 @@ document.getElementById('connexionBtn').onclick = async () => {
   localStorage.setItem('prenom', prenom);
   localStorage.setItem('userPhotoUrl', photoUrl);
   localStorage.removeItem('pendingPhotoUrl');
+  
+  // ✅ REDIRECTION CORRIGÉE VERS CHAT.HTML
   window.location.href = 'chat.html';
 };
 
