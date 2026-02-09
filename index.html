@@ -18,39 +18,109 @@ height: 100vh;
 overflow: hidden;
 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 position: relative;
+transition: background 0.5s ease;
 }
 
-/* Thèmes de couleurs - TOUS LES THÈMES DU CHAT */
-body.theme-zen {
-background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%);
+/* ========== 20 THÈMES DE COULEURS STYLÉS ========== */
+
+/* 1. Aquarium Bleu */
+body.theme-aquarium {
+background: linear-gradient(135deg, #0077be 0%, #00a8e8 50%, #4dd2ff 100%);
 }
 
-body.theme-plage {
-background: linear-gradient(135deg, #ffd89b 0%, #f4a460 50%, #19547b 100%);
+/* 2. Jaune Électrique */
+body.theme-yellow {
+background: linear-gradient(135deg, #f4d03f 0%, #ffd700 50%, #ffed4e 100%);
 }
 
-body.theme-foret {
-background: linear-gradient(135deg, #134e5e 0%, #3a7e6f 50%, #71b280 100%);
+/* 3. Vert Forêt */
+body.theme-green {
+background: linear-gradient(135deg, #0b6623 0%, #228b22 50%, #7cfc00 100%);
 }
 
-body.theme-futuriste {
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* 4. Violet Futuriste */
+body.theme-violet {
+background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #b06ab3 100%);
 }
 
-body.theme-bonbon {
+/* 5. Rouge Iron Man */
+body.theme-ironman {
+background: linear-gradient(135deg, #8b0000 0%, #dc143c 50%, #ff6347 100%);
+}
+
+/* 6. Orange Savane Coucher de Soleil */
+body.theme-savane {
+background: linear-gradient(135deg, #ff4500 0%, #ff8c00 50%, #ffa500 100%);
+}
+
+/* 7. Rose Néon */
+body.theme-pink {
+background: linear-gradient(135deg, #ff1493 0%, #ff69b4 50%, #ffb6c1 100%);
+}
+
+/* 8. Cyan Glacial */
+body.theme-cyan {
+background: linear-gradient(135deg, #00ced1 0%, #40e0d0 50%, #afeeee 100%);
+}
+
+/* 9. Or Luxe */
+body.theme-gold {
+background: linear-gradient(135deg, #b8860b 0%, #daa520 50%, #ffd700 100%);
+}
+
+/* 10. Émeraude Profond */
+body.theme-emerald {
+background: linear-gradient(135deg, #134e5e 0%, #3a7e6f 50%, #50c878 100%);
+}
+
+/* 11. Pêche Pastel */
+body.theme-peach {
 background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff9a9e 100%);
 }
 
-body.theme-bar {
-background: linear-gradient(135deg, #2c003e 0%, #4b0082 50%, #8b008b 100%);
+/* 12. Blanc Pur */
+body.theme-white {
+background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #e0e0e0 100%);
 }
 
-body.theme-chasse {
-background: linear-gradient(135deg, #3e2723 0%, #5d4037 50%, #795548 100%);
+/* 13. Brun Chocolat */
+body.theme-brown {
+background: linear-gradient(135deg, #3e2723 0%, #5d4037 50%, #8d6e63 100%);
 }
 
-body.theme-aquarium {
-background: linear-gradient(135deg, #00416a 0%, #1976d2 33%, #4caf50 66%, #ffe000 100%);
+/* 14. Lime Acide */
+body.theme-lime {
+background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 50%, #00ff00 100%);
+}
+
+/* 15. Indigo Mystique */
+body.theme-indigo {
+background: linear-gradient(135deg, #2c003e 0%, #4b0082 50%, #9370db 100%);
+}
+
+/* 16. Turquoise Tropical */
+body.theme-turquoise {
+background: linear-gradient(135deg, #17a2b8 0%, #1dd1a1 50%, #54e8d4 100%);
+}
+
+/* 17. Magenta Vibrant */
+body.theme-magenta {
+background: linear-gradient(135deg, #c71585 0%, #ff00ff 50%, #ee82ee 100%);
+}
+
+/* 18. Argent Métallique */
+body.theme-silver {
+background: linear-gradient(135deg, #708090 0%, #c0c0c0 50%, #dcdcdc 100%);
+}
+
+/* 19. Corail Océan */
+body.theme-coral {
+background: linear-gradient(135deg, #ff6b6b 0%, #ff7f50 50%, #ffa07a 100%);
+}
+
+/* 20. Noir Espace */
+body.theme-black {
+background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #333333 100%);
 }
 
 /* Pour image personnalisée */
@@ -60,7 +130,7 @@ background-position: center !important;
 background-attachment: fixed !important;
 }
 
-/* Fond animé avec particules flottantes */
+/* ========== CONTENEUR ANIMATIONS ========== */
 #particles-bg {
 position: absolute;
 width: 100%;
@@ -69,6 +139,9 @@ overflow: hidden;
 z-index: 0;
 }
 
+/* ========== ANIMATIONS COMMUNES ========== */
+
+/* Particules flottantes */
 .particle {
 position: absolute;
 border-radius: 50%;
@@ -94,6 +167,133 @@ opacity: 0;
 }
 }
 
+/* Bulles d’aquarium */
+.bubble {
+position: absolute;
+border-radius: 50%;
+background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(100, 200, 255, 0.3));
+animation: bubbleRise linear infinite;
+box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes bubbleRise {
+0% {
+transform: translateY(100vh) translateX(0) scale(0.5);
+opacity: 0;
+}
+10% {
+opacity: 0.7;
+}
+90% {
+opacity: 0.7;
+}
+100% {
+transform: translateY(-100px) translateX(50px) scale(1.2);
+opacity: 0;
+}
+}
+
+/* Éléments qui marchent/volent */
+.moving-element {
+position: absolute;
+font-size: 60px;
+animation: moveAcross linear infinite;
+opacity: 0.6;
+}
+
+@keyframes moveAcross {
+0% {
+transform: translateX(-100px) scaleX(1);
+}
+48% {
+transform: translateX(calc(100vw + 100px)) scaleX(1);
+}
+50% {
+transform: translateX(calc(100vw + 100px)) scaleX(-1);
+}
+98% {
+transform: translateX(-100px) scaleX(-1);
+}
+100% {
+transform: translateX(-100px) scaleX(1);
+}
+}
+
+/* Étoiles filantes */
+.star {
+position: absolute;
+width: 2px;
+height: 2px;
+background: white;
+border-radius: 50%;
+box-shadow: 0 0 10px white, 0 0 20px white;
+animation: shootingStar linear infinite;
+}
+
+@keyframes shootingStar {
+0% {
+transform: translateX(0) translateY(0);
+opacity: 1;
+}
+100% {
+transform: translateX(200px) translateY(200px);
+opacity: 0;
+}
+}
+
+/* Balancement */
+.swaying {
+position: absolute;
+animation: sway ease-in-out infinite;
+}
+
+@keyframes sway {
+0%, 100% {
+transform: rotate(-5deg);
+}
+50% {
+transform: rotate(5deg);
+}
+}
+
+/* Pluie/neige qui tombe */
+.falling {
+position: absolute;
+animation: fall linear infinite;
+}
+
+@keyframes fall {
+0% {
+transform: translateY(-50px);
+opacity: 0;
+}
+10% {
+opacity: 0.8;
+}
+90% {
+opacity: 0.8;
+}
+100% {
+transform: translateY(100vh);
+opacity: 0;
+}
+}
+
+/* Rotation */
+.rotating {
+position: absolute;
+animation: rotate linear infinite;
+}
+
+@keyframes rotate {
+0% {
+transform: rotate(0deg);
+}
+100% {
+transform: rotate(360deg);
+}
+}
+
 /* Container principal */
 .login-container {
 position: relative;
@@ -106,7 +306,7 @@ align-items: center;
 flex-direction: column;
 }
 
-/* Carte glassmorphism - PLUS TRANSPARENTE */
+/* Carte glassmorphism */
 .login-card {
 background: rgba(255, 255, 255, 0.05);
 backdrop-filter: blur(30px);
@@ -190,24 +390,6 @@ box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
 }
 }
 
-h2 {
-text-align: center;
-color: white;
-font-size: 32px;
-margin-bottom: 10px;
-text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-font-weight: 300;
-letter-spacing: 2px;
-}
-
-.subtitle {
-text-align: center;
-color: rgba(255, 255, 255, 0.9);
-font-size: 14px;
-margin-bottom: 30px;
-font-weight: 300;
-}
-
 /* Inputs */
 .input-group {
 margin-bottom: 20px;
@@ -237,49 +419,14 @@ background: rgba(255, 255, 255, 0.1);
 box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
-/* Photo preview - VISIBLE MAINTENANT */
-.photo-preview-container {
-display: flex;
-align-items: center;
-gap: 15px;
-margin-bottom: 20px;
-}
-
-#profilePreview {
-width: 60px;
-height: 60px;
-border-radius: 50%;
-border: 3px solid rgba(255, 255, 255, 0.4);
-object-fit: cover;
-animation: popIn 0.3s ease-out;
-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-background: rgba(255, 255, 255, 0.1);
-flex-shrink: 0;
-}
-
-#profilePreview.hidden {
-display: none;
-}
-
-@keyframes popIn {
-from {
-transform: scale(0);
-opacity: 0;
-}
-to {
-transform: scale(1);
-opacity: 1;
-}
-}
-
-/* BOUTON PHOTO ROSE NÉON FUTURISTE */
+/* BOUTON PHOTO ROSE NÉON - PLEINE LARGEUR */
 .photo-btn-neon {
 background: linear-gradient(135deg, #ff6b9d 0%, #c06fff 100%);
 border: none;
 color: white;
-padding: 12px 20px;
-border-radius: 15px;
-font-size: 16px;
+padding: 18px 20px;
+border-radius: 20px;
+font-size: 18px;
 font-weight: 600;
 cursor: pointer;
 transition: all 0.3s ease;
@@ -288,8 +435,9 @@ display: flex;
 align-items: center;
 gap: 10px;
 justify-content: center;
-flex: 1;
+width: 100%;
 animation: neonPulse 2s ease-in-out infinite;
+margin-bottom: 20px;
 }
 
 .photo-btn-neon:hover {
@@ -347,22 +495,21 @@ background: rgba(255, 255, 255, 0.15);
 transform: translateY(-2px);
 }
 
-/* Sélecteur de thème - EN BAS */
+/* Sélecteur de thème */
 .theme-selector {
-display: flex;
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
 gap: 12px;
-justify-content: flex-start;
 margin-top: 25px;
 padding-top: 25px;
 border-top: 1px solid rgba(255, 255, 255, 0.15);
-overflow-x: auto;
-overflow-y: hidden;
-max-width: 100%;
-padding-bottom: 10px;
+max-height: 280px;
+overflow-y: auto;
+padding-right: 10px;
 }
 
 .theme-selector::-webkit-scrollbar {
-height: 6px;
+width: 6px;
 }
 
 .theme-selector::-webkit-scrollbar-track {
@@ -376,30 +523,31 @@ border-radius: 10px;
 }
 
 .theme-option {
-width: 50px;
-height: 50px;
+width: 65px;
+height: 65px;
 border-radius: 50%;
 cursor: pointer;
 border: 3px solid transparent;
 transition: all 0.3s ease;
 position: relative;
-flex-shrink: 0;
+justify-self: center;
 }
 
 .theme-option:hover {
-transform: scale(1.1);
-box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+transform: scale(1.15);
+box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
 }
 
 .theme-option.active {
 border-color: white;
-box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+box-shadow: 0 0 30px rgba(255, 255, 255, 0.9);
+transform: scale(1.1);
 }
 
-/* BOUTON PERSONNALISÉ ROSE NÉON AUSSI */
+/* BOUTON PERSONNALISÉ AVEC INPUT FILE */
 .theme-btn-custom {
-width: 50px;
-height: 50px;
+width: 65px;
+height: 65px;
 border-radius: 50%;
 border: 3px solid rgba(255, 107, 157, 0.6);
 background: linear-gradient(135deg, #ff6b9d 0%, #c06fff 100%);
@@ -407,16 +555,16 @@ cursor: pointer;
 display: flex;
 align-items: center;
 justify-content: center;
-font-size: 22px;
+font-size: 28px;
 transition: all 0.3s ease;
 position: relative;
-flex-shrink: 0;
 box-shadow: 0 0 15px rgba(255, 107, 157, 0.4);
+justify-self: center;
 }
 
 .theme-btn-custom:hover {
-transform: scale(1.1);
-box-shadow: 0 0 25px rgba(255, 107, 157, 0.7);
+transform: scale(1.15);
+box-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
 border-color: white;
 }
 
@@ -428,7 +576,7 @@ height: 100%;
 cursor: pointer;
 }
 
-/* Modal - PLUS TRANSPARENTE */
+/* Modal */
 .modal {
 display: none;
 position: fixed;
@@ -476,13 +624,21 @@ font-size: 16px;
 min-width: 90%;
 padding: 40px 30px;
 }
+.theme-selector {
+grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
+gap: 10px;
+}
+.theme-option, .theme-btn-custom {
+width: 55px;
+height: 55px;
+}
 }
 </style>
 
 </head>
-<body class="theme-futuriste">
+<body class="theme-violet">
 
-<!-- Fond de particules -->
+<!-- Fond de particules/animations -->
 
 <div id="particles-bg"></div>
 
@@ -496,14 +652,11 @@ padding: 40px 30px;
     </div>
 
 ```
-<!-- Photo preview -->
-<div class="photo-preview-container">
-  <img id="profilePreview" alt="Photo de profil" class="hidden">
-  <button class="photo-btn-neon" id="photoBtn">
-    <span>✨</span>
-    <span>Ajouter Photo</span>
-  </button>
-</div>
+<!-- Bouton photo PLEINE LARGEUR -->
+<button class="photo-btn-neon" id="photoBtn">
+  <span>✨</span>
+  <span>Ajouter Photo</span>
+</button>
 <input type="file" id="photoInput" accept="image/*" style="display:none;">
 
 <!-- Inputs -->
@@ -518,17 +671,29 @@ padding: 40px 30px;
 <!-- Bouton connexion -->
 <button class="btn btn-primary" id="connexionBtn">Se connecter</button>
 
-<!-- Sélecteur de thème -->
+<!-- Sélecteur de thème - 20 COULEURS + PERSONNALISÉ -->
 <div class="theme-selector">
-  <div class="theme-option theme-zen" data-theme="zen" style="background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);" title="Zen"></div>
-  <div class="theme-option theme-plage" data-theme="plage" style="background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);" title="Plage"></div>
-  <div class="theme-option theme-foret" data-theme="foret" style="background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);" title="Forêt"></div>
-  <div class="theme-option theme-futuriste active" data-theme="futuriste" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="Futuriste"></div>
-  <div class="theme-option theme-bonbon" data-theme="bonbon" style="background: linear-gradient(135deg, #ffecd2 0%, #ff9a9e 100%);" title="Bonbon"></div>
-  <div class="theme-option theme-bar" data-theme="bar" style="background: linear-gradient(135deg, #2c003e 0%, #8b008b 100%);" title="Bar"></div>
-  <div class="theme-option theme-chasse" data-theme="chasse" style="background: linear-gradient(135deg, #3e2723 0%, #795548 100%);" title="Chasse"></div>
-  <div class="theme-option theme-aquarium" data-theme="aquarium" style="background: linear-gradient(135deg, #00416a 0%, #ffe000 100%);" title="Aquarium"></div>
-  <div class="theme-btn-custom" title="Photo personnalisée">
+  <div class="theme-option" data-theme="aquarium" style="background: linear-gradient(135deg, #0077be 0%, #4dd2ff 100%);" title="Aquarium 🐠"></div>
+  <div class="theme-option" data-theme="yellow" style="background: linear-gradient(135deg, #f4d03f 0%, #ffed4e 100%);" title="Jaune Électrique ⚡"></div>
+  <div class="theme-option" data-theme="green" style="background: linear-gradient(135deg, #0b6623 0%, #7cfc00 100%);" title="Vert Forêt 🌲"></div>
+  <div class="theme-option active" data-theme="violet" style="background: linear-gradient(135deg, #667eea 0%, #b06ab3 100%);" title="Violet Futuriste 🌌"></div>
+  <div class="theme-option" data-theme="ironman" style="background: linear-gradient(135deg, #8b0000 0%, #ff6347 100%);" title="Rouge Iron Man 🦾"></div>
+  <div class="theme-option" data-theme="savane" style="background: linear-gradient(135deg, #ff4500 0%, #ffa500 100%);" title="Orange Savane 🌅"></div>
+  <div class="theme-option" data-theme="pink" style="background: linear-gradient(135deg, #ff1493 0%, #ffb6c1 100%);" title="Rose Néon 💖"></div>
+  <div class="theme-option" data-theme="cyan" style="background: linear-gradient(135deg, #00ced1 0%, #afeeee 100%);" title="Cyan Glacial ❄️"></div>
+  <div class="theme-option" data-theme="gold" style="background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%);" title="Or Luxe 👑"></div>
+  <div class="theme-option" data-theme="emerald" style="background: linear-gradient(135deg, #134e5e 0%, #50c878 100%);" title="Émeraude 💎"></div>
+  <div class="theme-option" data-theme="peach" style="background: linear-gradient(135deg, #ffecd2 0%, #ff9a9e 100%);" title="Pêche Pastel 🍑"></div>
+  <div class="theme-option" data-theme="white" style="background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);" title="Blanc Pur ⚪"></div>
+  <div class="theme-option" data-theme="brown" style="background: linear-gradient(135deg, #3e2723 0%, #8d6e63 100%);" title="Brun Chocolat 🍫"></div>
+  <div class="theme-option" data-theme="lime" style="background: linear-gradient(135deg, #d4fc79 0%, #00ff00 100%);" title="Lime Acide 🟢"></div>
+  <div class="theme-option" data-theme="indigo" style="background: linear-gradient(135deg, #2c003e 0%, #9370db 100%);" title="Indigo Mystique 🔮"></div>
+  <div class="theme-option" data-theme="turquoise" style="background: linear-gradient(135deg, #17a2b8 0%, #54e8d4 100%);" title="Turquoise Tropical 🏝️"></div>
+  <div class="theme-option" data-theme="magenta" style="background: linear-gradient(135deg, #c71585 0%, #ee82ee 100%);" title="Magenta Vibrant 💜"></div>
+  <div class="theme-option" data-theme="silver" style="background: linear-gradient(135deg, #708090 0%, #dcdcdc 100%);" title="Argent Métallique 🤖"></div>
+  <div class="theme-option" data-theme="coral" style="background: linear-gradient(135deg, #ff6b6b 0%, #ffa07a 100%);" title="Corail Océan 🪸"></div>
+  <div class="theme-option" data-theme="black" style="background: linear-gradient(135deg, #000000 0%, #333333 100%);" title="Noir Espace 🖤"></div>
+  <div class="theme-btn-custom" title="Photo personnalisée 📸">
     🌌
     <input type="file" id="customBgInput" accept="image/*">
   </div>
@@ -561,25 +726,431 @@ const supabase = createClient(
 // ====== Éléments DOM ======
 const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
-const profilePreview = document.getElementById('profilePreview');
 const prenomInput = document.getElementById('prenom');
+const particlesBg = document.getElementById('particles-bg');
 
-// ====== Génération particules flottantes ======
-function createParticles() {
-  const container = document.getElementById('particles-bg');
-  for(let i = 0; i < 20; i++) {
-    const particle = document.createElement('div');
-    particle.className = 'particle';
-    const size = Math.random() * 60 + 20;
-    particle.style.width = size + 'px';
-    particle.style.height = size + 'px';
-    particle.style.left = Math.random() * 100 + '%';
-    particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
-    particle.style.animationDelay = Math.random() * 5 + 's';
-    container.appendChild(particle);
+// ====== FONCTIONS D'ANIMATION POUR CHAQUE THÈME ======
+
+// 1. AQUARIUM - Poissons et bulles
+function createAquarium() {
+  particlesBg.innerHTML = '';
+  // Bulles
+  for(let i = 0; i < 25; i++) {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    const size = Math.random() * 40 + 15;
+    bubble.style.width = size + 'px';
+    bubble.style.height = size + 'px';
+    bubble.style.left = Math.random() * 100 + '%';
+    bubble.style.animationDuration = (Math.random() * 8 + 10) + 's';
+    bubble.style.animationDelay = Math.random() * 5 + 's';
+    particlesBg.appendChild(bubble);
+  }
+  // Poissons
+  const fishes = ['🐠', '🐟', '🐡', '🦈', '🐙'];
+  for(let i = 0; i < 8; i++) {
+    const fish = document.createElement('div');
+    fish.className = 'moving-element';
+    fish.textContent = fishes[Math.floor(Math.random() * fishes.length)];
+    fish.style.top = Math.random() * 80 + 10 + '%';
+    fish.style.fontSize = Math.random() * 40 + 30 + 'px';
+    fish.style.animationDuration = (Math.random() * 20 + 25) + 's';
+    fish.style.animationDelay = Math.random() * 10 + 's';
+    particlesBg.appendChild(fish);
   }
 }
-createParticles();
+
+// 2. JAUNE - Abeilles et soleils
+function createYellow() {
+  particlesBg.innerHTML = '';
+  const elements = ['🐝', '🌻', '☀️', '⭐'];
+  for(let i = 0; i < 15; i++) {
+    const el = document.createElement('div');
+    el.className = 'moving-element';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.top = Math.random() * 80 + 10 + '%';
+    el.style.fontSize = Math.random() * 35 + 25 + 'px';
+    el.style.animationDuration = (Math.random() * 15 + 20) + 's';
+    el.style.animationDelay = Math.random() * 8 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// 3. VERT - Forêt avec arbres et feuilles
+function createGreen() {
+  particlesBg.innerHTML = '';
+  // Arbres fixes
+  const trees = ['🌲', '🌳', '🌴'];
+  for(let i = 0; i < 6; i++) {
+    const tree = document.createElement('div');
+    tree.className = 'swaying';
+    tree.textContent = trees[Math.floor(Math.random() * trees.length)];
+    tree.style.left = Math.random() * 100 + '%';
+    tree.style.bottom = '0';
+    tree.style.fontSize = Math.random() * 50 + 60 + 'px';
+    tree.style.animationDuration = (Math.random() * 3 + 2) + 's';
+    tree.style.opacity = 0.5;
+    particlesBg.appendChild(tree);
+  }
+  // Feuilles tombantes
+  for(let i = 0; i < 15; i++) {
+    const leaf = document.createElement('div');
+    leaf.className = 'falling';
+    leaf.textContent = '🍃';
+    leaf.style.fontSize = Math.random() * 20 + 15 + 'px';
+    leaf.style.left = Math.random() * 100 + '%';
+    leaf.style.animationDuration = (Math.random() * 8 + 12) + 's';
+    leaf.style.animationDelay = Math.random() * 5 + 's';
+    particlesBg.appendChild(leaf);
+  }
+}
+
+// 4. VIOLET - Espace avec étoiles
+function createViolet() {
+  particlesBg.innerHTML = '';
+  // Étoiles filantes
+  for(let i = 0; i < 30; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+    star.style.animationDelay = Math.random() * 5 + 's';
+    particlesBg.appendChild(star);
+  }
+  // Planètes
+  const celestial = ['🌟', '⭐', '✨', '🌙', '🪐'];
+  for(let i = 0; i < 10; i++) {
+    const obj = document.createElement('div');
+    obj.className = 'particle';
+    obj.textContent = celestial[Math.floor(Math.random() * celestial.length)];
+    obj.style.fontSize = Math.random() * 30 + 20 + 'px';
+    obj.style.left = Math.random() * 100 + '%';
+    obj.style.animationDuration = (Math.random() * 15 + 20) + 's';
+    obj.style.animationDelay = Math.random() * 5 + 's';
+    obj.style.opacity = 0.8;
+    particlesBg.appendChild(obj);
+  }
+}
+
+// 5. ROUGE IRON MAN - Étincelles et feu
+function createIronman() {
+  particlesBg.innerHTML = '';
+  const elements = ['🔥', '💥', '⚡', '✨'];
+  for(let i = 0; i < 20; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.fontSize = Math.random() * 35 + 20 + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (Math.random() * 6 + 8) + 's';
+    el.style.animationDelay = Math.random() * 3 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// 6. ORANGE SAVANE - Plage + Dinosaures Jurassic Park
+function createSavane() {
+  particlesBg.innerHTML = '';
+  // Palmiers
+  for(let i = 0; i < 5; i++) {
+    const palm = document.createElement('div');
+    palm.className = 'swaying';
+    palm.textContent = '🌴';
+    palm.style.left = Math.random() * 100 + '%';
+    palm.style.bottom = '0';
+    palm.style.fontSize = Math.random() * 40 + 70 + 'px';
+    palm.style.animationDuration = (Math.random() * 3 + 2) + 's';
+    palm.style.opacity = 0.6;
+    particlesBg.appendChild(palm);
+  }
+  // Dinosaures
+  const dinosaurs = ['🦕', '🦖'];
+  for(let i = 0; i < 4; i++) {
+    const dino = document.createElement('div');
+    dino.className = 'moving-element';
+    dino.textContent = dinosaurs[Math.floor(Math.random() * dinosaurs.length)];
+    dino.style.top = Math.random() * 60 + 20 + '%';
+    dino.style.fontSize = Math.random() * 50 + 50 + 'px';
+    dino.style.animationDuration = (Math.random() * 25 + 30) + 's';
+    dino.style.animationDelay = Math.random() * 10 + 's';
+    particlesBg.appendChild(dino);
+  }
+  // Oiseaux
+  for(let i = 0; i < 6; i++) {
+    const bird = document.createElement('div');
+    bird.className = 'particle';
+    bird.textContent = '🦅';
+    bird.style.fontSize = Math.random() * 25 + 20 + 'px';
+    bird.style.left = Math.random() * 100 + '%';
+    bird.style.animationDuration = (Math.random() * 10 + 15) + 's';
+    bird.style.animationDelay = Math.random() * 5 + 's';
+    particlesBg.appendChild(bird);
+  }
+}
+
+// 7. ROSE - Coeurs et fleurs
+function createPink() {
+  particlesBg.innerHTML = '';
+  const elements = ['💖', '💕', '💗', '🌸', '🌺'];
+  for(let i = 0; i < 18; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.fontSize = Math.random() * 30 + 20 + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (Math.random() * 12 + 15) + 's';
+    el.style.animationDelay = Math.random() * 5 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// 8. CYAN - Flocons de neige et cristaux
+function createCyan() {
+  particlesBg.innerHTML = '';
+  const elements = ['❄️', '🧊', '💎'];
+  for(let i = 0; i < 25; i++) {
+    const el = document.createElement('div');
+    el.className = 'falling';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.fontSize = Math.random() * 25 + 15 + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (Math.random() * 10 + 12) + 's';
+    el.style.animationDelay = Math.random() * 5 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// 9. OR - Pièces et trésors
+function createGold() {
+  particlesBg.innerHTML = '';
+  const elements = ['💰', '🪙', '👑', '💍', '✨'];
+  for(let i = 0; i < 15; i++) {
+    const el = document.createElement('div');
+    el.className = 'falling';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.fontSize = Math.random() * 30 + 20 + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (Math.random() * 8 + 10) + 's';
+    el.style.animationDelay = Math.random() * 4 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// 10. ÉMERAUDE - Gemmes et nature
+function createEmerald() {
+  particlesBg.innerHTML = '';
+  const elements = ['💎', '🌿', '🍀', '✨'];
+  for(let i = 0; i < 20; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.fontSize = Math.random() * 30 + 20 + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (Math.random() * 12 + 15) + 's';
+    el.style.animationDelay = Math.random() * 5 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// 11. PÊCHE - Fruits et papillons
+function createPeach() {
+  particlesBg.innerHTML = '';
+  const elements = ['🍑', '🦋', '🌸', '🌼'];
+  for(let i = 0; i < 16; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.fontSize = Math.random() * 28 + 18 + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (Math.random() * 14 + 16) + 's';
+    el.style.animationDelay = Math.random() * 5 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// 12. BLANC - Nuages et colombes
+function createWhite() {
+  particlesBg.innerHTML = '';
+  const elements = ['☁️', '🕊️', '⭐', '✨'];
+  for(let i = 0; i < 18; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.fontSize = Math.random() * 30 + 20 + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (Math.random() * 18 + 20) + 's';
+    el.style.animationDelay = Math.random() * 6 + 's';
+    el.style.opacity = 0.7;
+    particlesBg.appendChild(el);
+  }
+}
+
+// 13. BRUN - Grains de café et chocolat
+function createBrown() {
+  particlesBg.innerHTML = '';
+  const elements = ['☕', '🍫', '🌰', '🍂'];
+  for(let i = 0; i < 16; i++) {
+    const el = document.createElement('div');
+    el.className = 'falling';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.fontSize = Math.random() * 28 + 18 + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (Math.random() * 10 + 12) + 's';
+    el.style.animationDelay = Math.random() * 5 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// 14. LIME - Citrons et citrons verts
+function createLime() {
+  particlesBg.innerHTML = '';
+  const elements = ['🍋', '🍈', '🌿', '✨'];
+  for(let i = 0; i < 17; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.fontSize = Math.random() * 30 + 20 + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (Math.random() * 10 + 14) + 's';
+    el.style.animationDelay = Math.random() * 4 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// 15. INDIGO - Magie et mystère
+function createIndigo() {
+  particlesBg.innerHTML = '';
+  const elements = ['🔮', '✨', '🌙', '⭐', '💫'];
+  for(let i = 0; i < 20; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.fontSize = Math.random() * 32 + 22 + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (Math.random() * 15 + 18) + 's';
+    el.style.animationDelay = Math.random() * 6 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// 16. TURQUOISE - Plage tropicale
+function createTurquoise() {
+  particlesBg.innerHTML = '';
+  const elements = ['🏝️', '🐚', '🌊', '🦜'];
+  for(let i = 0; i < 15; i++) {
+    const el = document.createElement('div');
+    el.className = 'moving-element';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.top = Math.random() * 80 + 10 + '%';
+    el.style.fontSize = Math.random() * 35 + 25 + 'px';
+    el.style.animationDuration = (Math.random() * 20 + 22) + 's';
+    el.style.animationDelay = Math.random() * 8 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// 17. MAGENTA - Néon et clubbing
+function createMagenta() {
+  particlesBg.innerHTML = '';
+  const elements = ['💜', '💗', '✨', '🎵', '🎶'];
+  for(let i = 0; i < 22; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.fontSize = Math.random() * 30 + 20 + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (Math.random() * 8 + 10) + 's';
+    el.style.animationDelay = Math.random() * 4 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// 18. ARGENT - Robots et technologie
+function createSilver() {
+  particlesBg.innerHTML = '';
+  const elements = ['🤖', '⚙️', '💾', '🔧', '✨'];
+  for(let i = 0; i < 16; i++) {
+    const el = document.createElement('div');
+    el.className = 'rotating';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.fontSize = Math.random() * 30 + 20 + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.top = Math.random() * 100 + '%';
+    el.style.animationDuration = (Math.random() * 12 + 15) + 's';
+    el.style.opacity = 0.6;
+    particlesBg.appendChild(el);
+  }
+}
+
+// 19. CORAIL - Océan et vie marine
+function createCoral() {
+  particlesBg.innerHTML = '';
+  const elements = ['🪸', '🐠', '🐙', '🦀', '🌊'];
+  for(let i = 0; i < 18; i++) {
+    const el = document.createElement('div');
+    el.className = 'moving-element';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.top = Math.random() * 80 + 10 + '%';
+    el.style.fontSize = Math.random() * 35 + 25 + 'px';
+    el.style.animationDuration = (Math.random() * 18 + 22) + 's';
+    el.style.animationDelay = Math.random() * 7 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// 20. NOIR - Espace profond
+function createBlack() {
+  particlesBg.innerHTML = '';
+  // Étoiles scintillantes
+  for(let i = 0; i < 40; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+    star.style.animationDelay = Math.random() * 5 + 's';
+    particlesBg.appendChild(star);
+  }
+  const elements = ['🌟', '🌙', '🪐', '☄️'];
+  for(let i = 0; i < 8; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.textContent = elements[Math.floor(Math.random() * elements.length)];
+    el.style.fontSize = Math.random() * 35 + 25 + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.animationDuration = (Math.random() * 20 + 25) + 's';
+    el.style.animationDelay = Math.random() * 8 + 's';
+    particlesBg.appendChild(el);
+  }
+}
+
+// ====== Mapping thème -> fonction ======
+const backgroundAnimations = {
+  aquarium: createAquarium,
+  yellow: createYellow,
+  green: createGreen,
+  violet: createViolet,
+  ironman: createIronman,
+  savane: createSavane,
+  pink: createPink,
+  cyan: createCyan,
+  gold: createGold,
+  emerald: createEmerald,
+  peach: createPeach,
+  white: createWhite,
+  brown: createBrown,
+  lime: createLime,
+  indigo: createIndigo,
+  turquoise: createTurquoise,
+  magenta: createMagenta,
+  silver: createSilver,
+  coral: createCoral,
+  black: createBlack
+};
+
+// Initialiser animation par défaut
+createViolet();
 
 // ====== Sélecteur de thème ======
 document.querySelectorAll('.theme-option').forEach(option => {
@@ -589,15 +1160,26 @@ document.querySelectorAll('.theme-option').forEach(option => {
     document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
     option.classList.add('active');
     localStorage.setItem('theme', theme);
+    
+    // Changer l'animation de fond
+    if (backgroundAnimations[theme]) {
+      backgroundAnimations[theme]();
+    }
   });
 });
 
 // Charger thème sauvegardé
-const savedTheme = localStorage.getItem('theme');
-if(savedTheme) {
+const savedTheme = localStorage.getItem('theme') || 'violet';
+if(savedTheme && savedTheme !== 'custom') {
   document.body.className = 'theme-' + savedTheme;
   document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
-  document.querySelector(`[data-theme="${savedTheme}"]`)?.classList.add('active');
+  const savedOption = document.querySelector(`[data-theme="${savedTheme}"]`);
+  if(savedOption) {
+    savedOption.classList.add('active');
+    if (backgroundAnimations[savedTheme]) {
+      backgroundAnimations[savedTheme]();
+    }
+  }
 }
 
 // ====== Thème personnalisé (image de fond) ======
@@ -615,6 +1197,7 @@ if(customBgInput) {
       document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
       localStorage.setItem('customBg', imageUrl);
       localStorage.setItem('theme', 'custom');
+      particlesBg.innerHTML = ''; // Effacer animations
     };
     reader.readAsDataURL(file);
   };
@@ -625,25 +1208,22 @@ const savedCustomBg = localStorage.getItem('customBg');
 if(savedCustomBg && savedTheme === 'custom') {
   document.body.style.backgroundImage = `url(${savedCustomBg})`;
   document.body.className = 'custom-bg';
+  particlesBg.innerHTML = '';
 }
 
-// ====== Upload photo ======
+// ====== Upload photo de profil ======
 photoBtn.onclick = () => photoInput.click();
 
 photoInput.onchange = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  // Afficher dans le preview ET dans le logo
+  // Afficher dans le logo immédiatement
   const reader = new FileReader();
   reader.onload = (e) => {
     const imageUrl = e.target.result;
-    profilePreview.src = imageUrl;
-    profilePreview.classList.remove('hidden');
-    
     const logoCircle = document.getElementById('logoCircle');
     logoCircle.innerHTML = `<img src="${imageUrl}" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
-    
     localStorage.setItem('tempPhotoPreview', imageUrl);
   };
   reader.readAsDataURL(file);
@@ -700,7 +1280,7 @@ document.getElementById('connexionBtn').onclick = async () => {
     .eq('prenom', prenom)
     .single();
 
-  const photoUrl = localStorage.getItem('pendingPhotoUrl') || profilePreview.src || null;
+  const photoUrl = localStorage.getItem('pendingPhotoUrl') || null;
 
   if(!existing) {
     // Nouveau utilisateur
@@ -729,7 +1309,6 @@ document.getElementById('connexionBtn').onclick = async () => {
   localStorage.setItem('userPhotoUrl', photoUrl);
   localStorage.removeItem('pendingPhotoUrl');
   
-  // ✅ REDIRECTION CORRIGÉE VERS CHAT.HTML
   window.location.href = 'chat.html';
 };
 
