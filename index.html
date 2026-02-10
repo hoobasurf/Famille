@@ -21,518 +21,121 @@ position: relative;
 transition: background 0.5s ease;
 }
 
-/* ========== 20 THÈMES DE COULEURS STYLÉS ========== */
+/* 20 THÈMES */
+body.theme-aquarium { background: linear-gradient(135deg, #0077be 0%, #00a8e8 50%, #4dd2ff 100%); }
+body.theme-yellow { background: linear-gradient(135deg, #f4d03f 0%, #ffd700 50%, #ffed4e 100%); }
+body.theme-green { background: linear-gradient(135deg, #0b6623 0%, #228b22 50%, #7cfc00 100%); }
+body.theme-violet { background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #b06ab3 100%); }
+body.theme-ironman { background: linear-gradient(135deg, #8b0000 0%, #dc143c 50%, #ff6347 100%); }
+body.theme-savane { background: linear-gradient(135deg, #ff4500 0%, #ff8c00 50%, #ffa500 100%); }
+body.theme-pink { background: linear-gradient(135deg, #ff1493 0%, #ff69b4 50%, #ffb6c1 100%); }
+body.theme-cyan { background: linear-gradient(135deg, #00ced1 0%, #40e0d0 50%, #afeeee 100%); }
+body.theme-gold { background: linear-gradient(135deg, #b8860b 0%, #daa520 50%, #ffd700 100%); }
+body.theme-emerald { background: linear-gradient(135deg, #134e5e 0%, #3a7e6f 50%, #50c878 100%); }
+body.theme-peach { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff9a9e 100%); }
+body.theme-white { background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #e0e0e0 100%); }
+body.theme-brown { background: linear-gradient(135deg, #3e2723 0%, #5d4037 50%, #8d6e63 100%); }
+body.theme-lime { background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 50%, #00ff00 100%); }
+body.theme-indigo { background: linear-gradient(135deg, #2c003e 0%, #4b0082 50%, #9370db 100%); }
+body.theme-turquoise { background: linear-gradient(135deg, #17a2b8 0%, #1dd1a1 50%, #54e8d4 100%); }
+body.theme-magenta { background: linear-gradient(135deg, #c71585 0%, #ff00ff 50%, #ee82ee 100%); }
+body.theme-silver { background: linear-gradient(135deg, #708090 0%, #c0c0c0 50%, #dcdcdc 100%); }
+body.theme-coral { background: linear-gradient(135deg, #ff6b6b 0%, #ff7f50 50%, #ffa07a 100%); }
+body.theme-black { background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #333333 100%); }
+body.custom-bg { background-size: cover !important; background-position: center !important; background-attachment: fixed !important; }
 
-/* 1. Aquarium Bleu */
-body.theme-aquarium {
-background: linear-gradient(135deg, #0077be 0%, #00a8e8 50%, #4dd2ff 100%);
-}
-
-/* 2. Jaune Électrique */
-body.theme-yellow {
-background: linear-gradient(135deg, #f4d03f 0%, #ffd700 50%, #ffed4e 100%);
-}
-
-/* 3. Vert Forêt */
-body.theme-green {
-background: linear-gradient(135deg, #0b6623 0%, #228b22 50%, #7cfc00 100%);
-}
-
-/* 4. Violet Futuriste */
-body.theme-violet {
-background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #b06ab3 100%);
-}
-
-/* 5. Rouge Iron Man */
-body.theme-ironman {
-background: linear-gradient(135deg, #8b0000 0%, #dc143c 50%, #ff6347 100%);
-}
-
-/* 6. Orange Savane Coucher de Soleil */
-body.theme-savane {
-background: linear-gradient(135deg, #ff4500 0%, #ff8c00 50%, #ffa500 100%);
-}
-
-/* 7. Rose Néon */
-body.theme-pink {
-background: linear-gradient(135deg, #ff1493 0%, #ff69b4 50%, #ffb6c1 100%);
-}
-
-/* 8. Cyan Glacial */
-body.theme-cyan {
-background: linear-gradient(135deg, #00ced1 0%, #40e0d0 50%, #afeeee 100%);
-}
-
-/* 9. Or Luxe */
-body.theme-gold {
-background: linear-gradient(135deg, #b8860b 0%, #daa520 50%, #ffd700 100%);
-}
-
-/* 10. Émeraude Profond */
-body.theme-emerald {
-background: linear-gradient(135deg, #134e5e 0%, #3a7e6f 50%, #50c878 100%);
-}
-
-/* 11. Pêche Pastel */
-body.theme-peach {
-background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff9a9e 100%);
-}
-
-/* 12. Blanc Pur */
-body.theme-white {
-background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #e0e0e0 100%);
-}
-
-/* 13. Brun Chocolat */
-body.theme-brown {
-background: linear-gradient(135deg, #3e2723 0%, #5d4037 50%, #8d6e63 100%);
-}
-
-/* 14. Lime Acide */
-body.theme-lime {
-background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 50%, #00ff00 100%);
-}
-
-/* 15. Indigo Mystique */
-body.theme-indigo {
-background: linear-gradient(135deg, #2c003e 0%, #4b0082 50%, #9370db 100%);
-}
-
-/* 16. Turquoise Tropical */
-body.theme-turquoise {
-background: linear-gradient(135deg, #17a2b8 0%, #1dd1a1 50%, #54e8d4 100%);
-}
-
-/* 17. Magenta Vibrant */
-body.theme-magenta {
-background: linear-gradient(135deg, #c71585 0%, #ff00ff 50%, #ee82ee 100%);
-}
-
-/* 18. Argent Métallique */
-body.theme-silver {
-background: linear-gradient(135deg, #708090 0%, #c0c0c0 50%, #dcdcdc 100%);
-}
-
-/* 19. Corail Océan */
-body.theme-coral {
-background: linear-gradient(135deg, #ff6b6b 0%, #ff7f50 50%, #ffa07a 100%);
-}
-
-/* 20. Noir Espace */
-body.theme-black {
-background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #333333 100%);
-}
-
-/* Pour image personnalisée */
-body.custom-bg {
-background-size: cover !important;
-background-position: center !important;
-background-attachment: fixed !important;
-}
-
-/* ========== CONTENEUR ANIMATIONS ========== */
-#particles-bg {
-position: absolute;
-width: 100%;
-height: 100%;
-overflow: hidden;
-z-index: 0;
-}
-
-/* ========== ANIMATIONS COMMUNES ========== */
-
-/* Particules flottantes */
-.particle {
-position: absolute;
-border-radius: 50%;
-background: rgba(255, 255, 255, 0.1);
-animation: float linear infinite;
-backdrop-filter: blur(3px);
-}
+#particles-bg { position: absolute; width: 100%; height: 100%; overflow: hidden; z-index: 0; }
+.particle { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.1); animation: float linear infinite; backdrop-filter: blur(3px); }
 
 @keyframes float {
-0% {
-transform: translateY(100vh) translateX(0) rotate(0deg);
-opacity: 0;
-}
-10% {
-opacity: 0.3;
-}
-90% {
-opacity: 0.3;
-}
-100% {
-transform: translateY(-100px) translateX(100px) rotate(360deg);
-opacity: 0;
-}
+0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
+10% { opacity: 0.3; }
+90% { opacity: 0.3; }
+100% { transform: translateY(-100px) translateX(100px) rotate(360deg); opacity: 0; }
 }
 
-/* Container principal */
-.login-container {
-position: relative;
-z-index: 10;
-width: 100%;
-height: 100vh;
-display: flex;
-justify-content: center;
-align-items: center;
-flex-direction: column;
-}
-
-/* Carte glassmorphism */
-.login-card {
-background: rgba(255, 255, 255, 0.05);
-backdrop-filter: blur(30px);
-border-radius: 30px;
-padding: 50px 40px;
-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-border: 1px solid rgba(255, 255, 255, 0.15);
-min-width: 400px;
-animation: slideIn 0.6s ease-out;
-position: relative;
-overflow: hidden;
-}
+.login-container { position: relative; z-index: 10; width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+.login-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(30px); border-radius: 30px; padding: 50px 40px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); min-width: 400px; animation: slideIn 0.6s ease-out; position: relative; overflow: hidden; }
 
 @keyframes slideIn {
-from {
-opacity: 0;
-transform: translateY(50px);
-}
-to {
-opacity: 1;
-transform: translateY(0);
-}
+from { opacity: 0; transform: translateY(50px); }
+to { opacity: 1; transform: translateY(0); }
 }
 
-/* Effet brillant animé sur la carte */
-.login-card::before {
-content: ‘’;
-position: absolute;
-top: -50%;
-left: -50%;
-width: 200%;
-height: 200%;
-background: linear-gradient(
-45deg,
-transparent,
-rgba(255, 255, 255, 0.05),
-transparent
-);
-transform: rotate(45deg);
-animation: shine 3s infinite;
-}
+.login-card::before { content: ‘’; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent); transform: rotate(45deg); animation: shine 3s infinite; }
 
 @keyframes shine {
 0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
 100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
 }
 
-/* Logo central */
-.logo-circle {
-width: 120px;
-height: 120px;
-border-radius: 50%;
-margin: 0 auto 30px;
-background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
-border: 3px solid rgba(255, 255, 255, 0.3);
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 48px;
-animation: pulse 2s ease-in-out infinite;
-box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
-position: relative;
-overflow: hidden;
-}
-
-.logo-circle img {
-width: 100%;
-height: 100%;
-object-fit: cover;
-border-radius: 50%;
-}
+.logo-circle { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 30px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)); border: 3px solid rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center; font-size: 48px; animation: pulse 2s ease-in-out infinite; box-shadow: 0 0 30px rgba(255, 255, 255, 0.2); position: relative; overflow: hidden; }
+.logo-circle img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
 @keyframes pulse {
-0%, 100% {
-transform: scale(1);
-box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
-}
-50% {
-transform: scale(1.05);
-box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
-}
+0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(255, 255, 255, 0.2); }
+50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(255, 255, 255, 0.3); }
 }
 
-/* Inputs */
-.input-group {
-margin-bottom: 20px;
-position: relative;
-}
+.input-group { margin-bottom: 20px; position: relative; }
+.input-group input { width: 100%; padding: 15px 20px; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 15px; background: rgba(255, 255, 255, 0.05); color: white; font-size: 16px; outline: none; transition: all 0.3s ease; backdrop-filter: blur(10px); }
+.input-group input::placeholder { color: rgba(255, 255, 255, 0.6); }
+.input-group input:focus { border-color: rgba(255, 255, 255, 0.5); background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
 
-.input-group input {
-width: 100%;
-padding: 15px 20px;
-border: 2px solid rgba(255, 255, 255, 0.2);
-border-radius: 15px;
-background: rgba(255, 255, 255, 0.05);
-color: white;
-font-size: 16px;
-outline: none;
-transition: all 0.3s ease;
-backdrop-filter: blur(10px);
-}
-
-.input-group input::placeholder {
-color: rgba(255, 255, 255, 0.6);
-}
-
-.input-group input:focus {
-border-color: rgba(255, 255, 255, 0.5);
-background: rgba(255, 255, 255, 0.1);
-box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-}
-
-/* BOUTON PHOTO ROSE NÉON - PLEINE LARGEUR */
-.photo-btn-neon {
-background: linear-gradient(135deg, #ff6b9d 0%, #c06fff 100%);
-border: none;
-color: white;
-padding: 18px 20px;
-border-radius: 20px;
-font-size: 18px;
-font-weight: 600;
-cursor: pointer;
-transition: all 0.3s ease;
-box-shadow: 0 0 20px rgba(255, 107, 157, 0.5), 0 0 40px rgba(192, 111, 255, 0.3);
-display: flex;
-align-items: center;
-gap: 10px;
-justify-content: center;
-width: 100%;
-animation: neonPulse 2s ease-in-out infinite;
-margin-bottom: 20px;
-}
-
-.photo-btn-neon:hover {
-transform: translateY(-3px);
-box-shadow: 0 0 30px rgba(255, 107, 157, 0.8), 0 0 60px rgba(192, 111, 255, 0.5);
-}
+.photo-btn-neon { background: linear-gradient(135deg, #ff6b9d 0%, #c06fff 100%); border: none; color: white; padding: 18px 20px; border-radius: 20px; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 0 20px rgba(255, 107, 157, 0.5), 0 0 40px rgba(192, 111, 255, 0.3); display: flex; align-items: center; gap: 10px; justify-content: center; width: 100%; animation: neonPulse 2s ease-in-out infinite; margin-bottom: 20px; }
+.photo-btn-neon:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(255, 107, 157, 0.8), 0 0 60px rgba(192, 111, 255, 0.5); }
 
 @keyframes neonPulse {
-0%, 100% {
-box-shadow: 0 0 20px rgba(255, 107, 157, 0.5), 0 0 40px rgba(192, 111, 255, 0.3);
-}
-50% {
-box-shadow: 0 0 30px rgba(255, 107, 157, 0.8), 0 0 60px rgba(192, 111, 255, 0.5);
-}
+0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 157, 0.5), 0 0 40px rgba(192, 111, 255, 0.3); }
+50% { box-shadow: 0 0 30px rgba(255, 107, 157, 0.8), 0 0 60px rgba(192, 111, 255, 0.5); }
 }
 
-/* Boutons */
-.btn {
-width: 100%;
-padding: 15px;
-border: none;
-border-radius: 15px;
-font-size: 16px;
-font-weight: 600;
-cursor: pointer;
-transition: all 0.3s ease;
-margin-bottom: 12px;
-position: relative;
-overflow: hidden;
-letter-spacing: 1px;
-}
+.btn { width: 100%; padding: 15px; border: none; border-radius: 15px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px; position: relative; overflow: hidden; letter-spacing: 1px; }
+.btn-primary { background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1)); color: white; border: 2px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2)); }
+.btn-secondary { background: rgba(255, 255, 255, 0.05); color: white; border: 2px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); }
+.btn-secondary:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
 
-.btn-primary {
-background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-color: white;
-border: 2px solid rgba(255, 255, 255, 0.3);
-backdrop-filter: blur(10px);
-}
+.theme-selector { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 12px; margin-top: 25px; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.15); max-height: 280px; overflow-y: auto; padding-right: 10px; }
+.theme-selector::-webkit-scrollbar { width: 6px; }
+.theme-selector::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+.theme-selector::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
 
-.btn-primary:hover {
-transform: translateY(-2px);
-box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
-}
+.theme-option { width: 65px; height: 65px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all 0.3s ease; position: relative; justify-self: center; }
+.theme-option:hover { transform: scale(1.15); box-shadow: 0 0 25px rgba(255, 255, 255, 0.6); }
+.theme-option.active { border-color: white; box-shadow: 0 0 30px rgba(255, 255, 255, 0.9); transform: scale(1.1); }
 
-.btn-secondary {
-background: rgba(255, 255, 255, 0.05);
-color: white;
-border: 2px solid rgba(255, 255, 255, 0.2);
-backdrop-filter: blur(10px);
-}
+.theme-btn-custom { width: 65px; height: 65px; border-radius: 50%; border: 3px solid rgba(255, 107, 157, 0.6); background: linear-gradient(135deg, #ff6b9d 0%, #c06fff 100%); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 28px; transition: all 0.3s ease; position: relative; box-shadow: 0 0 15px rgba(255, 107, 157, 0.4); justify-self: center; }
+.theme-btn-custom:hover { transform: scale(1.15); box-shadow: 0 0 30px rgba(255, 107, 157, 0.8); border-color: white; }
+.theme-btn-custom input[type=“file”] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
 
-.btn-secondary:hover {
-background: rgba(255, 255, 255, 0.15);
-transform: translateY(-2px);
-}
+.modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); justify-content: center; align-items: center; z-index: 1000; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* Sélecteur de thème */
-.theme-selector {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
-gap: 12px;
-margin-top: 25px;
-padding-top: 25px;
-border-top: 1px solid rgba(255, 255, 255, 0.15);
-max-height: 280px;
-overflow-y: auto;
-padding-right: 10px;
-}
+.modal-content { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(30px); border-radius: 25px; padding: 40px; border: 1px solid rgba(255, 255, 255, 0.2); text-align: center; animation: slideIn 0.4s ease-out; min-width: 300px; }
+.modal-content h3 { color: white; font-size: 28px; margin-bottom: 15px; font-weight: 300; }
+.modal-content p { color: rgba(255, 255, 255, 0.9); margin-bottom: 25px; font-size: 16px; }
 
-.theme-selector::-webkit-scrollbar {
-width: 6px;
-}
-
-.theme-selector::-webkit-scrollbar-track {
-background: rgba(255, 255, 255, 0.05);
-border-radius: 10px;
-}
-
-.theme-selector::-webkit-scrollbar-thumb {
-background: rgba(255, 255, 255, 0.2);
-border-radius: 10px;
-}
-
-.theme-option {
-width: 65px;
-height: 65px;
-border-radius: 50%;
-cursor: pointer;
-border: 3px solid transparent;
-transition: all 0.3s ease;
-position: relative;
-justify-self: center;
-}
-
-.theme-option:hover {
-transform: scale(1.15);
-box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
-}
-
-.theme-option.active {
-border-color: white;
-box-shadow: 0 0 30px rgba(255, 255, 255, 0.9);
-transform: scale(1.1);
-}
-
-/* BOUTON PERSONNALISÉ AVEC INPUT FILE */
-.theme-btn-custom {
-width: 65px;
-height: 65px;
-border-radius: 50%;
-border: 3px solid rgba(255, 107, 157, 0.6);
-background: linear-gradient(135deg, #ff6b9d 0%, #c06fff 100%);
-cursor: pointer;
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 28px;
-transition: all 0.3s ease;
-position: relative;
-box-shadow: 0 0 15px rgba(255, 107, 157, 0.4);
-justify-self: center;
-}
-
-.theme-btn-custom:hover {
-transform: scale(1.15);
-box-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
-border-color: white;
-}
-
-.theme-btn-custom input[type=“file”] {
-position: absolute;
-opacity: 0;
-width: 100%;
-height: 100%;
-cursor: pointer;
-}
-
-/* Modal */
-.modal {
-display: none;
-position: fixed;
-inset: 0;
-background: rgba(0, 0, 0, 0.4);
-backdrop-filter: blur(15px);
-justify-content: center;
-align-items: center;
-z-index: 1000;
-animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-from { opacity: 0; }
-to { opacity: 1; }
-}
-
-.modal-content {
-background: rgba(255, 255, 255, 0.08);
-backdrop-filter: blur(30px);
-border-radius: 25px;
-padding: 40px;
-border: 1px solid rgba(255, 255, 255, 0.2);
-text-align: center;
-animation: slideIn 0.4s ease-out;
-min-width: 300px;
-}
-
-.modal-content h3 {
-color: white;
-font-size: 28px;
-margin-bottom: 15px;
-font-weight: 300;
-}
-
-.modal-content p {
-color: rgba(255, 255, 255, 0.9);
-margin-bottom: 25px;
-font-size: 16px;
-}
-
-/* Responsive */
 @media (max-width: 500px) {
-.login-card {
-min-width: 90%;
-padding: 40px 30px;
-}
-.theme-selector {
-grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
-gap: 10px;
-}
-.theme-option, .theme-btn-custom {
-width: 55px;
-height: 55px;
-}
+.login-card { min-width: 90%; padding: 40px 30px; }
+.theme-selector { grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 10px; }
+.theme-option, .theme-btn-custom { width: 55px; height: 55px; }
 }
 </style>
 
 </head>
 <body class="theme-violet">
 
-<!-- Fond de particules/animations -->
-
 <div id="particles-bg"></div>
-
-<!-- Container principal -->
 
 <div class="login-container">
   <div class="login-card">
-    <!-- Logo -->
-    <div class="logo-circle" id="logoCircle">
-      💬
-    </div>
+    <div class="logo-circle" id="logoCircle">💬</div>
 
 ```
-<!-- Bouton photo PLEINE LARGEUR -->
-<button class="photo-btn-neon" id="photoBtn">
-  <span>✨</span>
-  <span>Ajouter Photo</span>
-</button>
+<button class="photo-btn-neon" id="photoBtn"><span>✨</span><span>Ajouter Photo</span></button>
 <input type="file" id="photoInput" accept="image/*" style="display:none;">
 
-<!-- Inputs -->
 <div class="input-group">
   <input type="text" id="prenom" placeholder="✨ Votre prénom" required>
 </div>
@@ -541,10 +144,8 @@ height: 55px;
   <input type="password" id="password" placeholder="🔐 Mot de passe">
 </div>
 
-<!-- Bouton connexion -->
 <button class="btn btn-primary" id="connexionBtn">Se connecter</button>
 
-<!-- Sélecteur de thème - 20 COULEURS + PERSONNALISÉ -->
 <div class="theme-selector">
   <div class="theme-option" data-theme="aquarium" style="background: linear-gradient(135deg, #0077be 0%, #4dd2ff 100%);" title="Aquarium 🐠"></div>
   <div class="theme-option" data-theme="yellow" style="background: linear-gradient(135deg, #f4d03f 0%, #ffed4e 100%);" title="Jaune Électrique ⚡"></div>
@@ -566,17 +167,12 @@ height: 55px;
   <div class="theme-option" data-theme="silver" style="background: linear-gradient(135deg, #708090 0%, #dcdcdc 100%);" title="Argent Métallique 🤖"></div>
   <div class="theme-option" data-theme="coral" style="background: linear-gradient(135deg, #ff6b6b 0%, #ffa07a 100%);" title="Corail Océan 🪸"></div>
   <div class="theme-option" data-theme="black" style="background: linear-gradient(135deg, #000000 0%, #333333 100%);" title="Noir Espace 🖤"></div>
-  <div class="theme-btn-custom" title="Photo personnalisée 📸">
-    🌌
-    <input type="file" id="customBgInput" accept="image/*">
-  </div>
+  <div class="theme-btn-custom" title="Photo personnalisée 📸">🌌<input type="file" id="customBgInput" accept="image/*"></div>
 </div>
 ```
 
   </div>
 </div>
-
-<!-- Modal choix admin -->
 
 <div id="choiceModal" class="modal">
   <div class="modal-content">
@@ -588,16 +184,14 @@ height: 55px;
 </div>
 
 <script>
-// ====== Éléments DOM ======
+console.log('🚀 INDEX.HTML CHARGÉ');
+
 const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
 const prenomInput = document.getElementById('prenom');
 const particlesBg = document.getElementById('particles-bg');
-
-// Variable globale pour stocker la photo en base64
 let userPhotoBase64 = null;
 
-// ====== Génération particules flottantes ======
 function createParticles() {
   particlesBg.innerHTML = '';
   for(let i = 0; i < 20; i++) {
@@ -612,10 +206,8 @@ function createParticles() {
     particlesBg.appendChild(particle);
   }
 }
-
 createParticles();
 
-// ====== Sélecteur de thème ======
 document.querySelectorAll('.theme-option').forEach(option => {
   option.addEventListener('click', () => {
     const theme = option.dataset.theme;
@@ -626,24 +218,19 @@ document.querySelectorAll('.theme-option').forEach(option => {
   });
 });
 
-// Charger thème sauvegardé
 const savedTheme = localStorage.getItem('theme') || 'violet';
 if(savedTheme && savedTheme !== 'custom') {
   document.body.className = 'theme-' + savedTheme;
   document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
   const savedOption = document.querySelector(`[data-theme="${savedTheme}"]`);
-  if(savedOption) {
-    savedOption.classList.add('active');
-  }
+  if(savedOption) savedOption.classList.add('active');
 }
 
-// ====== Thème personnalisé (image de fond) ======
 const customBgInput = document.getElementById('customBgInput');
 if(customBgInput) {
   customBgInput.onchange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
     const reader = new FileReader();
     reader.onload = (e) => {
       const imageUrl = e.target.result;
@@ -657,80 +244,74 @@ if(customBgInput) {
   };
 }
 
-// Charger fond personnalisé si sauvegardé
 const savedCustomBg = localStorage.getItem('customBg');
 if(savedCustomBg && savedTheme === 'custom') {
   document.body.style.backgroundImage = `url(${savedCustomBg})`;
   document.body.className = 'custom-bg';
 }
 
-// ====== Upload photo de profil ======
-photoBtn.onclick = () => photoInput.click();
+photoBtn.onclick = () => {
+  console.log('📷 Clic sur bouton photo');
+  photoInput.click();
+};
 
-photoInput.onchange = async (e) => {
+photoInput.onchange = (e) => {
   const file = e.target.files[0];
   if (!file) return;
-
-  // Convertir en base64 et afficher immédiatement
+  console.log('📸 Photo sélectionnée:', file.name);
   const reader = new FileReader();
   reader.onload = (e) => {
     const imageUrl = e.target.result;
-    userPhotoBase64 = imageUrl; // Stocker en variable globale
-    
-    const logoCircle = document.getElementById('logoCircle');
-    logoCircle.innerHTML = `<img src="${imageUrl}" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
-    
-    // Sauvegarder IMMÉDIATEMENT dans localStorage
+    userPhotoBase64 = imageUrl;
+    document.getElementById('logoCircle').innerHTML = `<img src="${imageUrl}" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
     localStorage.setItem('userPhotoUrl', imageUrl);
-    console.log('✅ Photo sauvegardée dans localStorage');
+    console.log('✅ PHOTO SAUVEGARDÉE (taille:', imageUrl.length, 'caractères)');
   };
   reader.readAsDataURL(file);
 };
 
-// ====== Connexion ======
-document.getElementById('connexionBtn').onclick = async () => {
+document.getElementById('connexionBtn').onclick = () => {
+  console.log('🔘 CLIC SUR BOUTON CONNEXION');
+  
   const prenom = prenomInput.value.trim();
   const password = document.getElementById('password').value;
+
+  console.log('👤 Prénom saisi:', prenom);
 
   if(!prenom) {
     alert("⚠️ Veuillez saisir votre prénom");
     return;
   }
 
-  // Sauvegarder le prénom
   localStorage.setItem('prenom', prenom);
+  console.log('✅ PRÉNOM SAUVEGARDÉ:', prenom);
   
-  // S'assurer que la photo est bien sauvegardée
   if (userPhotoBase64) {
     localStorage.setItem('userPhotoUrl', userPhotoBase64);
-    console.log('✅ Photo confirmée dans localStorage avant redirection');
+    console.log('✅ PHOTO CONFIRMÉE (taille:', userPhotoBase64.length, ')');
+  } else {
+    console.log('⚠️ Pas de photo');
   }
 
-  // Admin spécial
   if(prenom === "Steph" && password === "Steph1511") {
+    console.log('👑 Admin détecté');
     document.getElementById('choiceModal').style.display = 'flex';
     return;
   }
 
-  // Redirection vers chat.html
-  console.log('🚀 Redirection vers chat.html');
+  console.log('🚀 REDIRECTION VERS chat.html');
   window.location.href = 'chat.html';
 };
 
-// ====== Modal admin ======
-document.getElementById('creationBtn').onclick = () => {
-  window.location.href = 'owner.html';
-};
-
-document.getElementById('visiteBtn').onclick = () => {
-  window.location.href = 'chat.html';
-};
-
+document.getElementById('creationBtn').onclick = () => { window.location.href = 'owner.html'; };
+document.getElementById('visiteBtn').onclick = () => { window.location.href = 'chat.html'; };
 document.getElementById('choiceModal').onclick = (e) => {
   if(e.target === document.getElementById('choiceModal')) {
     document.getElementById('choiceModal').style.display = 'none';
   }
 };
+
+console.log('✅ SCRIPT PRÊT - Bouton connexion configuré');
 </script>
 
 </body>
