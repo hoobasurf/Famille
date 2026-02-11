@@ -62,7 +62,7 @@
         .profile-photo img { width: 100%; height: 100%; object-fit: cover; }
         .status-dot { position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(0, 0, 0, 0.4); }
         .status-dot.online { background: #4caf50; box-shadow: 0 0 10px #4caf50; animation: pulse-online 2s infinite; }
-        .status-dot.offline { background: #757575; }
+        .status-dot.offline { background: #f44336; }
         @keyframes pulse-online { 0%, 100% { box-shadow: 0 0 10px #4caf50; } 50% { box-shadow: 0 0 20px #4caf50; } }
         .profile-info { flex: 1; }
         .profile-name { color: white; font-weight: 600; font-size: 16px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); }
@@ -130,6 +130,26 @@
     }
     displayUserPhoto();
 
+    // METTRE À JOUR LE STATUT EN LIGNE
+    async function setOnlineStatus(isOnline) {
+        try {
+            await supabase
+                .from('profiles')
+                .update({ is_online: isOnline })
+                .eq('prenom', currentUserPrenom);
+        } catch (err) {
+            // Erreur silencieuse
+        }
+    }
+
+    // Se mettre en ligne au chargement
+    setOnlineStatus(true);
+
+    // Se mettre hors ligne à la fermeture
+    window.addEventListener('beforeunload', () => {
+        setOnlineStatus(false);
+    });
+
     let profiles = [];
 
     async function loadProfiles() {
@@ -167,7 +187,8 @@
             return;
         }
         
-        countElement.textContent = `${profiles.length} utilisateur${profiles.length > 1 ? 's' : ''}`;
+        const onlineCount = profiles.filter(p => p.is_online).length;
+        countElement.textContent = `${profiles.length} utilisateur${profiles.length > 1 ? 's' : ''} (${onlineCount} en ligne)`;
         
         profiles.forEach(profile => {
             const item = document.createElement('div');
@@ -209,7 +230,7 @@
         });
     }
 
-    setInterval(loadProfiles, 10000);
+    setInterval(loadProfiles, 5000);
     loadProfiles();
 
     document.getElementById('toggleProfileSidebar').addEventListener('click', () => {
