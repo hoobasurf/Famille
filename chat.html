@@ -106,17 +106,19 @@
         </div>
     </div>
 
-```
 <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
     const supabase = createClient(
-  'https://eeikriwrwuynwpzodbbt.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWtyaXdyd3V5bndwem9kYmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzQ3NjYsImV4cCI6MjA4NjE1MDc2Nn0.MJ6CSmrttEWcrdfy5C7nP4sE_pe19sGNE-WasASPDNc'
-);
+        'https://eeikriwrwuynwpzodbbt.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWtyaXdyd3V5bndwem9kYmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzQ3NjYsImV4cCI6MjA4NjE1MDc2Nn0.MJ6CSmrttEWcrdfy5C7nP4sE_pe19sGNE-WasASPDNc'
+    );
 
     let currentUserPhoto = null;
     let currentUserPrenom = localStorage.getItem('prenom') || 'Invité';
+    let currentUniqueId = localStorage.getItem('browserFingerprint') ? 
+        `${currentUserPrenom}_${localStorage.getItem('browserFingerprint')}` : null;
+    
     const savedPhotoUrl = localStorage.getItem('userPhotoUrl') || localStorage.getItem('tempPhotoPreview');
     
     function displayUserPhoto() {
@@ -130,17 +132,31 @@
     }
     displayUserPhoto();
 
-    // METTRE À JOUR LE STATUT EN LIGNE
+    // ✅ METTRE À JOUR LE STATUT EN LIGNE avec unique_id
     async function setOnlineStatus(isOnline) {
+        if (!currentUniqueId) return;
+        
         try {
             await supabase
                 .from('profiles')
-                .update({ is_online: isOnline })
-                .eq('prenom', currentUserPrenom);
+                .update({ 
+                    is_online: isOnline,
+                    last_seen: new Date().toISOString()
+                })
+                .eq('unique_id', currentUniqueId);
+            
+            console.log(`✅ Statut mis à jour: ${isOnline ? 'en ligne' : 'hors ligne'}`);
         } catch (err) {
-            // Erreur silencieuse
+            console.error('❌ Erreur mise à jour statut:', err);
         }
     }
+
+    // ✅ Heartbeat : mettre à jour last_seen toutes les 30 secondes
+    setInterval(() => {
+        if (currentUniqueId) {
+            setOnlineStatus(true);
+        }
+    }, 30000); // 30 secondes
 
     // Se mettre en ligne au chargement
     setOnlineStatus(true);
@@ -156,21 +172,27 @@
         try {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('prenom, photo_url, is_online');
+                .select('unique_id, prenom, photo_url, is_online, last_seen')
+                .order('prenom', { ascending: true });
             
             if (error) {
+                console.error('❌ Erreur chargement profils:', error);
                 document.getElementById('profileCount').textContent = 'Erreur DB';
                 return;
             }
             
             profiles = (data || []).map(p => ({
+                unique_id: p.unique_id || '',
                 prenom: p.prenom || '',
                 photo_url: p.photo_url || null,
-                is_online: p.is_online || false
+                is_online: p.is_online || false,
+                last_seen: p.last_seen
             }));
             
+            console.log('✅ Profils chargés:', profiles.length);
             renderProfiles();
         } catch (err) {
+            console.error('❌ Erreur réseau:', err);
             document.getElementById('profileCount').textContent = 'Erreur réseau';
         }
     }
@@ -230,6 +252,7 @@
         });
     }
 
+    // ✅ Rafraîchir les profils toutes les 5 secondes
     setInterval(loadProfiles, 5000);
     loadProfiles();
 
@@ -317,7 +340,6 @@
     createParticles();
     addMessage('BubbleChat', `Bienvenue ${currentUserPrenom} ! 🎉`);
 </script>
-```
 
 </body>
 </html>
