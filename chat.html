@@ -23,8 +23,11 @@
     .particle { position: absolute; width: 3px; height: 3px; background: rgba(255,255,255,0.5); border-radius: 50%; animation: float 20s infinite ease-in-out; }
     @keyframes float { 0%,100% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-100vh) translateX(50px); opacity: 0; } }
 
-    .chat-container { position: relative; max-width: 1200px; margin: 0 auto; padding: 20px; min-height: 100vh; z-index: 1; }
-    .chat-header { background: rgba(255,255,255,0.05); backdrop-filter: blur(30px); border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+    /* ── MAIN LAYOUT ── */
+    .app-wrapper { position: relative; z-index: 1; max-width: 1300px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; gap: 20px; }
+
+    /* ── HEADER ── */
+    .chat-header { background: rgba(255,255,255,0.05); backdrop-filter: blur(30px); border-radius: 20px; padding: 18px 24px; border: 1px solid rgba(255,255,255,0.2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
     .theme-selector { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .theme-label { color: white; font-weight: 600; text-shadow: 0 2px 5px rgba(0,0,0,0.3); }
     .theme-options { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
@@ -35,10 +38,69 @@
     .theme-btn-custom:hover { transform: scale(1.15); border-color: white; }
     .theme-btn-custom input[type="file"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
     .user-profile-photo { width: 45px; height: 45px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.6); overflow: hidden; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ff6b9d 0%, #c06fff 100%); font-size: 20px; color: white; box-shadow: 0 4px 15px rgba(255,107,157,0.4); transition: all 0.3s ease; cursor: pointer; }
-    .user-profile-photo:hover { transform: scale(1.15); box-shadow: 0 6px 25px rgba(255,107,157,0.6); border-color: white; }
+    .user-profile-photo:hover { transform: scale(1.15); }
     .user-profile-photo img { width: 100%; height: 100%; object-fit: cover; }
 
-    .messages-area { background: rgba(255,255,255,0.05); backdrop-filter: blur(30px); border-radius: 20px; padding: 20px; height: 500px; overflow-y: auto; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.2); }
+    /* ── TWO-COLUMN BODY ── */
+    .body-columns { display: flex; gap: 20px; flex: 1; min-height: 0; }
+
+    /* ── LEFT SIDEBAR (users list) ── */
+    .users-panel { width: 280px; flex-shrink: 0; background: rgba(255,255,255,0.05); backdrop-filter: blur(30px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); padding: 18px 12px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: calc(100vh - 160px); }
+    .users-panel-header { color: white; font-weight: 700; font-size: 17px; text-align: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.15); }
+    .users-panel-count { font-size: 12px; opacity: 0.6; font-weight: 400; margin-top: 4px; }
+    .user-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .user-item { display: flex; align-items: center; gap: 11px; padding: 11px 12px; border-radius: 15px; cursor: pointer; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); transition: all 0.25s ease; position: relative; overflow: hidden; }
+    .user-item::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,107,157,0.12), rgba(192,111,255,0.12)); opacity: 0; transition: opacity 0.2s; border-radius: 14px; pointer-events: none; }
+    .user-item:hover { border-color: rgba(255,107,157,0.35); transform: translateX(4px); }
+    .user-item:hover::after { opacity: 1; }
+    .user-item.active { border-color: rgba(255,107,157,0.6); background: rgba(255,107,157,0.12); }
+    .user-item.active::after { opacity: 1; }
+
+    .user-avatar { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.25); overflow: hidden; flex-shrink: 0; position: relative; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; }
+    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .status-dot { position: absolute; bottom: 1px; right: 1px; width: 11px; height: 11px; border-radius: 50%; border: 2px solid transparent; }
+    .status-dot.online { background: #4caf50; animation: pulse-online 2s infinite; border-color: rgba(0,0,0,0.3); }
+    .status-dot.offline { background: #555; border-color: rgba(0,0,0,0.3); }
+    @keyframes pulse-online { 0%,100% { box-shadow: 0 0 6px #4caf50; } 50% { box-shadow: 0 0 14px #4caf50; } }
+
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { color: white; font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-status-txt { font-size: 11px; margin-top: 2px; }
+    .user-status-txt.online { color: #4caf50; }
+    .user-status-txt.offline { color: rgba(255,255,255,0.4); }
+
+    .notif-badge { position: absolute; top: 7px; right: 7px; background: linear-gradient(135deg, #ff6b9d, #ff3060); color: white; font-size: 10px; font-weight: 800; border-radius: 10px; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; padding: 0 4px; box-shadow: 0 2px 8px rgba(255,64,64,0.5); animation: badgePop 0.35s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes badgePop { from { transform: scale(0) rotate(-15deg); } to { transform: scale(1); } }
+
+    /* ── RIGHT PANEL ── */
+    .right-panel { flex: 1; display: flex; flex-direction: column; gap: 0; min-width: 0; }
+
+    /* ── PUBLIC CHAT ── */
+    #publicChatPanel { display: flex; flex-direction: column; gap: 0; height: 100%; }
+    #publicChatPanel .messages-area { flex: 1; }
+    
+    /* ── PRIVATE CHAT ── */
+    #pmPanel { display: none; flex-direction: column; height: 100%; }
+    #pmPanel.active { display: flex; }
+
+    /* PM header */
+    .pm-chat-header { background: rgba(255,255,255,0.05); backdrop-filter: blur(30px); border-radius: 20px 20px 0 0; padding: 16px 20px; border: 1px solid rgba(255,255,255,0.2); border-bottom: none; display: flex; align-items: center; gap: 14px; }
+    .pm-chat-header-avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid rgba(255,107,157,0.5); overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; background: linear-gradient(135deg, #ff6b9d, #c06fff); flex-shrink: 0; }
+    .pm-chat-header-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .pm-chat-header-info { flex: 1; }
+    .pm-chat-header-name { color: white; font-weight: 700; font-size: 16px; }
+    .pm-chat-header-status { font-size: 12px; margin-top: 2px; }
+    .pm-chat-header-status.online { color: #4caf50; }
+    .pm-chat-header-status.offline { color: rgba(255,255,255,0.4); }
+    .pm-back-btn { padding: 8px 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: white; font-size: 13px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .pm-back-btn:hover { background: rgba(255,255,255,0.2); }
+
+    /* messages areas */
+    .messages-area { background: rgba(255,255,255,0.05); backdrop-filter: blur(30px); padding: 20px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.2); flex: 1; min-height: 0; height: 0; }
+    #publicChatPanel .messages-area { border-radius: 20px; margin-bottom: 16px; }
+    #pmPanel .pm-messages-area { border-radius: 0; border-top: none; border-bottom: none; }
+
     .message { background: rgba(255,255,255,0.08); padding: 12px 18px; border-radius: 15px; margin-bottom: 12px; color: white; animation: slideIn 0.3s ease; display: flex; gap: 12px; align-items: flex-start; }
     @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .message-avatar { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: linear-gradient(135deg, #ff6b9d 0%, #c06fff 100%); display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid rgba(255,255,255,0.3); }
@@ -47,171 +109,157 @@
     .message-author { font-weight: bold; margin-bottom: 5px; font-size: 14px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
     .message-text { font-size: 16px; }
     .message-time { font-size: 11px; opacity: 0.7; text-align: right; margin-top: 5px; }
-    .input-area { background: rgba(255,255,255,0.05); backdrop-filter: blur(30px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.2); display: flex; gap: 10px; }
-    .message-input { flex: 1; padding: 15px 20px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; color: white; font-size: 16px; transition: all 0.3s ease; }
-    .message-input:focus { outline: none; background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); }
-    .message-input::placeholder { color: rgba(255,255,255,0.6); }
-    .send-btn { padding: 15px 35px; background: linear-gradient(135deg, #ff6b9d 0%, #c06fff 100%); border: none; border-radius: 15px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 20px rgba(192,111,255,0.4); }
-    .send-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(192,111,255,0.6); }
 
-    /* ── SIDEBAR ── */
-    #profileSidebar { position: fixed; top: 0; left: -310px; width: 300px; height: 100vh; background: rgba(15,5,35,0.88); backdrop-filter: blur(25px); border-right: 1px solid rgba(255,255,255,0.12); padding: 20px 12px; transition: left 0.35s cubic-bezier(.34,1.56,.64,1); z-index: 999; overflow-y: auto; }
-    #profileSidebar.open { left: 0; }
-    #toggleProfileSidebar { position: fixed; top: 20px; left: 20px; width: 50px; height: 50px; background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); border: 2px solid rgba(255,255,255,0.2); border-radius: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; font-size: 24px; transition: all 0.3s ease; color: white; }
-    #toggleProfileSidebar:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
-    .sidebar-header { color: white; font-weight: 700; font-size: 20px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.12); text-align: center; }
-    .profile-count { font-size: 12px; opacity: 0.6; font-weight: 400; margin-top: 5px; }
-    .profile-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-
-    .profile-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 15px; transition: all 0.25s ease; cursor: pointer; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); position: relative; overflow: hidden; }
-    .profile-item::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,107,157,0.12), rgba(192,111,255,0.12)); opacity: 0; transition: opacity 0.25s; border-radius: 14px; pointer-events: none; }
-    .profile-item:hover { border-color: rgba(255,107,157,0.35); transform: translateX(5px); }
-    .profile-item:hover::after { opacity: 1; }
-    .profile-item:hover .pm-hint { opacity: 1; transform: translateY(-50%) scale(1); }
-
-    .pm-hint { position: absolute; right: 12px; top: 50%; transform: translateY(-50%) scale(0.6); font-size: 17px; opacity: 0; transition: all 0.25s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
-
-    .profile-photo { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.25); overflow: hidden; flex-shrink: 0; position: relative; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; }
-    .profile-photo img { width: 100%; height: 100%; object-fit: cover; }
-    .status-dot { position: absolute; bottom: 1px; right: 1px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid rgba(15,5,35,0.9); }
-    .status-dot.online { background: #4caf50; animation: pulse-online 2s infinite; }
-    .status-dot.offline { background: #555; }
-    @keyframes pulse-online { 0%,100% { box-shadow: 0 0 6px #4caf50; } 50% { box-shadow: 0 0 14px #4caf50; } }
-
-    .profile-info { flex: 1; min-width: 0; }
-    .profile-name { color: white; font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .profile-status-text { font-size: 11px; margin-top: 2px; }
-    .profile-status-text.online { color: #4caf50; }
-    .profile-status-text.offline { color: rgba(255,255,255,0.4); }
-
-    .notif-badge { position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #ff6b9d, #ff3060); color: white; font-size: 10px; font-weight: 800; border-radius: 10px; min-width: 19px; height: 19px; display: flex; align-items: center; justify-content: center; padding: 0 4px; box-shadow: 0 2px 10px rgba(255,64,64,0.5); animation: badgePop 0.4s cubic-bezier(.34,1.56,.64,1); z-index: 2; }
-    @keyframes badgePop { from { transform: scale(0) rotate(-15deg); } to { transform: scale(1) rotate(0); } }
-
-    /* ── MODAL MP ── */
-    #pmOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(10px); z-index: 2000; align-items: center; justify-content: center; }
-    #pmOverlay.visible { display: flex; }
-    #pmModal { width: min(440px, 96vw); background: rgba(10,3,24,0.97); backdrop-filter: blur(40px); border: 1px solid rgba(255,255,255,0.12); border-radius: 26px; overflow: hidden; box-shadow: 0 50px 120px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08); animation: pmIn 0.4s cubic-bezier(.34,1.56,.64,1); display: flex; flex-direction: column; max-height: 84vh; }
-    @keyframes pmIn { from { opacity: 0; transform: scale(0.82) translateY(40px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-
-    #pmHeader { display: flex; align-items: center; gap: 14px; padding: 18px 20px; background: linear-gradient(135deg, rgba(255,107,157,0.08), rgba(192,111,255,0.08)); border-bottom: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
-    #pmAvatar { width: 46px; height: 46px; border-radius: 50%; border: 2px solid rgba(255,107,157,0.5); overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; background: linear-gradient(135deg, #ff6b9d, #c06fff); flex-shrink: 0; box-shadow: 0 4px 16px rgba(255,107,157,0.3); }
-    #pmAvatar img { width: 100%; height: 100%; object-fit: cover; }
-    #pmTitleInfo { flex: 1; }
-    #pmTitleName { color: white; font-weight: 700; font-size: 17px; }
-    #pmTitleStatus { font-size: 12px; margin-top: 3px; }
-    #pmTitleStatus.online { color: #4caf50; }
-    #pmTitleStatus.offline { color: rgba(255,255,255,0.4); }
-    #pmClose { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); width: 34px; height: 34px; border-radius: 50%; font-size: 15px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-    #pmClose:hover { background: rgba(255,60,60,0.3); border-color: rgba(255,60,60,0.5); color: white; }
-
-    #pmMessages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 6px; min-height: 220px; }
-    .pm-empty { text-align: center; color: rgba(255,255,255,0.3); font-size: 13px; padding: 40px 20px; line-height: 2; }
-    .pm-empty-icon { font-size: 38px; display: block; margin-bottom: 8px; }
-    .pm-loading { text-align: center; color: rgba(255,255,255,0.3); font-size: 13px; padding: 30px; }
-
-    .pm-msg-wrap { display: flex; flex-direction: column; }
+    /* PM bubbles */
+    .pm-msg-wrap { display: flex; flex-direction: column; margin-bottom: 8px; }
     .pm-msg-wrap.sent { align-items: flex-end; }
     .pm-msg-wrap.received { align-items: flex-start; }
-    .pm-msg { max-width: 78%; padding: 10px 14px 7px; border-radius: 16px; font-size: 14px; color: white; line-height: 1.5; word-break: break-word; animation: msgPop 0.25s cubic-bezier(.34,1.56,.64,1); }
-    @keyframes msgPop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-    .pm-msg.sent { background: linear-gradient(135deg, #ff6b9d, #c06fff); border-bottom-right-radius: 4px; box-shadow: 0 4px 18px rgba(192,111,255,0.3); }
-    .pm-msg.received { background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.09); border-bottom-left-radius: 4px; }
-    .pm-msg-meta { font-size: 10px; opacity: 0.5; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
-    .pm-msg-wrap.sent .pm-msg-meta { justify-content: flex-end; }
-    .pm-tick { font-size: 11px; }
+    .pm-msg { max-width: 72%; padding: 10px 15px 7px; border-radius: 18px; font-size: 15px; color: white; line-height: 1.5; word-break: break-word; animation: msgPop 0.25s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes msgPop { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+    .pm-msg.sent { border-bottom-right-radius: 4px; box-shadow: 0 4px 18px rgba(192,111,255,0.25); }
+    .pm-msg.received { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-bottom-left-radius: 4px; }
+    .pm-msg-meta { font-size: 10px; opacity: 0.5; margin-top: 4px; display: flex; align-items: center; gap: 4px; justify-content: flex-end; }
+    .pm-msg-wrap.received .pm-msg-meta { justify-content: flex-start; }
     .pm-tick.read { color: #64b5f6; opacity: 1 !important; }
 
-    #pmTyping { padding: 0 16px 6px; font-size: 11px; color: rgba(255,255,255,0.35); min-height: 18px; font-style: italic; flex-shrink: 0; }
-    #pmInputRow { display: flex; gap: 10px; padding: 12px 16px 14px; border-top: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
-    #pmInput { flex: 1; padding: 11px 16px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; color: white; font-size: 14px; transition: all 0.2s; }
-    #pmInput:focus { outline: none; background: rgba(255,255,255,0.11); border-color: rgba(255,107,157,0.45); box-shadow: 0 0 0 3px rgba(255,107,157,0.08); }
-    #pmInput::placeholder { color: rgba(255,255,255,0.3); }
-    #pmSend { padding: 11px 18px; background: linear-gradient(135deg, #ff6b9d, #c06fff); border: none; border-radius: 14px; color: white; font-size: 18px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(192,111,255,0.35); flex-shrink: 0; }
-    #pmSend:hover { transform: translateY(-2px) scale(1.06); box-shadow: 0 8px 22px rgba(192,111,255,0.55); }
-    #pmSend:active { transform: scale(0.96); }
+    .pm-empty { text-align: center; color: rgba(255,255,255,0.3); font-size: 13px; padding: 50px 20px; line-height: 2; }
+    .pm-empty-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+    .pm-loading { text-align: center; color: rgba(255,255,255,0.3); font-size: 13px; padding: 40px; }
+
+    /* ── INPUT AREAS ── */
+    .input-area { background: rgba(255,255,255,0.05); backdrop-filter: blur(30px); border-radius: 20px; padding: 16px 20px; border: 1px solid rgba(255,255,255,0.2); display: flex; gap: 10px; align-items: center; }
+    #pmPanel .input-area { border-radius: 0 0 20px 20px; border-top: none; flex-direction: column; gap: 10px; }
+    #pmPanel .input-row { display: flex; gap: 10px; width: 100%; align-items: center; }
+
+    .message-input { flex: 1; padding: 14px 20px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; color: white; font-size: 16px; transition: all 0.3s ease; }
+    .message-input:focus { outline: none; background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.5); }
+    .message-input::placeholder { color: rgba(255,255,255,0.6); }
+    .send-btn { padding: 14px 30px; background: linear-gradient(135deg, #ff6b9d 0%, #c06fff 100%); border: none; border-radius: 15px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 20px rgba(192,111,255,0.4); white-space: nowrap; }
+    .send-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(192,111,255,0.6); }
+    .send-btn:active { transform: scale(0.97); }
+
+    /* ── BUBBLE COLOR PICKER ── */
+    .bubble-color-row { display: flex; align-items: center; gap: 10px; width: 100%; }
+    .bubble-color-label { color: rgba(255,255,255,0.55); font-size: 12px; white-space: nowrap; }
+    .bubble-color-swatches { display: flex; gap: 7px; flex-wrap: wrap; }
+    .color-swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+    .color-swatch:hover { transform: scale(1.2); border-color: white; }
+    .color-swatch.active { border-color: white; box-shadow: 0 0 0 3px rgba(255,255,255,0.3); transform: scale(1.1); }
+    .color-swatch-custom { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.2s; position: relative; background: rgba(255,255,255,0.1); overflow: hidden; }
+    .color-swatch-custom:hover { transform: scale(1.2); border-color: white; }
+    .color-swatch-custom input[type="color"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
 
     /* TOAST */
     .pm-toast { position: fixed; bottom: 24px; right: 24px; z-index: 3000; background: rgba(10,3,24,0.97); border: 1px solid rgba(255,107,157,0.4); border-radius: 16px; padding: 14px 18px; color: white; font-size: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.5); cursor: pointer; max-width: 280px; backdrop-filter: blur(20px); animation: toastIn 0.4s cubic-bezier(.34,1.56,.64,1); transition: opacity 0.4s; }
-    @keyframes toastIn { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    .pm-toast-name { font-weight: 700; color: #ff6b9d; margin-bottom: 5px; font-size: 13px; }
-    .pm-toast-text { opacity: 0.8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    .pm-toast-name { font-weight: 700; color: #ff6b9d; margin-bottom: 4px; font-size: 13px; }
+    .pm-toast-text { opacity: 0.75; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     /* scrollbars */
-    #profileSidebar::-webkit-scrollbar, .messages-area::-webkit-scrollbar, #pmMessages::-webkit-scrollbar { width: 5px; }
-    #profileSidebar::-webkit-scrollbar-track, .messages-area::-webkit-scrollbar-track, #pmMessages::-webkit-scrollbar-track { background: transparent; }
-    #profileSidebar::-webkit-scrollbar-thumb, #pmMessages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
-    .messages-area::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #ff6b9d, #c06fff); border-radius: 10px; }
+    .users-panel::-webkit-scrollbar, .messages-area::-webkit-scrollbar, .pm-messages-area::-webkit-scrollbar { width: 5px; }
+    .users-panel::-webkit-scrollbar-track, .messages-area::-webkit-scrollbar-track, .pm-messages-area::-webkit-scrollbar-track { background: transparent; }
+    .users-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+    .messages-area::-webkit-scrollbar-thumb, .pm-messages-area::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #ff6b9d, #c06fff); border-radius: 10px; }
 
     @media (max-width: 768px) {
+        .body-columns { flex-direction: column; }
+        .users-panel { width: 100%; max-height: 220px; flex-direction: row; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; padding: 12px; }
+        .user-list { flex-direction: row; gap: 8px; }
+        .user-item { min-width: 140px; }
         .chat-header { flex-direction: column; align-items: flex-start; }
-        #profileSidebar { width: 280px; left: -290px; }
     }
 </style>
 ```
 
 </head>
 <body class="theme-futuriste">
-
-<div id="toggleProfileSidebar">👥</div>
-
-<!-- SIDEBAR -->
-
-<div id="profileSidebar">
-    <div class="sidebar-header">
-        💬 Utilisateurs
-        <div class="profile-count" id="profileCount">Chargement...</div>
-    </div>
-    <div class="profile-list" id="profileList"></div>
-</div>
-
-<!-- MODAL MP -->
-
-<div id="pmOverlay">
-    <div id="pmModal">
-        <div id="pmHeader">
-            <div id="pmAvatar">👤</div>
-            <div id="pmTitleInfo">
-                <div id="pmTitleName">Utilisateur</div>
-                <div id="pmTitleStatus" class="offline">🔴 Hors ligne</div>
-            </div>
-            <button id="pmClose">✕</button>
-        </div>
-        <div id="pmMessages">
-            <div class="pm-loading">Chargement...</div>
-        </div>
-        <div id="pmTyping"></div>
-        <div id="pmInputRow">
-            <input id="pmInput" type="text" placeholder="Message privé..." maxlength="1000">
-            <button id="pmSend">🚀</button>
-        </div>
-    </div>
-</div>
-
 <div class="particles" id="particles"></div>
 
-<div class="chat-container">
-    <div class="chat-header">
-        <div class="theme-selector">
-            <span class="theme-label">Thème :</span>
-            <div class="theme-options">
-                <div class="theme-btn" data-theme="zen" style="background:linear-gradient(135deg,#e0f7fa,#80deea)" title="Zen"></div>
-                <div class="theme-btn" data-theme="plage" style="background:linear-gradient(135deg,#ffd89b,#19547b)" title="Plage"></div>
-                <div class="theme-btn" data-theme="foret" style="background:linear-gradient(135deg,#134e5e,#71b280)" title="Forêt"></div>
-                <div class="theme-btn active" data-theme="futuriste" style="background:linear-gradient(135deg,#667eea,#764ba2)" title="Futuriste"></div>
-                <div class="theme-btn" data-theme="bonbon" style="background:linear-gradient(135deg,#ffecd2,#ff9a9e)" title="Bonbon"></div>
-                <div class="theme-btn" data-theme="bar" style="background:linear-gradient(135deg,#2c003e,#8b008b)" title="Bar"></div>
-                <div class="theme-btn" data-theme="chasse" style="background:linear-gradient(135deg,#3e2723,#795548)" title="Chasse"></div>
-                <div class="theme-btn" data-theme="aquarium" style="background:linear-gradient(135deg,#00416a,#ffe000)" title="Aquarium"></div>
-                <div class="theme-btn-custom" title="Photo personnalisée">📷<input type="file" id="customBgInput" accept="image/*"></div>
-                <div class="user-profile-photo" id="userProfilePhoto" title="Mon profil">💬</div>
-            </div>
+<div class="app-wrapper">
+
+```
+<!-- HEADER -->
+<div class="chat-header">
+    <div class="theme-selector">
+        <span class="theme-label">Thème :</span>
+        <div class="theme-options">
+            <div class="theme-btn" data-theme="zen" style="background:linear-gradient(135deg,#e0f7fa,#80deea)" title="Zen"></div>
+            <div class="theme-btn" data-theme="plage" style="background:linear-gradient(135deg,#ffd89b,#19547b)" title="Plage"></div>
+            <div class="theme-btn" data-theme="foret" style="background:linear-gradient(135deg,#134e5e,#71b280)" title="Forêt"></div>
+            <div class="theme-btn active" data-theme="futuriste" style="background:linear-gradient(135deg,#667eea,#764ba2)" title="Futuriste"></div>
+            <div class="theme-btn" data-theme="bonbon" style="background:linear-gradient(135deg,#ffecd2,#ff9a9e)" title="Bonbon"></div>
+            <div class="theme-btn" data-theme="bar" style="background:linear-gradient(135deg,#2c003e,#8b008b)" title="Bar"></div>
+            <div class="theme-btn" data-theme="chasse" style="background:linear-gradient(135deg,#3e2723,#795548)" title="Chasse"></div>
+            <div class="theme-btn" data-theme="aquarium" style="background:linear-gradient(135deg,#00416a,#ffe000)" title="Aquarium"></div>
+            <div class="theme-btn-custom" title="Photo personnalisée">📷<input type="file" id="customBgInput" accept="image/*"></div>
+            <div class="user-profile-photo" id="userProfilePhoto" title="Mon profil">💬</div>
         </div>
     </div>
-    <div class="messages-area" id="messagesArea"></div>
-    <div class="input-area">
-        <input type="text" class="message-input" id="messageInput" placeholder="Tapez votre message...">
-        <button class="send-btn" id="sendBtn">Envoyer 🚀</button>
+</div>
+
+<!-- TWO COLUMNS -->
+<div class="body-columns">
+
+    <!-- LEFT: users -->
+    <div class="users-panel" id="usersPanel">
+        <div class="users-panel-header">
+            💬 Utilisateurs
+            <div class="users-panel-count" id="profileCount">Chargement...</div>
+        </div>
+        <!-- "Chat général" entry -->
+        <div class="user-list">
+            <div class="user-item active" id="publicChatBtn" title="Chat général">
+                <div class="user-avatar" style="background:linear-gradient(135deg,#ff6b9d,#c06fff);">🌐</div>
+                <div class="user-info">
+                    <div class="user-name">Chat général</div>
+                    <div class="user-status-txt online">● Public</div>
+                </div>
+            </div>
+        </div>
+        <div class="user-list" id="profileList"></div>
     </div>
+
+    <!-- RIGHT: chat zone -->
+    <div class="right-panel">
+
+        <!-- PUBLIC CHAT -->
+        <div id="publicChatPanel">
+            <div class="messages-area" id="messagesArea"></div>
+            <div class="input-area">
+                <input type="text" class="message-input" id="messageInput" placeholder="Tapez votre message...">
+                <button class="send-btn" id="sendBtn">Envoyer 🚀</button>
+            </div>
+        </div>
+
+        <!-- PRIVATE CHAT -->
+        <div id="pmPanel">
+            <div class="pm-chat-header">
+                <div class="pm-chat-header-avatar" id="pmHeaderAvatar">👤</div>
+                <div class="pm-chat-header-info">
+                    <div class="pm-chat-header-name" id="pmHeaderName">Utilisateur</div>
+                    <div class="pm-chat-header-status offline" id="pmHeaderStatus">🔴 Hors ligne</div>
+                </div>
+                <button class="pm-back-btn" id="pmBackBtn">← Chat général</button>
+            </div>
+            <div class="messages-area pm-messages-area" id="pmMessagesArea"></div>
+            <div class="input-area">
+                <div class="input-row">
+                    <input type="text" class="message-input" id="pmInput" placeholder="Message privé..." maxlength="1000">
+                    <button class="send-btn" id="pmSend">Envoyer 🚀</button>
+                </div>
+                <!-- BUBBLE COLOR PICKER -->
+                <div class="bubble-color-row">
+                    <span class="bubble-color-label">🎨 Couleur de mes bulles :</span>
+                    <div class="bubble-color-swatches" id="colorSwatches"></div>
+                    <div class="color-swatch-custom" title="Couleur personnalisée">✏️<input type="color" id="customColorInput"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+```
+
 </div>
 
 <script type="module">
@@ -227,15 +275,63 @@ const supabase = createClient(
 ════════════════════════ */
 let currentUserPhoto = null;
 const currentUserPrenom = localStorage.getItem('prenom') || 'Invité';
-const fingerprint = localStorage.getItem('browserFingerprint') || '';
-const currentUniqueId = fingerprint ? `${currentUserPrenom}_${fingerprint}` : null;
-const savedPhotoUrl = localStorage.getItem('userPhotoUrl') || localStorage.getItem('tempPhotoPreview');
+const fingerprint      = localStorage.getItem('browserFingerprint') || '';
+const currentUniqueId  = fingerprint ? `${currentUserPrenom}_${fingerprint}` : null;
+const savedPhotoUrl    = localStorage.getItem('userPhotoUrl') || localStorage.getItem('tempPhotoPreview');
 
-(function displayUserPhoto() {
+(function initPhoto() {
     const el = document.getElementById('userProfilePhoto');
     if (savedPhotoUrl) { el.innerHTML = `<img src="${savedPhotoUrl}" alt="Profil">`; currentUserPhoto = savedPhotoUrl; }
     else el.textContent = '💬';
 })();
+
+/* ════════════════════════
+   BUBBLE COLOR
+════════════════════════ */
+const BUBBLE_PRESETS = [
+    { label: 'Rose/Violet (défaut)', value: 'linear-gradient(135deg,#ff6b9d,#c06fff)' },
+    { label: 'Bleu', value: 'linear-gradient(135deg,#2196f3,#03a9f4)' },
+    { label: 'Vert', value: 'linear-gradient(135deg,#43e97b,#38f9d7)' },
+    { label: 'Orange', value: 'linear-gradient(135deg,#f7971e,#ffd200)' },
+    { label: 'Rouge', value: 'linear-gradient(135deg,#f44336,#e91e63)' },
+    { label: 'Indigo', value: 'linear-gradient(135deg,#5c6bc0,#7c4dff)' },
+    { label: 'Cyan', value: 'linear-gradient(135deg,#00bcd4,#26c6da)' },
+    { label: 'Noir mat', value: 'linear-gradient(135deg,#2d2d2d,#555)' },
+];
+
+let myBubbleStyle = localStorage.getItem('myBubbleStyle') || BUBBLE_PRESETS[0].value;
+
+function applyBubbleStyle(style) {
+    myBubbleStyle = style;
+    localStorage.setItem('myBubbleStyle', style);
+    // Met à jour toutes les bulles existantes de l'utilisateur
+    document.querySelectorAll('.pm-msg.sent').forEach(b => b.style.background = style);
+}
+
+function buildColorSwatches() {
+    const container = document.getElementById('colorSwatches');
+    container.innerHTML = '';
+    BUBBLE_PRESETS.forEach(preset => {
+        const sw = document.createElement('div');
+        sw.className = 'color-swatch' + (myBubbleStyle === preset.value ? ' active' : '');
+        sw.style.background = preset.value;
+        sw.title = preset.label;
+        sw.addEventListener('click', () => {
+            container.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            sw.classList.add('active');
+            applyBubbleStyle(preset.value);
+        });
+        container.appendChild(sw);
+    });
+}
+buildColorSwatches();
+
+document.getElementById('customColorInput').addEventListener('input', e => {
+    const hex = e.target.value;
+    const style = hex;
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+    applyBubbleStyle(style);
+});
 
 /* ════════════════════════
    ONLINE STATUS
@@ -261,12 +357,12 @@ async function loadProfiles() {
         .from('profiles')
         .select('unique_id, prenom, photo_url, is_online, last_seen')
         .order('is_online', { ascending: false })
-        .order('prenom', { ascending: true });
+        .order('prenom',    { ascending: true });
 
     if (error) { document.getElementById('profileCount').textContent = 'Erreur DB'; return; }
     profiles = (data || []).map(p => ({
         unique_id: p.unique_id || '',
-        prenom: p.prenom || '',
+        prenom:    p.prenom    || '',
         photo_url: p.photo_url || null,
         is_online: !!p.is_online
     }));
@@ -279,54 +375,44 @@ function renderProfiles() {
     container.innerHTML = '';
 
     const others = profiles.filter(p => p.unique_id !== currentUniqueId);
-    if (!others.length) {
-        container.innerHTML = '<div style="color:rgba(255,255,255,0.35);text-align:center;padding:24px;font-size:13px;">Aucun autre utilisateur</div>';
-        countEl.textContent = '0 utilisateur';
-        return;
-    }
     const onlineCount = others.filter(p => p.is_online).length;
     countEl.textContent = `${others.length} utilisateur${others.length > 1 ? 's' : ''} · ${onlineCount} en ligne`;
 
     others.forEach(profile => {
         const item = document.createElement('div');
-        item.className = 'profile-item';
-        item.title = `Écrire en privé à ${profile.prenom || 'Anonyme'}`;
+        item.className = 'user-item' + (pmCurrentProfile?.unique_id === profile.unique_id ? ' active' : '');
+        item.title = `Message privé avec ${profile.prenom || 'Anonyme'}`;
 
         // avatar
-        const photoDiv = document.createElement('div');
-        photoDiv.className = 'profile-photo';
+        const av = document.createElement('div');
+        av.className = 'user-avatar';
         if (profile.photo_url) {
             const img = document.createElement('img');
             img.src = profile.photo_url; img.alt = profile.prenom;
-            photoDiv.appendChild(img);
+            av.appendChild(img);
         } else {
-            photoDiv.textContent = (profile.prenom || '?')[0].toUpperCase();
+            av.textContent = (profile.prenom || '?')[0].toUpperCase();
         }
         const dot = document.createElement('div');
         dot.className = 'status-dot ' + (profile.is_online ? 'online' : 'offline');
-        photoDiv.appendChild(dot);
+        av.appendChild(dot);
 
         // info
-        const infoDiv = document.createElement('div');
-        infoDiv.className = 'profile-info';
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'profile-name';
-        nameDiv.textContent = profile.prenom || 'Anonyme';
-        const stDiv = document.createElement('div');
-        stDiv.className = 'profile-status-text ' + (profile.is_online ? 'online' : 'offline');
-        stDiv.textContent = profile.is_online ? '● En ligne' : '● Hors ligne';
-        infoDiv.appendChild(nameDiv);
-        infoDiv.appendChild(stDiv);
+        const info = document.createElement('div');
+        info.className = 'user-info';
+        const nameEl = document.createElement('div');
+        nameEl.className = 'user-name';
+        nameEl.textContent = profile.prenom || 'Anonyme';
+        const stEl = document.createElement('div');
+        stEl.className = 'user-status-txt ' + (profile.is_online ? 'online' : 'offline');
+        stEl.textContent = profile.is_online ? '● En ligne' : '● Hors ligne';
+        info.appendChild(nameEl);
+        info.appendChild(stEl);
 
-        const hint = document.createElement('span');
-        hint.className = 'pm-hint';
-        hint.textContent = '✉️';
+        item.appendChild(av);
+        item.appendChild(info);
 
-        item.appendChild(photoDiv);
-        item.appendChild(infoDiv);
-        item.appendChild(hint);
-
-        // badge non lus
+        // badge
         const unread = pmBadges[profile.unique_id] || 0;
         if (unread > 0) {
             const badge = document.createElement('div');
@@ -344,7 +430,24 @@ setInterval(loadProfiles, 5000);
 loadProfiles();
 
 /* ════════════════════════
-   REALTIME INBOX (global)
+   PANEL SWITCHING
+════════════════════════ */
+let pmCurrentProfile = null;
+
+function showPublicChat() {
+    pmCurrentProfile = null;
+    document.getElementById('publicChatPanel').style.display = 'flex';
+    document.getElementById('pmPanel').classList.remove('active');
+    document.getElementById('publicChatBtn').classList.add('active');
+    document.querySelectorAll('#profileList .user-item').forEach(i => i.classList.remove('active'));
+    if (pmConvChannel) { supabase.removeChannel(pmConvChannel); pmConvChannel = null; }
+}
+
+document.getElementById('publicChatBtn').addEventListener('click', showPublicChat);
+document.getElementById('pmBackBtn').addEventListener('click', showPublicChat);
+
+/* ════════════════════════
+   REALTIME INBOX
 ════════════════════════ */
 function subscribeInbox() {
     if (!currentUniqueId) return;
@@ -357,13 +460,10 @@ function subscribeInbox() {
         }, payload => {
             const msg = payload.new;
             const sid = msg.sender_unique_id;
-
             if (pmCurrentProfile && pmCurrentProfile.unique_id === sid) {
-                // Fenêtre ouverte sur cet expéditeur → afficher + marquer lu
                 appendPMBubble({ id: msg.id, text: msg.message, fromMe: false, time: fmtTime(msg.created_at), is_read: false });
                 markRead(msg.id);
             } else {
-                // Badge + toast
                 pmBadges[sid] = (pmBadges[sid] || 0) + 1;
                 renderProfiles();
                 showToast(msg, sid);
@@ -401,28 +501,37 @@ async function markAllRead(senderUniqueId) {
 }
 
 /* ════════════════════════
-   PM MODAL
+   OPEN PM (inline)
 ════════════════════════ */
-let pmCurrentProfile  = null;
-let pmConvChannel     = null;
+let pmConvChannel = null;
 
 async function openPM(profile) {
     pmCurrentProfile = profile;
+
+    // badge off
     pmBadges[profile.unique_id] = 0;
+
+    // switch panel
+    document.getElementById('publicChatPanel').style.display = 'none';
+    document.getElementById('pmPanel').classList.add('active');
+
+    // active state in list
+    document.getElementById('publicChatBtn').classList.remove('active');
+    document.querySelectorAll('#profileList .user-item').forEach(i => i.classList.remove('active'));
+    // re-render to reflect active + clear badge
     renderProfiles();
 
     // header
-    const av = document.getElementById('pmAvatar');
+    const av = document.getElementById('pmHeaderAvatar');
     if (profile.photo_url) av.innerHTML = `<img src="${profile.photo_url}" alt="${escHtml(profile.prenom)}">`;
     else av.textContent = (profile.prenom || '?')[0].toUpperCase();
-
-    document.getElementById('pmTitleName').textContent = profile.prenom || 'Anonyme';
-    const stEl = document.getElementById('pmTitleStatus');
-    stEl.className = profile.is_online ? 'online' : 'offline';
+    document.getElementById('pmHeaderName').textContent = profile.prenom || 'Anonyme';
+    const stEl = document.getElementById('pmHeaderStatus');
+    stEl.className = 'pm-chat-header-status ' + (profile.is_online ? 'online' : 'offline');
     stEl.textContent = profile.is_online ? '🟢 En ligne' : '🔴 Hors ligne';
 
-    document.getElementById('pmMessages').innerHTML = '<div class="pm-loading">Chargement...</div>';
-    document.getElementById('pmOverlay').classList.add('visible');
+    // load messages
+    document.getElementById('pmMessagesArea').innerHTML = '<div class="pm-loading">Chargement...</div>';
     document.getElementById('pmInput').focus();
 
     await fetchHistory(profile.unique_id);
@@ -430,6 +539,9 @@ async function openPM(profile) {
     subscribeConv(profile.unique_id);
 }
 
+/* ════════════════════════
+   PM HISTORY
+════════════════════════ */
 async function fetchHistory(otherId) {
     if (!currentUniqueId) { renderHistory([]); return; }
     const { data, error } = await supabase
@@ -453,7 +565,7 @@ async function fetchHistory(otherId) {
 }
 
 function renderHistory(messages) {
-    const area = document.getElementById('pmMessages');
+    const area = document.getElementById('pmMessagesArea');
     area.innerHTML = '';
     if (!messages.length) {
         area.innerHTML = `<div class="pm-empty"><span class="pm-empty-icon">💌</span>Aucun message pour l'instant<br><span style="font-size:12px;opacity:0.5">Soyez le premier à écrire !</span></div>`;
@@ -470,17 +582,16 @@ function buildBubble(msg) {
 
     const bubble = document.createElement('div');
     bubble.className = 'pm-msg ' + (msg.fromMe ? 'sent' : 'received');
+    if (msg.fromMe) bubble.style.background = myBubbleStyle;
 
-    let tick = '';
-    if (msg.fromMe) tick = `<span class="pm-tick ${msg.is_read ? 'read' : ''}">${msg.is_read ? '✓✓' : '✓'}</span>`;
-
+    let tick = msg.fromMe ? `<span class="pm-tick ${msg.is_read ? 'read' : ''}">${msg.is_read ? '✓✓' : '✓'}</span>` : '';
     bubble.innerHTML = `${escHtml(msg.text)}<div class="pm-msg-meta">${msg.time}${tick}</div>`;
     wrap.appendChild(bubble);
     return wrap;
 }
 
 function appendPMBubble(msg) {
-    const area = document.getElementById('pmMessages');
+    const area = document.getElementById('pmMessagesArea');
     area.querySelector('.pm-empty, .pm-loading')?.remove();
     area.appendChild(buildBubble(msg));
     area.scrollTop = area.scrollHeight;
@@ -489,7 +600,6 @@ function appendPMBubble(msg) {
 function subscribeConv(otherId) {
     if (pmConvChannel) { supabase.removeChannel(pmConvChannel); pmConvChannel = null; }
     if (!currentUniqueId) return;
-    // Écoute les nouveaux messages de l'autre personne dans cette conv
     pmConvChannel = supabase.channel(`conv-${[currentUniqueId, otherId].sort().join('-')}`)
         .on('postgres_changes', {
             event: 'INSERT',
@@ -505,6 +615,9 @@ function subscribeConv(otherId) {
         .subscribe();
 }
 
+/* ════════════════════════
+   SEND PM
+════════════════════════ */
 async function sendPM() {
     if (!pmCurrentProfile || !currentUniqueId) return;
     const input = document.getElementById('pmInput');
@@ -512,7 +625,6 @@ async function sendPM() {
     if (!text) return;
     input.value = '';
 
-    // message optimiste
     const tempId = 'tmp-' + Date.now();
     appendPMBubble({ id: tempId, text, fromMe: true, time: fmtTime(new Date().toISOString()), is_read: false });
 
@@ -533,23 +645,29 @@ async function sendPM() {
     }
 }
 
-function closePM() {
-    document.getElementById('pmOverlay').classList.remove('visible');
-    if (pmConvChannel) { supabase.removeChannel(pmConvChannel); pmConvChannel = null; }
-    pmCurrentProfile = null;
-}
-
 document.getElementById('pmSend').addEventListener('click', sendPM);
 document.getElementById('pmInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendPM(); });
-document.getElementById('pmClose').addEventListener('click', closePM);
-document.getElementById('pmOverlay').addEventListener('click', e => { if (e.target === document.getElementById('pmOverlay')) closePM(); });
 
 /* ════════════════════════
-   SIDEBAR TOGGLE
+   PUBLIC CHAT
 ════════════════════════ */
-document.getElementById('toggleProfileSidebar').addEventListener('click', () => {
-    document.getElementById('profileSidebar').classList.toggle('open');
-});
+function addMessage(author, text) {
+    const container = document.getElementById('messagesArea');
+    const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    const photo = author === currentUserPrenom ? currentUserPhoto : (profiles.find(p => p.prenom === author) || {}).photo_url;
+    const av = photo ? `<img src="${photo}" alt="${escHtml(author)}">` : (author[0] || '?').toUpperCase();
+    const msg = document.createElement('div');
+    msg.className = 'message';
+    msg.innerHTML = `<div class="message-avatar">${av}</div><div class="message-content"><div class="message-author">${escHtml(author)}</div><div class="message-text">${escHtml(text)}</div><div class="message-time">${time}</div></div>`;
+    container.appendChild(msg);
+    container.scrollTop = container.scrollHeight;
+}
+function sendMessage() {
+    const input = document.getElementById('messageInput');
+    if (input.value.trim()) { addMessage(currentUserPrenom, input.value.trim()); input.value = ''; }
+}
+document.getElementById('sendBtn').addEventListener('click', sendMessage);
+document.getElementById('messageInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
 
 /* ════════════════════════
    THEMES
@@ -574,30 +692,9 @@ document.getElementById('customBgInput').addEventListener('change', e => {
 });
 
 /* ════════════════════════
-   PUBLIC CHAT
-════════════════════════ */
-function addMessage(author, text) {
-    const container = document.getElementById('messagesArea');
-    const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    const photo = author === currentUserPrenom ? currentUserPhoto : (profiles.find(p => p.prenom === author) || {}).photo_url;
-    const av = photo ? `<img src="${photo}" alt="${escHtml(author)}">` : (author[0] || '?').toUpperCase();
-    const msg = document.createElement('div');
-    msg.className = 'message';
-    msg.innerHTML = `<div class="message-avatar">${av}</div><div class="message-content"><div class="message-author">${escHtml(author)}</div><div class="message-text">${escHtml(text)}</div><div class="message-time">${time}</div></div>`;
-    container.appendChild(msg);
-    container.scrollTop = container.scrollHeight;
-}
-function sendMessage() {
-    const input = document.getElementById('messageInput');
-    if (input.value.trim()) { addMessage(currentUserPrenom, input.value.trim()); input.value = ''; }
-}
-document.getElementById('sendBtn').addEventListener('click', sendMessage);
-document.getElementById('messageInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
-
-/* ════════════════════════
    PARTICLES
 ════════════════════════ */
-(function createParticles() {
+(function() {
     const c = document.getElementById('particles');
     for (let i = 0; i < 40; i++) {
         const p = document.createElement('div');
@@ -617,18 +714,18 @@ function escHtml(s) {
 }
 function fmtTime(iso) {
     if (!iso) return '';
-    const d = new Date(iso);
-    const today = new Date();
+    const d = new Date(iso), today = new Date();
     const hm = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    return d.toDateString() === today.toDateString()
-        ? hm
+    return d.toDateString() === today.toDateString() ? hm
         : d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }) + ' ' + hm;
 }
 
 /* ════════════════════════
    INIT
 ════════════════════════ */
-addMessage('BubbleChat', `Bienvenue ${currentUserPrenom} ! 🎉  Cliquez sur un profil pour écrire en privé ✉️`);
+addMessage('BubbleChat', `Bienvenue ${currentUserPrenom} ! 🎉  Cliquez sur un profil à gauche pour lui écrire en privé ✉️`);
+// ensure public panel visible by default
+document.getElementById('publicChatPanel').style.display = 'flex';
 </script>
 
 </body>
