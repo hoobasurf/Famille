@@ -74,11 +74,12 @@
         gap: 20px; 
         flex: 1; 
         min-height: 0; 
+        position: relative;
     }
 
-    /* ── LEFT SIDEBAR (users list) - TRANSPARENT ── */
+    /* ── LEFT SIDEBAR - TRANSPARENT & TOGGLEABLE ── */
     .users-panel { 
-        width: 300px; 
+        width: 320px; 
         flex-shrink: 0; 
         background: rgba(255,255,255,0.03); 
         backdrop-filter: blur(20px); 
@@ -89,7 +90,18 @@
         flex-direction: column; 
         gap: 12px; 
         overflow-y: auto; 
-        max-height: calc(100vh - 160px); 
+        max-height: calc(100vh - 160px);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 100;
+    }
+    .users-panel.hidden {
+        transform: translateX(-100%);
+        opacity: 0;
+        pointer-events: none;
     }
     .users-panel-header { 
         color: white; 
@@ -222,6 +234,39 @@
         border-radius: 20px; 
         border: 1px solid rgba(255,255,255,0.15); 
         overflow: hidden;
+        transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-left: 340px;
+    }
+    .right-panel.full-width {
+        margin-left: 0;
+    }
+
+    /* Toggle Button */
+    .toggle-sidebar-btn {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 200;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 12px;
+        padding: 10px 14px;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .toggle-sidebar-btn:hover {
+        background: rgba(255,255,255,0.2);
+        transform: scale(1.05);
+    }
+    .toggle-sidebar-btn .toggle-text {
+        font-size: 13px;
+        font-weight: 600;
     }
 
     /* Chat Header */
@@ -516,16 +561,15 @@
     }
 
     @media (max-width: 768px) {
-        .body-columns { flex-direction: column; }
         .users-panel {
-            width: 100%;
-            max-height: 200px;
-            flex-direction: row;
-            overflow-x: auto;
-            overflow-y: hidden;
+            width: 280px;
         }
-        .user-list { flex-direction: row; }
-        .user-item { min-width: 150px; }
+        .right-panel {
+            margin-left: 0 !important;
+        }
+        .right-panel.full-width {
+            margin-left: 0;
+        }
     }
 </style>
 ```
@@ -557,15 +601,21 @@
 ```
 <!-- TWO COLUMNS -->
 <div class="body-columns">
+    <!-- Toggle Button -->
+    <button class="toggle-sidebar-btn" id="toggleSidebar">
+        <span id="toggleIcon">👥</span>
+        <span class="toggle-text" id="toggleText">Profils</span>
+    </button>
+
     <!-- LEFT SIDEBAR -->
-    <div class="users-panel">
+    <div class="users-panel" id="usersPanel">
         <div class="users-panel-header">
             💬 Conversations
             <div class="users-panel-count" id="profileCount">Chargement...</div>
         </div>
         <div class="user-list">
             <!-- Chat général -->
-            <div class="user-item active" id="publicChatBtn" data-chat-type="public">
+            <div class="user-item active" id="publicChatBtn">
                 <div class="user-avatar">🌐</div>
                 <div class="user-info">
                     <div class="user-name">Chat général</div>
@@ -577,7 +627,7 @@
     </div>
 
     <!-- RIGHT PANEL -->
-    <div class="right-panel">
+    <div class="right-panel" id="rightPanel">
         <!-- Dynamic Header -->
         <div class="chat-panel-header">
             <div class="chat-panel-header-avatar" id="chatHeaderAvatar">🌐</div>
@@ -614,6 +664,8 @@ const supabase = createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWtyaXdyd3V5bndwem9kYmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzQ3NjYsImV4cCI6MjA4NjE1MDc2Nn0.MJ6CSmrttEWcrdfy5C7nP4sE_pe19sGNE-WasASPDNc'
 );
 
+console.log('✅ Application démarrée');
+
 /* ════════════════════════
    CURRENT USER
 ════════════════════════ */
@@ -622,6 +674,8 @@ const currentUserPrenom = localStorage.getItem('prenom') || 'Invité';
 const fingerprint = localStorage.getItem('browserFingerprint') || '';
 const currentUniqueId = fingerprint ? `${currentUserPrenom}_${fingerprint}` : null;
 const savedPhotoUrl = localStorage.getItem('userPhotoUrl') || localStorage.getItem('tempPhotoPreview');
+
+console.log('👤 Utilisateur:', currentUserPrenom, 'ID:', currentUniqueId);
 
 (function initPhoto() {
     const el = document.getElementById('userProfilePhoto');
@@ -634,13 +688,36 @@ const savedPhotoUrl = localStorage.getItem('userPhotoUrl') || localStorage.getIt
 })();
 
 /* ════════════════════════
-   STATE MANAGEMENT
+   SIDEBAR TOGGLE
 ════════════════════════ */
-let currentChatType = 'public'; // 'public' or 'private'
-let currentChatUser = null; // pour PM
+let sidebarVisible = true;
+const toggleBtn = document.getElementById('toggleSidebar');
+const usersPanel = document.getElementById('usersPanel');
+const rightPanel = document.getElementById('rightPanel');
+
+toggleBtn.addEventListener('click', () => {
+    sidebarVisible = !sidebarVisible;
+    if (sidebarVisible) {
+        usersPanel.classList.remove('hidden');
+        rightPanel.classList.remove('full-width');
+        document.getElementById('toggleIcon').textContent = '👥';
+        document.getElementById('toggleText').textContent = 'Profils';
+    } else {
+        usersPanel.classList.add('hidden');
+        rightPanel.classList.add('full-width');
+        document.getElementById('toggleIcon').textContent = '💬';
+        document.getElementById('toggleText').textContent = 'Chat';
+    }
+});
+
+/* ════════════════════════
+   STATE
+════════════════════════ */
+let currentChatType = 'public';
+let currentChatUser = null;
 let profiles = [];
 const pmBadges = {};
-let pmChannels = {}; // pour gérer les subscriptions PM
+let lastPublicMsgId = 0;
 
 /* ════════════════════════
    BUBBLE COLOR
@@ -671,7 +748,6 @@ function buildColorSwatches() {
             sw.classList.add('active');
             myBubbleStyle = preset.value;
             localStorage.setItem('myBubbleStyle', preset.value);
-            // Update existing bubbles
             document.querySelectorAll('.pm-msg.sent').forEach(b => b.style.background = preset.value);
         });
         container.appendChild(sw);
@@ -684,9 +760,13 @@ buildColorSwatches();
 ════════════════════════ */
 async function setOnlineStatus(online) {
     if (!currentUniqueId) return;
-    await supabase.from('profiles')
-        .update({ is_online: online, last_seen: new Date().toISOString() })
-        .eq('unique_id', currentUniqueId);
+    try {
+        await supabase.from('profiles')
+            .update({ is_online: online, last_seen: new Date().toISOString() })
+            .eq('unique_id', currentUniqueId);
+    } catch (err) {
+        console.error('Erreur mise à jour statut:', err);
+    }
 }
 setOnlineStatus(true);
 setInterval(() => setOnlineStatus(true), 30000);
@@ -696,26 +776,27 @@ window.addEventListener('beforeunload', () => setOnlineStatus(false));
    LOAD PROFILES
 ════════════════════════ */
 async function loadProfiles() {
-    const { data, error } = await supabase
-        .from('profiles')
-        .select('unique_id, prenom, photo_url, is_online, last_seen')
-        .order('is_online', { ascending: false })
-        .order('prenom', { ascending: true });
+    try {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('unique_id, prenom, photo_url, is_online, last_seen')
+            .order('is_online', { ascending: false })
+            .order('prenom', { ascending: true });
 
-    if (error) {
-        console.error('Erreur chargement profils:', error);
+        if (error) throw error;
+
+        profiles = (data || []).filter(p => p.unique_id !== currentUniqueId).map(p => ({
+            unique_id: p.unique_id || '',
+            prenom: p.prenom || 'Anonyme',
+            photo_url: p.photo_url || null,
+            is_online: !!p.is_online
+        }));
+
+        renderProfiles();
+    } catch (err) {
+        console.error('Erreur chargement profils:', err);
         document.getElementById('profileCount').textContent = 'Erreur';
-        return;
     }
-
-    profiles = (data || []).filter(p => p.unique_id !== currentUniqueId).map(p => ({
-        unique_id: p.unique_id || '',
-        prenom: p.prenom || 'Anonyme',
-        photo_url: p.photo_url || null,
-        is_online: !!p.is_online
-    }));
-
-    renderProfiles();
 }
 
 function renderProfiles() {
@@ -732,10 +813,8 @@ function renderProfiles() {
         if (currentChatType === 'private' && currentChatUser?.unique_id === profile.unique_id) {
             item.classList.add('active');
         }
-        item.dataset.chatType = 'private';
         item.dataset.uniqueId = profile.unique_id;
 
-        // Avatar
         const av = document.createElement('div');
         av.className = 'user-avatar';
         if (profile.photo_url) {
@@ -747,7 +826,6 @@ function renderProfiles() {
         dot.className = 'status-dot ' + (profile.is_online ? 'online' : 'offline');
         av.appendChild(dot);
 
-        // Info
         const info = document.createElement('div');
         info.className = 'user-info';
         info.innerHTML = `
@@ -760,7 +838,6 @@ function renderProfiles() {
         item.appendChild(av);
         item.appendChild(info);
 
-        // Badge
         const unread = pmBadges[profile.unique_id] || 0;
         if (unread > 0) {
             const badge = document.createElement('div');
@@ -769,14 +846,112 @@ function renderProfiles() {
             item.appendChild(badge);
         }
 
-        item.addEventListener('click', () => switchToPrivateChat(profile));
+        item.addEventListener('click', () => {
+            switchToPrivateChat(profile);
+            if (window.innerWidth <= 768) {
+                sidebarVisible = false;
+                usersPanel.classList.add('hidden');
+                rightPanel.classList.add('full-width');
+            }
+        });
         container.appendChild(item);
     });
 }
 
-// Refresh profiles every 5 seconds
 setInterval(loadProfiles, 5000);
 loadProfiles();
+
+/* ════════════════════════
+   PUBLIC CHAT
+════════════════════════ */
+async function loadPublicMessages() {
+    try {
+        const { data, error } = await supabase
+            .from('public_messages')
+            .select('id, author, message, photo_url, created_at')
+            .gt('id', lastPublicMsgId)
+            .order('created_at', { ascending: true })
+            .limit(50);
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+            data.forEach(msg => {
+                if (msg.id > lastPublicMsgId) lastPublicMsgId = msg.id;
+                if (currentChatType === 'public') {
+                    renderPublicMessage({
+                        author: msg.author,
+                        text: msg.message,
+                        photo: msg.photo_url,
+                        time: fmtTime(msg.created_at)
+                    });
+                }
+            });
+        }
+    } catch (err) {
+        console.error('Erreur chargement messages publics:', err);
+    }
+}
+
+function renderPublicMessage(msg) {
+    const container = document.getElementById('messagesArea');
+    const msgEl = document.createElement('div');
+    msgEl.className = 'message';
+
+    const av = document.createElement('div');
+    av.className = 'message-avatar';
+    if (msg.photo) {
+        av.innerHTML = `<img src="${msg.photo}" alt="${escHtml(msg.author)}">`;
+    } else {
+        av.textContent = (msg.author[0] || '?').toUpperCase();
+    }
+
+    const content = document.createElement('div');
+    content.className = 'message-content';
+    content.innerHTML = `
+        <div class="message-author">${escHtml(msg.author)}</div>
+        <div class="message-text">${escHtml(msg.text)}</div>
+        <div class="message-time">${msg.time}</div>
+    `;
+
+    msgEl.appendChild(av);
+    msgEl.appendChild(content);
+    container.appendChild(msgEl);
+    container.scrollTop = container.scrollHeight;
+}
+
+async function sendPublicMessage(text) {
+    try {
+        const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        
+        // Afficher localement immédiatement
+        renderPublicMessage({
+            author: currentUserPrenom,
+            text: text,
+            photo: currentUserPhoto,
+            time: time
+        });
+
+        // Enregistrer dans la DB
+        const { data, error } = await supabase
+            .from('public_messages')
+            .insert({
+                author: currentUserPrenom,
+                message: text,
+                photo_url: currentUserPhoto
+            })
+            .select()
+            .single();
+
+        if (error) throw error;
+        if (data && data.id > lastPublicMsgId) lastPublicMsgId = data.id;
+    } catch (err) {
+        console.error('Erreur envoi message public:', err);
+    }
+}
+
+// Poll pour nouveaux messages publics
+setInterval(loadPublicMessages, 2000);
 
 /* ════════════════════════
    SWITCH CHAT
@@ -785,39 +960,27 @@ function switchToPublicChat() {
     currentChatType = 'public';
     currentChatUser = null;
 
-    // Update header
     document.getElementById('chatHeaderAvatar').innerHTML = '🌐';
     document.getElementById('chatHeaderName').textContent = 'Chat général';
     document.getElementById('chatHeaderStatus').className = 'chat-panel-header-status online';
     document.getElementById('chatHeaderStatus').textContent = '● Public';
 
-    // Update active state
     document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
     document.getElementById('publicChatBtn').classList.add('active');
 
-    // Hide color picker
     document.getElementById('bubbleColorPicker').style.display = 'none';
 
-    // Clear messages and show public messages
     const area = document.getElementById('messagesArea');
     area.innerHTML = '';
-    addMessage('BubbleChat', `Bienvenue dans le chat général ! 🎉`);
-
-    // Unsubscribe from PM channels
-    Object.values(pmChannels).forEach(channel => {
-        supabase.removeChannel(channel);
-    });
-    pmChannels = {};
+    loadPublicMessages();
 }
 
 function switchToPrivateChat(profile) {
     currentChatType = 'private';
     currentChatUser = profile;
 
-    // Clear badge
     pmBadges[profile.unique_id] = 0;
 
-    // Update header
     const av = document.getElementById('chatHeaderAvatar');
     if (profile.photo_url) {
         av.innerHTML = `<img src="${profile.photo_url}" alt="${escHtml(profile.prenom)}">`;
@@ -829,69 +992,34 @@ function switchToPrivateChat(profile) {
     statusEl.className = 'chat-panel-header-status ' + (profile.is_online ? 'online' : 'offline');
     statusEl.textContent = profile.is_online ? '🟢 En ligne' : '🔴 Hors ligne';
 
-    // Update active state
     document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
     document.querySelectorAll(`.user-item[data-unique-id="${profile.unique_id}"]`).forEach(i => {
         i.classList.add('active');
     });
 
-    // Show color picker
     document.getElementById('bubbleColorPicker').style.display = 'flex';
 
-    // Load PM history
     loadPMHistory(profile.unique_id);
-
-    // Subscribe to PM updates
-    subscribeToPM(profile.unique_id);
-
-    // Mark all as read
+    startPMPolling(profile.unique_id);
     markAllRead(profile.unique_id);
-
-    // Re-render profiles to update badge
     renderProfiles();
 }
 
-document.getElementById('publicChatBtn').addEventListener('click', switchToPublicChat);
-
-/* ════════════════════════
-   PUBLIC MESSAGES
-════════════════════════ */
-function addMessage(author, text) {
-    if (currentChatType !== 'public') return;
-
-    const container = document.getElementById('messagesArea');
-    const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    const profile = profiles.find(p => p.prenom === author);
-    const photo = author === currentUserPrenom ? currentUserPhoto : (profile?.photo_url || null);
-
-    const msg = document.createElement('div');
-    msg.className = 'message';
-
-    const av = document.createElement('div');
-    av.className = 'message-avatar';
-    if (photo) {
-        av.innerHTML = `<img src="${photo}" alt="${escHtml(author)}">`;
-    } else {
-        av.textContent = (author[0] || '?').toUpperCase();
+document.getElementById('publicChatBtn').addEventListener('click', () => {
+    switchToPublicChat();
+    if (window.innerWidth <= 768) {
+        sidebarVisible = false;
+        usersPanel.classList.add('hidden');
+        rightPanel.classList.add('full-width');
     }
-
-    const content = document.createElement('div');
-    content.className = 'message-content';
-    content.innerHTML = `
-        <div class="message-author">${escHtml(author)}</div>
-        <div class="message-text">${escHtml(text)}</div>
-        <div class="message-time">${time}</div>
-    `;
-
-    msg.appendChild(av);
-    msg.appendChild(content);
-    container.appendChild(msg);
-    container.scrollTop = container.scrollHeight;
-}
+});
 
 /* ════════════════════════
    PRIVATE MESSAGES
 ════════════════════════ */
+let pmPollInterval = null;
+let lastPMId = 0;
+
 async function loadPMHistory(otherUserId) {
     const area = document.getElementById('messagesArea');
     area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">💬</span>Chargement...</div>';
@@ -901,40 +1029,43 @@ async function loadPMHistory(otherUserId) {
         return;
     }
 
-    const { data, error } = await supabase
-        .from('private_messages')
-        .select('id, sender_unique_id, message, created_at, is_read')
-        .or(
-            `and(sender_unique_id.eq.${currentUniqueId},receiver_unique_id.eq.${otherUserId}),` +
-            `and(sender_unique_id.eq.${otherUserId},receiver_unique_id.eq.${currentUniqueId})`
-        )
-        .order('created_at', { ascending: true })
-        .limit(100);
+    try {
+        const { data, error } = await supabase
+            .from('private_messages')
+            .select('id, sender_unique_id, message, created_at, is_read')
+            .or(
+                `and(sender_unique_id.eq.${currentUniqueId},receiver_unique_id.eq.${otherUserId}),` +
+                `and(sender_unique_id.eq.${otherUserId},receiver_unique_id.eq.${currentUniqueId})`
+            )
+            .order('created_at', { ascending: true })
+            .limit(100);
 
-    if (error) {
-        console.error('Erreur chargement PM:', error);
-        area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">⚠️</span>Erreur de chargement</div>';
-        return;
-    }
+        if (error) throw error;
 
-    area.innerHTML = '';
-    if (!data || data.length === 0) {
-        area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">💌</span>Aucun message pour l\'instant<br><span style="font-size:12px;opacity:0.6">Soyez le premier à écrire !</span></div>';
-        return;
-    }
+        area.innerHTML = '';
+        if (!data || data.length === 0) {
+            area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">💌</span>Aucun message<br><span style="font-size:12px;opacity:0.6">Soyez le premier à écrire !</span></div>';
+            lastPMId = 0;
+            return;
+        }
 
-    data.forEach(msg => {
-        const fromMe = msg.sender_unique_id === currentUniqueId;
-        appendPMBubble({
-            id: msg.id,
-            text: msg.message,
-            fromMe,
-            time: fmtTime(msg.created_at),
-            is_read: msg.is_read
+        data.forEach(msg => {
+            const fromMe = msg.sender_unique_id === currentUniqueId;
+            if (msg.id > lastPMId) lastPMId = msg.id;
+            appendPMBubble({
+                id: msg.id,
+                text: msg.message,
+                fromMe,
+                time: fmtTime(msg.created_at),
+                is_read: msg.is_read
+            });
         });
-    });
 
-    area.scrollTop = area.scrollHeight;
+        area.scrollTop = area.scrollHeight;
+    } catch (err) {
+        console.error('Erreur chargement PM:', err);
+        area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">⚠️</span>Erreur</div>';
+    }
 }
 
 function appendPMBubble(msg) {
@@ -981,46 +1112,45 @@ async function sendPM() {
         is_read: false
     });
 
-    const { data, error } = await supabase.from('private_messages').insert({
-        sender_unique_id: currentUniqueId,
-        receiver_unique_id: currentChatUser.unique_id,
-        message: text,
-        is_read: false
-    }).select().single();
+    try {
+        const { data, error } = await supabase.from('private_messages').insert({
+            sender_unique_id: currentUniqueId,
+            receiver_unique_id: currentChatUser.unique_id,
+            message: text,
+            is_read: false
+        }).select().single();
 
-    if (error) {
-        console.error('Erreur envoi PM:', error);
+        if (error) throw error;
+        if (data) {
+            const el = document.querySelector(`[data-msg-id="${tempId}"]`);
+            if (el) el.dataset.msgId = data.id;
+            if (data.id > lastPMId) lastPMId = data.id;
+        }
+    } catch (err) {
+        console.error('Erreur envoi PM:', err);
         document.querySelector(`[data-msg-id="${tempId}"]`)?.remove();
         input.value = text;
-        alert('Erreur lors de l\'envoi du message');
-    } else if (data) {
-        const el = document.querySelector(`[data-msg-id="${tempId}"]`);
-        if (el) el.dataset.msgId = data.id;
+        alert('Erreur envoi message');
     }
 }
 
-function subscribeToPM(otherUserId) {
-    if (!currentUniqueId) return;
+async function pollNewPMs(otherUserId) {
+    if (!currentUniqueId || currentChatType !== 'private' || currentChatUser?.unique_id !== otherUserId) return;
 
-    // Unsubscribe previous
-    Object.values(pmChannels).forEach(channel => {
-        supabase.removeChannel(channel);
-    });
-    pmChannels = {};
+    try {
+        const { data, error } = await supabase
+            .from('private_messages')
+            .select('id, sender_unique_id, message, created_at, is_read')
+            .eq('sender_unique_id', otherUserId)
+            .eq('receiver_unique_id', currentUniqueId)
+            .gt('id', lastPMId)
+            .order('created_at', { ascending: true });
 
-    // Subscribe to new messages FROM the other user
-    const channelName = `pm-${otherUserId}-${currentUniqueId}`;
-    const channel = supabase.channel(channelName)
-        .on('postgres_changes', {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'private_messages',
-            filter: `sender_unique_id=eq.${otherUserId}`
-        }, payload => {
-            const msg = payload.new;
-            if (msg.receiver_unique_id !== currentUniqueId) return;
+        if (error) throw error;
 
-            if (currentChatType === 'private' && currentChatUser?.unique_id === otherUserId) {
+        if (data && data.length > 0) {
+            data.forEach(msg => {
+                if (msg.id > lastPMId) lastPMId = msg.id;
                 appendPMBubble({
                     id: msg.id,
                     text: msg.message,
@@ -1029,91 +1159,50 @@ function subscribeToPM(otherUserId) {
                     is_read: false
                 });
                 markRead(msg.id);
-            }
-        })
-        .subscribe();
+            });
+        }
+    } catch (err) {
+        console.error('Erreur poll PM:', err);
+    }
+}
 
-    pmChannels[channelName] = channel;
+function startPMPolling(otherUserId) {
+    if (pmPollInterval) clearInterval(pmPollInterval);
+    pmPollInterval = setInterval(() => pollNewPMs(otherUserId), 2000);
 }
 
 async function markRead(msgId) {
-    await supabase.from('private_messages')
-        .update({ is_read: true })
-        .eq('id', msgId);
+    try {
+        await supabase.from('private_messages')
+            .update({ is_read: true })
+            .eq('id', msgId);
+    } catch (err) {
+        console.error('Erreur markRead:', err);
+    }
 }
 
 async function markAllRead(senderUniqueId) {
     if (!currentUniqueId) return;
-    await supabase.from('private_messages')
-        .update({ is_read: true })
-        .eq('receiver_unique_id', currentUniqueId)
-        .eq('sender_unique_id', senderUniqueId)
-        .eq('is_read', false);
+    try {
+        await supabase.from('private_messages')
+            .update({ is_read: true })
+            .eq('receiver_unique_id', currentUniqueId)
+            .eq('sender_unique_id', senderUniqueId)
+            .eq('is_read', false);
+    } catch (err) {
+        console.error('Erreur markAllRead:', err);
+    }
 }
 
 /* ════════════════════════
-   INBOX SUBSCRIPTION (notifications)
-════════════════════════ */
-function subscribeInbox() {
-    if (!currentUniqueId) return;
-
-    supabase.channel('inbox-' + currentUniqueId)
-        .on('postgres_changes', {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'private_messages',
-            filter: `receiver_unique_id=eq.${currentUniqueId}`
-        }, payload => {
-            const msg = payload.new;
-            const senderId = msg.sender_unique_id;
-
-            // If we're in a PM with this sender, message already handled
-            if (currentChatType === 'private' && currentChatUser?.unique_id === senderId) {
-                return;
-            }
-
-            // Otherwise, increment badge and show toast
-            pmBadges[senderId] = (pmBadges[senderId] || 0) + 1;
-            renderProfiles();
-            showToast(msg, senderId);
-        })
-        .subscribe();
-}
-subscribeInbox();
-
-function showToast(msg, senderId) {
-    const sender = profiles.find(p => p.unique_id === senderId);
-    const name = sender?.prenom || 'Quelqu\'un';
-
-    const toast = document.createElement('div');
-    toast.className = 'pm-toast';
-    toast.innerHTML = `
-        <div class="pm-toast-name">💌 ${escHtml(name)}</div>
-        <div class="pm-toast-text">${escHtml(msg.message)}</div>
-    `;
-
-    toast.addEventListener('click', () => {
-        const prof = profiles.find(p => p.unique_id === senderId);
-        if (prof) switchToPrivateChat(prof);
-        toast.remove();
-    });
-
-    document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 400);
-    }, 5000);
-}
-
-/* ════════════════════════
-   SEND MESSAGE (unified)
+   SEND MESSAGE
 ════════════════════════ */
 function sendMessage() {
     if (currentChatType === 'public') {
         const input = document.getElementById('messageInput');
         const text = input.value.trim();
         if (!text) return;
-        addMessage(currentUserPrenom, text);
+        sendPublicMessage(text);
         input.value = '';
     } else {
         sendPM();
@@ -1185,6 +1274,7 @@ function fmtTime(iso) {
 /* ════════════════════════
    INIT
 ════════════════════════ */
+console.log('🚀 Initialisation...');
 switchToPublicChat();
 </script>
 
