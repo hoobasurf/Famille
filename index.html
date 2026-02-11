@@ -183,8 +183,13 @@ to { opacity: 1; transform: translateY(0); }
   </div>
 </div>
 
-<script>
-console.log('🚀 INDEX.HTML CHARGÉ');
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabase = createClient(
+  "https://lgduavepbznnzjfxlsnx.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxnZHVhdmVwYnpubnpqZnhsc254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NzgyODcsImV4cCI6MjA4NjA1NDI4N30.6yAmtLvG0t7ne3sV2DXMbsCfcK8JVAi5NujZsQUJ_Tk"
+);
 
 const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
@@ -251,32 +256,25 @@ if(savedCustomBg && savedTheme === 'custom') {
 }
 
 photoBtn.onclick = () => {
-  console.log('📷 Clic sur bouton photo');
   photoInput.click();
 };
 
 photoInput.onchange = (e) => {
   const file = e.target.files[0];
   if (!file) return;
-  console.log('📸 Photo sélectionnée:', file.name);
   const reader = new FileReader();
   reader.onload = (e) => {
     const imageUrl = e.target.result;
     userPhotoBase64 = imageUrl;
     document.getElementById('logoCircle').innerHTML = `<img src="${imageUrl}" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
     localStorage.setItem('userPhotoUrl', imageUrl);
-    console.log('✅ PHOTO SAUVEGARDÉE (taille:', imageUrl.length, 'caractères)');
   };
   reader.readAsDataURL(file);
 };
 
-document.getElementById('connexionBtn').onclick = () => {
-  console.log('🔘 CLIC SUR BOUTON CONNEXION');
-  
+document.getElementById('connexionBtn').onclick = async () => {
   const prenom = prenomInput.value.trim();
   const password = document.getElementById('password').value;
-
-  console.log('👤 Prénom saisi:', prenom);
 
   if(!prenom) {
     alert("⚠️ Veuillez saisir votre prénom");
@@ -284,22 +282,48 @@ document.getElementById('connexionBtn').onclick = () => {
   }
 
   localStorage.setItem('prenom', prenom);
-  console.log('✅ PRÉNOM SAUVEGARDÉ:', prenom);
   
   if (userPhotoBase64) {
     localStorage.setItem('userPhotoUrl', userPhotoBase64);
-    console.log('✅ PHOTO CONFIRMÉE (taille:', userPhotoBase64.length, ')');
-  } else {
-    console.log('⚠️ Pas de photo');
+  }
+
+  // CRÉER OU METTRE À JOUR LE PROFIL DANS SUPABASE
+  try {
+    // Vérifier si le profil existe déjà
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('prenom')
+      .eq('prenom', prenom)
+      .single();
+
+    if (existing) {
+      // Mettre à jour le profil existant (is_online = true)
+      await supabase
+        .from('profiles')
+        .update({ 
+          is_online: true,
+          photo_url: userPhotoBase64 || null
+        })
+        .eq('prenom', prenom);
+    } else {
+      // Créer un nouveau profil
+      await supabase
+        .from('profiles')
+        .insert({
+          prenom: prenom,
+          photo_url: userPhotoBase64 || null,
+          is_online: true
+        });
+    }
+  } catch (err) {
+    console.error('Erreur Supabase:', err);
   }
 
   if(prenom === "Steph" && password === "Steph1511") {
-    console.log('👑 Admin détecté');
     document.getElementById('choiceModal').style.display = 'flex';
     return;
   }
 
-  console.log('🚀 REDIRECTION VERS chat.html');
   window.location.href = 'chat.html';
 };
 
@@ -310,8 +334,6 @@ document.getElementById('choiceModal').onclick = (e) => {
     document.getElementById('choiceModal').style.display = 'none';
   }
 };
-
-console.log('✅ SCRIPT PRÊT - Bouton connexion configuré');
 </script>
 
 </body>
