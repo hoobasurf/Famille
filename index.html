@@ -186,9 +186,10 @@ to { opacity: 1; transform: translateY(0); }
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
+// ✅ CORRECTION : Utiliser LA MÊME base Supabase que chat.html
 const supabase = createClient(
-  "https://lgduavepbznnzjfxlsnx.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxnZHVhdmVwYnpubnpqZnhsc254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NzgyODcsImV4cCI6MjA4NjA1NDI4N30.6yAmtLvG0t7ne3sV2DXMbsCfcK8JVAi5NujZsQUJ_Tk"
+  'https://eeikriwrwuynwpzodbbt.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWtyaXdyd3V5bndwem9kYmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzQ3NjYsImV4cCI6MjA4NjE1MDc2Nn0.MJ6CSmrttEWcrdfy5C7nP4sE_pe19sGNE-WasASPDNc'
 );
 
 const photoBtn = document.getElementById('photoBtn');
@@ -289,34 +290,51 @@ document.getElementById('connexionBtn').onclick = async () => {
 
   // CRÉER OU METTRE À JOUR LE PROFIL DANS SUPABASE
   try {
-    // Vérifier si le profil existe déjà
+    // ✅ Créer un identifiant unique basé sur le prénom + timestamp du navigateur
+    const browserFingerprint = localStorage.getItem('browserFingerprint') || Date.now().toString();
+    localStorage.setItem('browserFingerprint', browserFingerprint);
+    
+    const uniqueId = `${prenom}_${browserFingerprint}`;
+
+    // Vérifier si CE profil spécifique existe déjà
     const { data: existing } = await supabase
       .from('profiles')
-      .select('prenom')
-      .eq('prenom', prenom)
+      .select('*')
+      .eq('unique_id', uniqueId)
       .single();
 
     if (existing) {
-      // Mettre à jour le profil existant (is_online = true)
+      // Mettre à jour le profil existant
       await supabase
         .from('profiles')
         .update({ 
           is_online: true,
-          photo_url: userPhotoBase64 || null
+          photo_url: userPhotoBase64 || existing.photo_url,
+          last_seen: new Date().toISOString()
         })
-        .eq('prenom', prenom);
+        .eq('unique_id', uniqueId);
+      
+      console.log('✅ Profil mis à jour:', uniqueId);
     } else {
-      // Créer un nouveau profil
-      await supabase
+      // Créer un nouveau profil avec un ID unique
+      const { error: insertError } = await supabase
         .from('profiles')
         .insert({
+          unique_id: uniqueId,
           prenom: prenom,
           photo_url: userPhotoBase64 || null,
-          is_online: true
+          is_online: true,
+          last_seen: new Date().toISOString()
         });
+      
+      if (insertError) {
+        console.error('❌ Erreur insertion:', insertError);
+      } else {
+        console.log('✅ Nouveau profil créé:', uniqueId);
+      }
     }
   } catch (err) {
-    console.error('Erreur Supabase:', err);
+    console.error('❌ Erreur Supabase:', err);
   }
 
   if(prenom === "Steph" && password === "Steph1511") {
