@@ -25,129 +25,37 @@
 
     .app-wrapper { position:relative; z-index:1; max-width:1500px; margin:0 auto; padding:20px; min-height:100vh; display:flex; flex-direction:column; gap:20px; }
 
-    /* ─── HEADER ─────────────────────────────── */
     .chat-header {
-        background:rgba(255,255,255,.05);
-        backdrop-filter:blur(10px);
-        border-radius:20px;
-        padding:14px 28px;
-        border:1px solid rgba(255,255,255,.15);
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        flex-wrap:wrap;
-        gap:12px;
+        background:rgba(255,255,255,.05); backdrop-filter:blur(10px); border-radius:20px;
+        padding:14px 28px; border:1px solid rgba(255,255,255,.15);
+        display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
     }
     .theme-selector { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
     .theme-label    { color:white; font-weight:600; text-shadow:0 2px 5px rgba(0,0,0,.3); }
+    .theme-options  { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
 
-    /* Toute la rangée thèmes + profil sur la même ligne */
-    .theme-options {
-        display:flex;
-        gap:10px;
-        flex-wrap:wrap;
-        align-items:center;
-    }
-
-    .theme-btn {
-        width:45px; height:45px;
-        border-radius:50%;
-        border:3px solid rgba(255,255,255,.5);
-        cursor:pointer;
-        transition:all .3s;
-        flex-shrink:0;
-    }
+    .theme-btn { width:45px; height:45px; border-radius:50%; border:3px solid rgba(255,255,255,.5); cursor:pointer; transition:all .3s; flex-shrink:0; }
     .theme-btn:hover  { transform:scale(1.15); border-color:white; }
     .theme-btn.active { border-color:white; box-shadow:0 0 0 4px rgba(255,255,255,.3); }
 
-    .theme-btn-custom {
-        width:45px; height:45px;
-        border-radius:50%;
-        border:3px solid rgba(255,255,255,.5);
-        background:linear-gradient(135deg,#fff,#ccc);
-        cursor:pointer;
-        display:flex; align-items:center; justify-content:center;
-        font-size:20px;
-        transition:all .3s;
-        position:relative;
-        flex-shrink:0;
-    }
+    .theme-btn-custom { width:45px; height:45px; border-radius:50%; border:3px solid rgba(255,255,255,.5); background:linear-gradient(135deg,#fff,#ccc); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; transition:all .3s; position:relative; flex-shrink:0; }
     .theme-btn-custom:hover { transform:scale(1.15); border-color:white; }
     .theme-btn-custom input[type=file] { position:absolute; opacity:0; width:100%; height:100%; cursor:pointer; }
 
-    /* ─── BOUTON PROFIL — même ligne, même taille, style rose ─── */
-    .user-profile-photo {
-        width:45px; height:45px;
-        border-radius:50%;
-        border:3px solid rgba(255,255,255,.6);
-        overflow:hidden;
-        display:flex; align-items:center; justify-content:center;
-        background:linear-gradient(135deg,#ff6b9d,#c06fff);
-        font-size:20px;
-        color:white;
-        cursor:pointer;
-        transition:all .3s;
-        flex-shrink:0;
-        /* Suppression de tout décalage vertical */
-        vertical-align:middle;
-        position:relative;
-        top:0;
-    }
+    .user-profile-photo { width:45px; height:45px; border-radius:50%; border:3px solid rgba(255,255,255,.6); overflow:hidden; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#ff6b9d,#c06fff); font-size:20px; color:white; cursor:pointer; transition:all .3s; flex-shrink:0; vertical-align:middle; position:relative; top:0; }
     .user-profile-photo:hover { transform:scale(1.15); }
     .user-profile-photo img { width:100%; height:100%; object-fit:cover; }
 
-    /* ─── TOGGLE SIDEBAR ─────────────────────── */
-    .toggle-sidebar-btn {
-        position:fixed; top:50%; left:20px;
-        transform:translateY(-50%);
-        z-index:300;
-        background:linear-gradient(135deg,#ff6b9d,#c06fff);
-        border:none; border-radius:16px;
-        padding:16px 20px;
-        color:white; font-weight:700; cursor:pointer;
-        transition:all .4s cubic-bezier(.34,1.56,.64,1);
-        display:flex; flex-direction:column; align-items:center; gap:8px;
-        animation:neonPulse 2s ease-in-out infinite;
-    }
-    @keyframes neonPulse {
-        0%,100%{ box-shadow:0 0 20px rgba(255,107,157,.6),0 0 40px rgba(192,111,255,.4),0 8px 25px rgba(0,0,0,.3); }
-        50%{ box-shadow:0 0 35px rgba(255,107,157,.9),0 0 65px rgba(192,111,255,.6),0 8px 25px rgba(0,0,0,.3); }
-    }
+    .toggle-sidebar-btn { position:fixed; top:50%; left:20px; transform:translateY(-50%); z-index:300; background:linear-gradient(135deg,#ff6b9d,#c06fff); border:none; border-radius:16px; padding:16px 20px; color:white; font-weight:700; cursor:pointer; transition:all .4s cubic-bezier(.34,1.56,.64,1); display:flex; flex-direction:column; align-items:center; gap:8px; animation:neonPulse 2s ease-in-out infinite; }
+    @keyframes neonPulse { 0%,100%{ box-shadow:0 0 20px rgba(255,107,157,.6),0 0 40px rgba(192,111,255,.4),0 8px 25px rgba(0,0,0,.3); } 50%{ box-shadow:0 0 35px rgba(255,107,157,.9),0 0 65px rgba(192,111,255,.6),0 8px 25px rgba(0,0,0,.3); } }
     .toggle-sidebar-btn:hover { transform:translateY(-50%) scale(1.1); }
     .toggle-icon { font-size:28px; }
     .toggle-text { font-size:12px; text-transform:uppercase; letter-spacing:1px; }
 
-    /* ─── COLONNES ───────────────────────────── */
     .body-columns { display:flex; gap:20px; flex:1; min-height:0; }
 
-    /* ─── SIDEBAR ────────────────────────────── */
-    .users-panel {
-        width:340px; flex-shrink:0;
-        background:rgba(255,255,255,.05);
-        backdrop-filter:blur(10px);
-        border-radius:20px;
-        border:1px solid rgba(255,255,255,.15);
-        padding:24px 16px;
-        display:flex; flex-direction:column; gap:16px;
-        overflow-y:auto;
-        max-height:calc(100vh - 160px);
-        transition:width .4s cubic-bezier(.4,0,.2,1),
-                    min-width .4s,
-                    opacity .4s,
-                    padding .4s,
-                    border .4s;
-    }
-    /* Sidebar cachée : réduit à 0 sans cacher le header ni le chat */
-    .users-panel.hidden {
-        width:0;
-        min-width:0;
-        padding-left:0;
-        padding-right:0;
-        opacity:0;
-        pointer-events:none;
-        border:none;
-        overflow:hidden;
-    }
+    .users-panel { width:340px; flex-shrink:0; background:rgba(255,255,255,.05); backdrop-filter:blur(10px); border-radius:20px; border:1px solid rgba(255,255,255,.15); padding:24px 16px; display:flex; flex-direction:column; gap:16px; overflow-y:auto; max-height:calc(100vh - 160px); transition:width .4s cubic-bezier(.4,0,.2,1), min-width .4s, opacity .4s, padding .4s, border .4s; }
+    .users-panel.hidden { width:0; min-width:0; padding-left:0; padding-right:0; opacity:0; pointer-events:none; border:none; overflow:hidden; }
 
     .users-panel-header { color:white; font-weight:700; font-size:20px; text-align:center; padding-bottom:16px; border-bottom:2px solid rgba(255,255,255,.15); }
     .users-panel-count  { font-size:13px; opacity:.7; font-weight:400; margin-top:6px; }
@@ -173,10 +81,8 @@
     .notif-badge { position:absolute; top:10px; right:10px; background:linear-gradient(135deg,#ff6b9d,#ff3060); color:white; font-size:12px; font-weight:900; border-radius:14px; min-width:24px; height:24px; display:flex; align-items:center; justify-content:center; padding:0 8px; animation:badgePop .5s cubic-bezier(.34,1.56,.64,1); }
     @keyframes badgePop { from{transform:scale(0) rotate(-15deg)} to{transform:scale(1)} }
 
-    /* ─── PANNEAU DROIT ──────────────────────── */
     .right-panel { flex:1; display:flex; flex-direction:column; min-width:0; background:rgba(255,255,255,.05); backdrop-filter:blur(10px); border-radius:20px; border:1px solid rgba(255,255,255,.15); overflow:hidden; transition:flex .4s; }
 
-    /* WIZZ */
     .wizz-btn { padding:10px 20px; background:linear-gradient(135deg,#ffd700,#ff8c00); border:none; border-radius:12px; color:white; font-weight:700; cursor:pointer; transition:all .3s; font-size:14px; }
     .wizz-btn:hover { transform:translateY(-2px); }
     @keyframes wizz { 0%,100%{transform:translate(0,0)} 15%{transform:translate(-10px,-10px) rotate(-5deg)} 30%{transform:translate(10px,10px) rotate(5deg)} 45%{transform:translate(-8px,8px) rotate(-4deg)} 60%{transform:translate(8px,-8px) rotate(4deg)} 80%{transform:translate(-4px,4px) rotate(-2deg)} }
@@ -193,7 +99,6 @@
 
     .messages-area { flex:1; padding:28px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
 
-    /* message public */
     .message { background:rgba(255,255,255,.12); padding:16px 22px; border-radius:18px; color:white; animation:slideIn .4s ease; display:flex; gap:16px; align-items:flex-start; border:1px solid rgba(255,255,255,.1); }
     @keyframes slideIn { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:translateY(0)} }
     .message-avatar { width:46px; height:46px; border-radius:50%; overflow:hidden; flex-shrink:0; background:linear-gradient(135deg,#ff6b9d,#c06fff); display:flex; align-items:center; justify-content:center; font-size:20px; border:3px solid rgba(255,255,255,.4); color:white; font-weight:700; }
@@ -203,7 +108,6 @@
     .message-text   { font-size:15px; line-height:1.6; }
     .message-time   { font-size:12px; opacity:.7; text-align:right; margin-top:8px; }
 
-    /* bulles MP */
     .pm-msg-wrap { display:flex; flex-direction:column; margin-bottom:10px; max-width:70%; }
     .pm-msg-wrap.sent     { align-self:flex-end;   align-items:flex-end; }
     .pm-msg-wrap.received { align-self:flex-start; align-items:flex-start; }
@@ -216,7 +120,6 @@
     .pm-empty { text-align:center; color:rgba(255,255,255,.5); font-size:15px; padding:80px 24px; line-height:2.2; }
     .pm-empty-icon { font-size:56px; display:block; margin-bottom:16px; }
 
-    /* saisie */
     .input-area { background:rgba(255,255,255,.08); padding:20px 28px; border-top:2px solid rgba(255,255,255,.15); display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
     .message-input { flex:1; min-width:200px; padding:16px 22px; background:rgba(255,255,255,.15); border:2px solid rgba(255,255,255,.2); border-radius:18px; color:white; font-size:15px; transition:all .3s; }
     .message-input:focus { outline:none; background:rgba(255,255,255,.25); border-color:rgba(255,255,255,.4); }
@@ -225,7 +128,6 @@
     .send-btn:hover  { transform:translateY(-3px); }
     .send-btn:active { transform:scale(.97); }
 
-    /* couleur bulles */
     .bubble-color-row { display:flex; align-items:center; gap:12px; width:100%; margin-top:4px; flex-wrap:wrap; }
     .bubble-color-label { color:rgba(255,255,255,.75); font-size:14px; font-weight:600; white-space:nowrap; }
     .bubble-color-swatches { display:flex; gap:10px; flex-wrap:wrap; }
@@ -236,19 +138,16 @@
     .color-swatch-custom:hover { transform:scale(1.25); border-color:white; }
     .color-swatch-custom input[type=color] { position:absolute; opacity:0; width:100%; height:100%; cursor:pointer; }
 
-    /* toast */
     .pm-toast { position:fixed; bottom:30px; right:30px; z-index:3000; background:rgba(10,3,24,.97); border:2px solid rgba(255,107,157,.6); border-radius:18px; padding:18px 24px; color:white; font-size:15px; box-shadow:0 15px 45px rgba(0,0,0,.7); cursor:pointer; max-width:300px; backdrop-filter:blur(25px); animation:toastIn .5s cubic-bezier(.34,1.56,.64,1); transition:opacity .4s; }
     @keyframes toastIn { from{opacity:0;transform:translateY(20px) scale(.9)} to{opacity:1;transform:scale(1)} }
     .pm-toast-name { font-weight:700; color:#ff6b9d; margin-bottom:6px; }
     .pm-toast-text { opacity:.8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-    /* scrollbars */
     .users-panel::-webkit-scrollbar, .messages-area::-webkit-scrollbar { width:7px; }
     .users-panel::-webkit-scrollbar-track, .messages-area::-webkit-scrollbar-track { background:rgba(255,255,255,.05); border-radius:10px; }
     .users-panel::-webkit-scrollbar-thumb  { background:rgba(255,255,255,.2); border-radius:10px; }
     .messages-area::-webkit-scrollbar-thumb { background:linear-gradient(135deg,#ff6b9d,#c06fff); border-radius:10px; }
 
-    /* ─── RESPONSIVE ─────────────────────────── */
     @media (max-width:900px) {
         .users-panel { width:260px; }
         .toggle-sidebar-btn { left:10px; padding:12px 14px; }
@@ -267,24 +166,8 @@
         .message-input { min-width:0; padding:12px 16px; font-size:14px; }
         .send-btn { padding:12px 20px; font-size:14px; }
         .pm-msg-wrap { max-width:90%; }
-        /* Sur mobile, sidebar recouvre le chat en overlay */
-        .users-panel {
-            position:fixed;
-            top:0; left:0;
-            height:100%;
-            z-index:200;
-            max-height:100vh;
-            border-radius:0 20px 20px 0;
-            width:280px;
-            transform:translateX(0);
-            transition:transform .4s cubic-bezier(.4,0,.2,1), opacity .4s;
-        }
-        .users-panel.hidden {
-            transform:translateX(-100%);
-            width:280px;
-            opacity:0;
-            pointer-events:none;
-        }
+        .users-panel { position:fixed; top:0; left:0; height:100%; z-index:200; max-height:100vh; border-radius:0 20px 20px 0; width:280px; transform:translateX(0); transition:transform .4s cubic-bezier(.4,0,.2,1), opacity .4s; }
+        .users-panel.hidden { transform:translateX(-100%); width:280px; opacity:0; pointer-events:none; }
     }
 </style>
 ```
@@ -294,7 +177,6 @@
 <div class="particles" id="particles"></div>
 
 <div class="app-wrapper">
-    <!-- HEADER : thèmes + profil sur la même ligne -->
     <div class="chat-header">
         <div class="theme-selector">
             <span class="theme-label">Thème :</span>
@@ -308,7 +190,6 @@
                 <div class="theme-btn" data-theme="chasse"    style="background:linear-gradient(135deg,#3e2723,#795548)"  title="Chasse"></div>
                 <div class="theme-btn" data-theme="aquarium"  style="background:linear-gradient(135deg,#00416a,#ffe000)"  title="Aquarium"></div>
                 <div class="theme-btn-custom" title="Photo personnalisée">📷<input type="file" id="customBgInput" accept="image/*"></div>
-                <!-- Bouton profil : même taille, même ligne, style rose -->
                 <div class="user-profile-photo" id="userProfilePhoto" title="Mon profil">💬</div>
             </div>
         </div>
@@ -368,8 +249,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 function logErr(label, err) {
     const msg = err?.message || err?.details || err?.hint || JSON.stringify(err) || String(err);
-    const code = err?.code || '';
-    console.error(`❌ ${label}: [${code}] ${msg}`);
+    console.error(`❌ ${label}: ${msg}`);
 }
 
 const supabase = createClient(
@@ -403,18 +283,12 @@ document.getElementById('toggleSidebar').addEventListener('click', () => {
     document.getElementById('toggleText').textContent  = sidebarVisible ? 'Profils' : 'Chat';
 });
 
-/* Sur mobile, fermer la sidebar en cliquant hors de celle-ci
-   — on exclut TOUT le panneau droit pour ne pas interférer avec Wizz / couleurs */
 document.addEventListener('click', e => {
     if (isMobile() && sidebarVisible) {
         const panel     = document.getElementById('usersPanel');
         const toggle    = document.getElementById('toggleSidebar');
         const rightPane = document.getElementById('rightPanel');
-        if (
-            !panel.contains(e.target) &&
-            !toggle.contains(e.target) &&
-            !rightPane.contains(e.target)
-        ) {
+        if (!panel.contains(e.target) && !toggle.contains(e.target) && !rightPane.contains(e.target)) {
             sidebarVisible = false;
             panel.classList.add('hidden');
             document.getElementById('toggleIcon').textContent = '💬';
@@ -424,14 +298,15 @@ document.addEventListener('click', e => {
 });
 
 /* ══ ÉTAT GLOBAL ══ */
-let currentChatType = 'public';
-let currentChatUser = null;
-let profiles        = [];
-const pmBadges      = {};
-let lastPublicMsgId = 0;
-let lastPMId        = 0;
-let pmPollInterval  = null;
-let lastInboxId     = 0;
+let currentChatType    = 'public';
+let currentChatUser    = null;
+let profiles           = [];
+const pmBadges         = {};
+// FIX : on utilise created_at (string ISO) au lieu de id (UUID) pour le polling
+let lastPublicMsgTime  = null;
+let lastPMId           = 0;
+let pmPollInterval     = null;
+let lastInboxId        = 0;
 
 /* ══ COULEUR BULLES ══ */
 const PRESETS = [
@@ -547,7 +422,6 @@ function renderProfiles() {
 
         item.addEventListener('click', () => {
             switchToPrivateChat(profile);
-            /* Sur mobile, fermer la sidebar après sélection */
             if (isMobile()) {
                 sidebarVisible = false;
                 document.getElementById('usersPanel').classList.add('hidden');
@@ -617,23 +491,36 @@ document.getElementById('wizzBtn').addEventListener('click', async () => {
     if (error) logErr('Wizz', error);
 });
 
-/* ══ CHAT PUBLIC ══ */
+/* ══ CHAT PUBLIC ══
+   FIX : on trie par created_at et on mémorise le dernier timestamp
+   pour éviter le problème de comparaison UUID > 0 */
 async function loadPublicMessages() {
-    const { data, error } = await supabase
+    let query = supabase
         .from('messages')
         .select('id, prenom, message, created_at, photo_url')
         .is('to_user', null)
-        .gt('id', lastPublicMsgId)
         .order('created_at', { ascending: true })
         .limit(60);
 
+    // Polling : on ne prend que les messages plus récents que le dernier connu
+    if (lastPublicMsgTime) {
+        query = query.gt('created_at', lastPublicMsgTime);
+    }
+
+    const { data, error } = await query;
     if (error) { logErr('Messages publics', error); return; }
     if (!data?.length) return;
 
-    if (lastPublicMsgId === 0) document.getElementById('messagesArea').innerHTML = '';
+    // Premier chargement : vider la zone
+    if (!lastPublicMsgTime) {
+        document.getElementById('messagesArea').innerHTML = '';
+    }
 
     data.forEach(msg => {
-        if (msg.id > lastPublicMsgId) lastPublicMsgId = msg.id;
+        // Mémoriser le timestamp le plus récent
+        if (!lastPublicMsgTime || msg.created_at > lastPublicMsgTime) {
+            lastPublicMsgTime = msg.created_at;
+        }
         if (currentChatType === 'public') {
             renderPublicMessage({
                 author: msg.prenom || 'Anonyme',
@@ -667,6 +554,7 @@ function renderPublicMessage({ author, text, photo, time }) {
 }
 
 async function sendPublicMessage(text) {
+    // Affichage local immédiat
     renderPublicMessage({ author: currentUserPrenom, text, photo: currentUserPhoto, time: fmtTime(new Date().toISOString()) });
 
     const { data, error } = await supabase.from('messages').insert({
@@ -674,10 +562,13 @@ async function sendPublicMessage(text) {
         message:   text,
         photo_url: currentUserPhoto || null,
         to_user:   null
-    }).select('id').single();
+    }).select('created_at').single();
 
     if (error) { logErr('Envoi public', error); return; }
-    if (data?.id > lastPublicMsgId) lastPublicMsgId = data.id;
+    // Mettre à jour le timestamp pour ne pas recharger ce message
+    if (data?.created_at && data.created_at > (lastPublicMsgTime || '')) {
+        lastPublicMsgTime = data.created_at;
+    }
 }
 
 setInterval(loadPublicMessages, 2500);
@@ -694,9 +585,9 @@ function setHeader(avatarHtml, name, statusTxt, isOnline, showWizz) {
 
 function switchToPublicChat() {
     if (pmPollInterval) { clearInterval(pmPollInterval); pmPollInterval = null; }
-    currentChatType = 'public';
-    currentChatUser = null;
-    lastPublicMsgId = 0;
+    currentChatType   = 'public';
+    currentChatUser   = null;
+    lastPublicMsgTime = null; // Reset pour recharger tous les messages
 
     setHeader('🌐', 'Chat général', '● Public', true, false);
     document.getElementById('bubbleColorPicker').style.display = 'none';
@@ -725,7 +616,6 @@ function switchToPrivateChat(profile) {
 
     loadPMHistory(profile.unique_id);
     markAllRead(profile.unique_id);
-    /* Supprime juste le badge sans recréer tout le DOM */
     document.querySelectorAll('.notif-badge').forEach(b => {
         const item = b.closest('.user-item');
         if (item?.dataset.uid === profile.unique_id) b.remove();
