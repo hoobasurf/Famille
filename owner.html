@@ -60,12 +60,6 @@ h2 { font-size: 28px; font-weight: 300; margin-bottom: 25px; display: flex; alig
   transition: all 0.3s ease; z-index: 1000; font-weight: 600;
 }
 .back-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
-.alert-box {
-  background: rgba(251,191,36,0.25); border: 2px solid rgba(251,191,36,0.6);
-  border-radius: 15px; padding: 15px 20px; margin-bottom: 20px;
-  font-size: 14px; line-height: 1.6; display: none;
-}
-.alert-box.visible { display: block; }
 </style>
 </head>
 <body>
@@ -73,12 +67,10 @@ h2 { font-size: 28px; font-weight: 300; margin-bottom: 25px; display: flex; alig
 <button class="back-btn" onclick="window.location.href='chat.html'">← Retour au chat</button>
 
 <div class="container">
-  <h1>&#127912; Espace Creation - Admin</h1>
-
-  <div class="alert-box" id="alertBox"></div>
+  <h1>🎨 Espace Création - Admin</h1>
 
   <div class="admin-card">
-    <h2>&#128202; Statistiques</h2>
+    <h2>📊 Statistiques</h2>
     <div class="stats-grid">
       <div class="stat-box"><div class="stat-number" id="totalUsers">0</div><div class="stat-label">Utilisateurs</div></div>
       <div class="stat-box"><div class="stat-number" id="onlineUsers">0</div><div class="stat-label">En ligne</div></div>
@@ -87,24 +79,24 @@ h2 { font-size: 28px; font-weight: 300; margin-bottom: 25px; display: flex; alig
   </div>
 
   <div class="admin-card">
-    <h2>&#128101; Gestion des utilisateurs</h2>
+    <h2>👥 Gestion des utilisateurs</h2>
     <table class="users-table">
-      <thead><tr><th>Photo</th><th>Prenom</th><th>Statut</th><th>Inscrit le</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Photo</th><th>Prénom</th><th>Statut</th><th>Inscrit le</th><th>Actions</th></tr></thead>
       <tbody id="usersTableBody"></tbody>
     </table>
   </div>
 
   <div class="admin-card">
-    <h2>&#128172; Messages recents</h2>
+    <h2>💬 Messages récents</h2>
     <div class="messages-list" id="messagesList"></div>
   </div>
 
   <div class="admin-card">
-    <h2>&#9881;&#65039; Actions</h2>
+    <h2>⚙️ Actions</h2>
     <div class="actions">
-      <button class="btn" onclick="location.reload()">&#128260; Actualiser</button>
-      <button class="btn btn-danger" id="clearMessagesBtn">&#128465;&#65039; Effacer tous les messages</button>
-      <button class="btn" onclick="window.location.href='chat.html'">&#128172; Aller au chat</button>
+      <button class="btn" onclick="location.reload()">🔄 Actualiser</button>
+      <button class="btn btn-danger" id="clearMessagesBtn">🗑️ Effacer tous les messages</button>
+      <button class="btn" onclick="window.location.href='chat.html'">💬 Aller au chat</button>
     </div>
   </div>
 </div>
@@ -117,195 +109,155 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWtyaXdyd3V5bndwem9kYmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzQ3NjYsImV4cCI6MjA4NjE1MDc2Nn0.MJ6CSmrttEWcrdfy5C7nP4sE_pe19sGNE-WasASPDNc"
 );
 
-// Acces admin uniquement
 if (localStorage.getItem('prenom') !== 'Steph') {
   window.location.href = 'chat.html';
 }
 
-// Lit les proprietes d'une erreur Supabase sans tenter de la cloner
-// (evite le DataCloneError de Safari / WKWebView)
-function readErr(e) {
-  if (!e) return 'erreur inconnue';
-  var msg     = typeof e.message === 'string' ? e.message  : '';
-  var code    = typeof e.code    === 'string' ? e.code     : '';
-  var hint    = typeof e.hint    === 'string' ? e.hint     : '';
-  var details = typeof e.details === 'string' ? e.details  : '';
-  var out = msg || code || 'erreur inconnue';
-  if (hint)    out += ' | hint: '    + hint;
-  if (details) out += ' | details: ' + details;
-  return out;
-}
-
-// console.log (pas .error) pour eviter DataCloneError
-function logErr(label, e) {
-  console.log(label + ' -> ' + readErr(e));
-}
-
-function showAlert(html) {
-  var el = document.getElementById('alertBox');
-  el.innerHTML = html;
-  el.classList.add('visible');
-}
-
-// -- Statistiques --
+// ── Stats ──
 async function loadStats() {
-  var r1 = await supabase.from('profiles').select('*');
-  var r2 = await supabase.from('messages').select('*');
-  var users    = r1.data || [];
-  var messages = r2.data || [];
-  document.getElementById('totalUsers').textContent    = users.length;
-  document.getElementById('onlineUsers').textContent   = users.filter(function(u){ return u.is_online; }).length;
-  document.getElementById('totalMessages').textContent = messages.length;
+  const { data: users }    = await supabase.from('profiles').select('*');
+  const { data: messages } = await supabase.from('messages').select('*');
+  document.getElementById('totalUsers').textContent    = users?.length || 0;
+  document.getElementById('onlineUsers').textContent   = users?.filter(u => u.is_online).length || 0;
+  document.getElementById('totalMessages').textContent = messages?.length || 0;
 }
 
-// -- Supprimer un utilisateur --
-async function deleteUser(prenom) {
-  if (!confirm('Voulez-vous vraiment supprimer l\'utilisateur "' + prenom + '" ?')) return;
+// ── Supprimer un utilisateur ──
+async function deleteUser(prenom, id) {
+  if (!confirm(`Supprimer "${prenom}" et tous ses messages ?`)) return;
 
-  // 1. Messages lies
-  var r1 = await supabase.from('messages').delete().eq('prenom', prenom);
-  if (r1.error) logErr('[deleteUser] messages', r1.error);
+  // Supprimer les messages de cet utilisateur
+  await supabase.from('messages').delete().eq('prenom', prenom);
 
-  // 2. Profil
-  var r2 = await supabase.from('profiles').delete().eq('prenom', prenom);
-  if (r2.error) {
-    logErr('[deleteUser] profil', r2.error);
-    alert('Erreur : ' + readErr(r2.error));
+  // Supprimer le profil par son UUID
+  const { error } = await supabase.from('profiles').delete().eq('id', id);
+  if (error) {
+    alert('Erreur suppression profil : ' + error.message);
     return;
   }
 
-  // 3. Verification : le profil a-t-il vraiment disparu ?
-  var r3 = await supabase.from('profiles').select('prenom').eq('prenom', prenom).maybeSingle();
-  if (r3.data !== null) {
-    // Toujours present = bloque par RLS silencieusement
-    showAlert(
-      '<strong>Suppression bloquee par les politiques RLS de Supabase.</strong><br>' +
-      'Va dans Dashboard Supabase > Table Editor > profiles > Policies ' +
-      'et ajoute une regle DELETE USING (true), ou desactive le RLS sur cette table.'
-    );
-    alert('Suppression bloquee par RLS — le profil existe toujours.');
-    return;
-  }
-
-  alert('L\'utilisateur "' + prenom + '" a ete supprime.');
   await loadUsers();
   await loadStats();
   await loadMessages();
 }
 
-// -- Charger utilisateurs --
+// ── Charger utilisateurs ──
 async function loadUsers() {
-  var res = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+  const { data: users, error } = await supabase
+    .from('profiles').select('*').order('created_at', { ascending: false });
 
-  if (res.error) {
-    logErr('[loadUsers]', res.error);
+  if (error) {
     document.getElementById('usersTableBody').innerHTML =
-      '<tr><td colspan="5" style="color:#fca5a5;padding:20px;text-align:center;">' +
-      readErr(res.error) + '</td></tr>';
+      `<tr><td colspan="5" style="color:#fca5a5;padding:20px;text-align:center">${error.message}</td></tr>`;
     return;
   }
 
-  var tbody = document.getElementById('usersTableBody');
+  const tbody = document.getElementById('usersTableBody');
   tbody.innerHTML = '';
 
-  (res.data || []).forEach(function(user) {
-    var row = document.createElement('tr');
+  (users || []).forEach(user => {
+    const row = document.createElement('tr');
 
-    var tdPhoto = document.createElement('td');
+    const tdPhoto = document.createElement('td');
     if (user.photo_url) {
-      var img = document.createElement('img');
+      const img = document.createElement('img');
       img.className = 'user-photo';
       img.src = user.photo_url;
       img.alt = user.prenom;
-      img.onerror = function() { img.style.display = 'none'; };
+      img.onerror = () => img.style.display = 'none';
       tdPhoto.appendChild(img);
     }
 
-    var tdPrenom = document.createElement('td');
-    tdPrenom.innerHTML = '<strong>' + user.prenom + '</strong>';
+    const tdPrenom = document.createElement('td');
+    tdPrenom.innerHTML = `<strong>${user.prenom}</strong>`;
 
-    var online = user.is_online;
-    var tdStatus = document.createElement('td');
-    tdStatus.innerHTML = '<span class="status-badge status-' + (online ? 'online' : 'offline') + '">' +
-      (online ? 'En ligne' : 'Hors ligne') + '</span>';
+    const tdStatus = document.createElement('td');
+    tdStatus.innerHTML = `<span class="status-badge status-${user.is_online ? 'online' : 'offline'}">
+      ${user.is_online ? 'En ligne' : 'Hors ligne'}</span>`;
 
-    var tdDate = document.createElement('td');
+    const tdDate = document.createElement('td');
     tdDate.textContent = new Date(user.created_at).toLocaleDateString('fr-FR');
 
-    var tdActions = document.createElement('td');
-    var btn = document.createElement('button');
+    const tdActions = document.createElement('td');
+    const btn = document.createElement('button');
     btn.className = 'btn btn-danger';
     btn.textContent = 'Supprimer';
-    (function(p) {
-      btn.addEventListener('click', function() { deleteUser(p); });
-    })(user.prenom);
+    // On passe l'UUID (user.id) pour éviter tout problème de type
+    btn.addEventListener('click', () => deleteUser(user.prenom, user.id));
     tdActions.appendChild(btn);
 
-    row.appendChild(tdPhoto);
-    row.appendChild(tdPrenom);
-    row.appendChild(tdStatus);
-    row.appendChild(tdDate);
-    row.appendChild(tdActions);
+    row.append(tdPhoto, tdPrenom, tdStatus, tdDate, tdActions);
     tbody.appendChild(row);
   });
 }
 
-// -- Charger messages --
+// ── Charger messages ──
 async function loadMessages() {
-  var res = await supabase.from('messages').select('*').order('created_at', { ascending: false }).limit(20);
+  const { data: messages, error } = await supabase
+    .from('messages').select('*').order('created_at', { ascending: false }).limit(20);
 
-  if (res.error) {
-    logErr('[loadMessages]', res.error);
+  if (error) {
     document.getElementById('messagesList').innerHTML =
-      '<div style="color:#fca5a5;padding:20px;text-align:center;">' +
-      readErr(res.error) + '</div>';
+      `<div style="color:#fca5a5;padding:20px;text-align:center">${error.message}</div>`;
     return;
   }
 
-  var container = document.getElementById('messagesList');
+  const container = document.getElementById('messagesList');
   container.innerHTML = '';
 
-  (res.data || []).forEach(function(msg) {
-    var item = document.createElement('div');
+  if (!messages?.length) {
+    container.innerHTML = '<div style="opacity:0.6;text-align:center;padding:20px">Aucun message.</div>';
+    return;
+  }
+
+  messages.forEach(msg => {
+    const item = document.createElement('div');
     item.className = 'message-item';
 
-    var header = document.createElement('div');
+    const header = document.createElement('div');
     header.className = 'message-header';
-    header.innerHTML = '<strong>' + msg.prenom + '</strong><span>' +
-      new Date(msg.created_at).toLocaleString('fr-FR') + '</span>';
+    header.innerHTML = `<strong>${msg.prenom}</strong><span>${new Date(msg.created_at).toLocaleString('fr-FR')}</span>`;
 
-    var text = document.createElement('div');
+    const text = document.createElement('div');
     text.className = 'message-text';
     text.textContent = msg.message;
 
-    item.appendChild(header);
-    item.appendChild(text);
+    item.append(header, text);
     container.appendChild(item);
   });
 }
 
-// -- Effacer tous les messages --
+// ── Effacer tous les messages ──
+// FIX : on récupère d'abord les IDs (UUID) puis on supprime un par un
 async function clearAllMessages() {
-  if (!confirm('Voulez-vous vraiment effacer TOUS les messages ?')) return;
+  if (!confirm('Effacer TOUS les messages ? Irréversible.')) return;
 
-  var res = await supabase.from('messages').delete().gt('id', 0);
-  if (res.error) {
-    logErr('[clearAllMessages]', res.error);
-    alert('Erreur : ' + readErr(res.error));
+  // Récupérer tous les IDs
+  const { data: rows, error: fetchErr } = await supabase
+    .from('messages').select('id');
+
+  if (fetchErr) {
+    alert('Erreur : ' + fetchErr.message);
     return;
   }
 
-  // Verification
-  var check = await supabase.from('messages').select('id').limit(1);
-  if (check.data && check.data.length > 0) {
-    showAlert('<strong>Suppression bloquee par RLS</strong> — ajouter une politique DELETE sur la table messages.');
-    alert('Les messages n\'ont pas ete supprimes — bloque par RLS.');
+  if (!rows || rows.length === 0) {
+    alert('Aucun message à supprimer.');
+    return;
+  }
+
+  // Supprimer par liste d'UUIDs
+  const ids = rows.map(r => r.id);
+  const { error } = await supabase.from('messages').delete().in('id', ids);
+
+  if (error) {
+    alert('Erreur suppression : ' + error.message);
     return;
   }
 
   await loadMessages();
   await loadStats();
-  alert('Tous les messages ont ete supprimes.');
+  alert('✅ Tous les messages ont été supprimés');
 }
 
 document.getElementById('clearMessagesBtn').addEventListener('click', clearAllMessages);
@@ -314,7 +266,7 @@ document.getElementById('clearMessagesBtn').addEventListener('click', clearAllMe
 loadStats();
 loadUsers();
 loadMessages();
-setInterval(function() { loadStats(); loadUsers(); loadMessages(); }, 10000);
+setInterval(() => { loadStats(); loadUsers(); loadMessages(); }, 10000);
 </script>
 
 </body>
