@@ -6,281 +6,105 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BubbleChat - Création</title>
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-font-family: ‘Segoe UI’, Tahoma, Geneva, Verdana, sans-serif;
-min-height: 100vh;
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-padding: 40px 20px;
-color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40px 20px;
+  color: white;
 }
-
-.container {
-max-width: 1200px;
-margin: 0 auto;
-}
-
+.container { max-width: 1200px; margin: 0 auto; }
 h1 {
-text-align: center;
-font-size: 42px;
-font-weight: 300;
-letter-spacing: 2px;
-margin-bottom: 40px;
-text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+  text-align: center; font-size: 42px; font-weight: 300;
+  letter-spacing: 2px; margin-bottom: 40px;
+  text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
 }
-
 .admin-card {
-background: rgba(255, 255, 255, 0.15);
-backdrop-filter: blur(20px);
-border-radius: 25px;
-padding: 40px;
-margin-bottom: 30px;
-border: 1px solid rgba(255, 255, 255, 0.2);
-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(20px);
+  border-radius: 25px; padding: 40px; margin-bottom: 30px;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
 }
-
-h2 {
-font-size: 28px;
-font-weight: 300;
-margin-bottom: 25px;
-display: flex;
-align-items: center;
-gap: 10px;
-}
-
-.stats-grid {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-gap: 20px;
-margin-bottom: 30px;
-}
-
-.stat-box {
-background: rgba(255, 255, 255, 0.1);
-padding: 25px;
-border-radius: 20px;
-text-align: center;
-border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.stat-number {
-font-size: 48px;
-font-weight: 700;
-margin-bottom: 10px;
-}
-
-.stat-label {
-font-size: 14px;
-opacity: 0.9;
-text-transform: uppercase;
-letter-spacing: 1px;
-}
-
-.users-table {
-width: 100%;
-border-collapse: collapse;
-margin-top: 20px;
-}
-
-.users-table th {
-background: rgba(255, 255, 255, 0.1);
-padding: 15px;
-text-align: left;
-font-weight: 600;
-border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.users-table td {
-padding: 15px;
-border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.users-table tr:hover {
-background: rgba(255, 255, 255, 0.05);
-}
-
-.user-photo {
-width: 40px;
-height: 40px;
-border-radius: 50%;
-object-fit: cover;
-border: 2px solid rgba(255, 255, 255, 0.4);
-}
-
-.status-badge {
-display: inline-block;
-padding: 5px 12px;
-border-radius: 20px;
-font-size: 12px;
-font-weight: 600;
-}
-
-.status-online {
-background: rgba(74, 222, 128, 0.3);
-border: 1px solid rgba(74, 222, 128, 0.6);
-}
-
-.status-offline {
-background: rgba(239, 68, 68, 0.3);
-border: 1px solid rgba(239, 68, 68, 0.6);
-}
-
+h2 { font-size: 28px; font-weight: 300; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+.stat-box { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.2); }
+.stat-number { font-size: 48px; font-weight: 700; margin-bottom: 10px; }
+.stat-label { font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+.users-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+.users-table th { background: rgba(255,255,255,0.1); padding: 15px; text-align: left; font-weight: 600; border-bottom: 2px solid rgba(255,255,255,0.2); }
+.users-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.users-table tr:hover { background: rgba(255,255,255,0.05); }
+.user-photo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.4); }
+.status-badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.status-online  { background: rgba(74,222,128,0.3); border: 1px solid rgba(74,222,128,0.6); }
+.status-offline { background: rgba(239,68,68,0.3);  border: 1px solid rgba(239,68,68,0.6);  }
 .btn {
-padding: 12px 25px;
-border: none;
-border-radius: 15px;
-font-size: 15px;
-font-weight: 600;
-cursor: pointer;
-transition: all 0.3s ease;
-background: rgba(255, 255, 255, 0.2);
-color: white;
-border: 2px solid rgba(255, 255, 255, 0.3);
-backdrop-filter: blur(10px);
-margin: 5px;
+  padding: 12px 25px; border: none; border-radius: 15px; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all 0.3s ease; background: rgba(255,255,255,0.2); color: white;
+  border: 2px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px); margin: 5px;
 }
-
-.btn:hover {
-background: rgba(255, 255, 255, 0.3);
-transform: translateY(-2px);
-}
-
-.btn-danger {
-background: rgba(239, 68, 68, 0.3);
-border-color: rgba(239, 68, 68, 0.6);
-}
-
-.btn-danger:hover {
-background: rgba(239, 68, 68, 0.5);
-}
-
-.actions {
-display: flex;
-gap: 10px;
-justify-content: center;
-flex-wrap: wrap;
-margin-top: 30px;
-}
-
-.messages-list {
-max-height: 400px;
-overflow-y: auto;
-margin-top: 20px;
-}
-
-.message-item {
-background: rgba(255, 255, 255, 0.1);
-padding: 15px;
-border-radius: 15px;
-margin-bottom: 12px;
-border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.message-header {
-display: flex;
-justify-content: space-between;
-margin-bottom: 8px;
-font-size: 13px;
-opacity: 0.8;
-}
-
-.message-text {
-font-size: 15px;
-line-height: 1.5;
-}
-
+.btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+.btn-danger { background: rgba(239,68,68,0.3); border-color: rgba(239,68,68,0.6); }
+.btn-danger:hover { background: rgba(239,68,68,0.5); }
+.actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+.messages-list { max-height: 400px; overflow-y: auto; margin-top: 20px; }
+.message-item { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.2); }
+.message-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; opacity: 0.8; }
+.message-text { font-size: 15px; line-height: 1.5; }
 .back-btn {
-position: fixed;
-top: 20px;
-left: 20px;
-padding: 10px 20px;
-background: rgba(255, 255, 255, 0.2);
-border: 2px solid rgba(255, 255, 255, 0.3);
-border-radius: 20px;
-color: white;
-cursor: pointer;
-backdrop-filter: blur(10px);
-transition: all 0.3s ease;
-z-index: 1000;
-font-weight: 600;
+  position: fixed; top: 20px; left: 20px; padding: 10px 20px;
+  background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 20px; color: white; cursor: pointer; backdrop-filter: blur(10px);
+  transition: all 0.3s ease; z-index: 1000; font-weight: 600;
 }
-
-.back-btn:hover {
-background: rgba(255, 255, 255, 0.3);
-transform: translateY(-2px);
+.back-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+.alert-box {
+  background: rgba(251,191,36,0.25); border: 2px solid rgba(251,191,36,0.6);
+  border-radius: 15px; padding: 15px 20px; margin-bottom: 20px;
+  font-size: 14px; line-height: 1.6; display: none;
 }
+.alert-box.visible { display: block; }
 </style>
-
 </head>
 <body>
 
 <button class="back-btn" onclick="window.location.href='chat.html'">← Retour au chat</button>
 
 <div class="container">
-  <h1>🎨 Espace Création - Admin</h1>
+  <h1>&#127912; Espace Creation - Admin</h1>
 
-  <!-- Statistiques -->
+  <div class="alert-box" id="alertBox"></div>
 
   <div class="admin-card">
-    <h2>📊 Statistiques</h2>
+    <h2>&#128202; Statistiques</h2>
     <div class="stats-grid">
-      <div class="stat-box">
-        <div class="stat-number" id="totalUsers">0</div>
-        <div class="stat-label">Utilisateurs</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-number" id="onlineUsers">0</div>
-        <div class="stat-label">En ligne</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-number" id="totalMessages">0</div>
-        <div class="stat-label">Messages</div>
-      </div>
+      <div class="stat-box"><div class="stat-number" id="totalUsers">0</div><div class="stat-label">Utilisateurs</div></div>
+      <div class="stat-box"><div class="stat-number" id="onlineUsers">0</div><div class="stat-label">En ligne</div></div>
+      <div class="stat-box"><div class="stat-number" id="totalMessages">0</div><div class="stat-label">Messages</div></div>
     </div>
   </div>
 
-  <!-- Gestion utilisateurs -->
-
   <div class="admin-card">
-    <h2>👥 Gestion des utilisateurs</h2>
+    <h2>&#128101; Gestion des utilisateurs</h2>
     <table class="users-table">
-      <thead>
-        <tr>
-          <th>Photo</th>
-          <th>Prénom</th>
-          <th>Statut</th>
-          <th>Inscrit le</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="usersTableBody">
-        <!-- Rempli dynamiquement -->
-      </tbody>
+      <thead><tr><th>Photo</th><th>Prenom</th><th>Statut</th><th>Inscrit le</th><th>Actions</th></tr></thead>
+      <tbody id="usersTableBody"></tbody>
     </table>
   </div>
 
-  <!-- Messages récents -->
-
   <div class="admin-card">
-    <h2>💬 Messages récents</h2>
-    <div class="messages-list" id="messagesList">
-      <!-- Rempli dynamiquement -->
-    </div>
+    <h2>&#128172; Messages recents</h2>
+    <div class="messages-list" id="messagesList"></div>
   </div>
 
-  <!-- Actions -->
-
   <div class="admin-card">
-    <h2>⚙️ Actions</h2>
+    <h2>&#9881;&#65039; Actions</h2>
     <div class="actions">
-      <button class="btn" onclick="location.reload()">🔄 Actualiser</button>
-      <button class="btn btn-danger" id="clearMessagesBtn">🗑️ Effacer tous les messages</button>
-      <button class="btn" onclick="window.location.href='chat.html'">💬 Aller au chat</button>
+      <button class="btn" onclick="location.reload()">&#128260; Actualiser</button>
+      <button class="btn btn-danger" id="clearMessagesBtn">&#128465;&#65039; Effacer tous les messages</button>
+      <button class="btn" onclick="window.location.href='chat.html'">&#128172; Aller au chat</button>
     </div>
   </div>
 </div>
@@ -293,137 +117,164 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWtyaXdyd3V5bndwem9kYmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzQ3NjYsImV4cCI6MjA4NjE1MDc2Nn0.MJ6CSmrttEWcrdfy5C7nP4sE_pe19sGNE-WasASPDNc"
 );
 
-// Vérifier que c'est bien Steph
-const currentUser = localStorage.getItem('prenom');
-if (currentUser !== 'Steph') {
+// Acces admin uniquement
+if (localStorage.getItem('prenom') !== 'Steph') {
   window.location.href = 'chat.html';
 }
 
-// Charger statistiques
-async function loadStats() {
-  const { data: users } = await supabase.from('profiles').select('*');
-  const { data: messages } = await supabase.from('messages').select('*');
-
-  const onlineCount = users?.filter(u => u.is_online).length || 0;
-
-  document.getElementById('totalUsers').textContent = users?.length || 0;
-  document.getElementById('onlineUsers').textContent = onlineCount;
-  document.getElementById('totalMessages').textContent = messages?.length || 0;
+// Lit les proprietes d'une erreur Supabase sans tenter de la cloner
+// (evite le DataCloneError de Safari / WKWebView)
+function readErr(e) {
+  if (!e) return 'erreur inconnue';
+  var msg     = typeof e.message === 'string' ? e.message  : '';
+  var code    = typeof e.code    === 'string' ? e.code     : '';
+  var hint    = typeof e.hint    === 'string' ? e.hint     : '';
+  var details = typeof e.details === 'string' ? e.details  : '';
+  var out = msg || code || 'erreur inconnue';
+  if (hint)    out += ' | hint: '    + hint;
+  if (details) out += ' | details: ' + details;
+  return out;
 }
 
-// Supprimer un utilisateur — FIX: bouton créé par JS pour éviter les problèmes de portée
+// console.log (pas .error) pour eviter DataCloneError
+function logErr(label, e) {
+  console.log(label + ' -> ' + readErr(e));
+}
+
+function showAlert(html) {
+  var el = document.getElementById('alertBox');
+  el.innerHTML = html;
+  el.classList.add('visible');
+}
+
+// -- Statistiques --
+async function loadStats() {
+  var r1 = await supabase.from('profiles').select('*');
+  var r2 = await supabase.from('messages').select('*');
+  var users    = r1.data || [];
+  var messages = r2.data || [];
+  document.getElementById('totalUsers').textContent    = users.length;
+  document.getElementById('onlineUsers').textContent   = users.filter(function(u){ return u.is_online; }).length;
+  document.getElementById('totalMessages').textContent = messages.length;
+}
+
+// -- Supprimer un utilisateur --
 async function deleteUser(prenom) {
-  if (!confirm(`Voulez-vous vraiment supprimer l'utilisateur ${prenom} ?`)) return;
+  if (!confirm('Voulez-vous vraiment supprimer l\'utilisateur "' + prenom + '" ?')) return;
 
-  // Supprimer les messages d'abord (clé étrangère éventuelle)
-  const { error: msgError } = await supabase.from('messages').delete().eq('prenom', prenom);
-  if (msgError) {
-    console.error('Erreur suppression messages:', msgError);
-  }
+  // 1. Messages lies
+  var r1 = await supabase.from('messages').delete().eq('prenom', prenom);
+  if (r1.error) logErr('[deleteUser] messages', r1.error);
 
-  // Puis supprimer le profil
-  const { error: profileError } = await supabase.from('profiles').delete().eq('prenom', prenom);
-  if (profileError) {
-    alert('Erreur lors de la suppression : ' + profileError.message);
-    console.error('Erreur suppression profil:', profileError);
+  // 2. Profil
+  var r2 = await supabase.from('profiles').delete().eq('prenom', prenom);
+  if (r2.error) {
+    logErr('[deleteUser] profil', r2.error);
+    alert('Erreur : ' + readErr(r2.error));
     return;
   }
 
+  // 3. Verification : le profil a-t-il vraiment disparu ?
+  var r3 = await supabase.from('profiles').select('prenom').eq('prenom', prenom).maybeSingle();
+  if (r3.data !== null) {
+    // Toujours present = bloque par RLS silencieusement
+    showAlert(
+      '<strong>Suppression bloquee par les politiques RLS de Supabase.</strong><br>' +
+      'Va dans Dashboard Supabase > Table Editor > profiles > Policies ' +
+      'et ajoute une regle DELETE USING (true), ou desactive le RLS sur cette table.'
+    );
+    alert('Suppression bloquee par RLS — le profil existe toujours.');
+    return;
+  }
+
+  alert('L\'utilisateur "' + prenom + '" a ete supprime.');
   await loadUsers();
   await loadStats();
   await loadMessages();
 }
 
-// Charger utilisateurs — FIX: boutons créés via addEventListener (pas de onclick inline)
+// -- Charger utilisateurs --
 async function loadUsers() {
-  const { data: users, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .order('created_at', { ascending: false });
+  var res = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
 
-  if (error) {
-    console.error('Erreur chargement utilisateurs:', error);
+  if (res.error) {
+    logErr('[loadUsers]', res.error);
+    document.getElementById('usersTableBody').innerHTML =
+      '<tr><td colspan="5" style="color:#fca5a5;padding:20px;text-align:center;">' +
+      readErr(res.error) + '</td></tr>';
     return;
   }
 
-  const tbody = document.getElementById('usersTableBody');
+  var tbody = document.getElementById('usersTableBody');
   tbody.innerHTML = '';
 
-  users?.forEach(user => {
-    const status = user.is_online ? 'online' : 'offline';
-    const statusText = user.is_online ? 'En ligne' : 'Hors ligne';
-    const createdDate = new Date(user.created_at).toLocaleDateString('fr-FR');
+  (res.data || []).forEach(function(user) {
+    var row = document.createElement('tr');
 
-    const row = document.createElement('tr');
-
-    // Colonne photo
-    const tdPhoto = document.createElement('td');
+    var tdPhoto = document.createElement('td');
     if (user.photo_url) {
-      const img = document.createElement('img');
+      var img = document.createElement('img');
       img.className = 'user-photo';
       img.src = user.photo_url;
       img.alt = user.prenom;
-      img.onerror = () => { img.style.display = 'none'; };
+      img.onerror = function() { img.style.display = 'none'; };
       tdPhoto.appendChild(img);
     }
 
-    // Colonne prénom
-    const tdPrenom = document.createElement('td');
-    tdPrenom.innerHTML = `<strong>${user.prenom}</strong>`;
+    var tdPrenom = document.createElement('td');
+    tdPrenom.innerHTML = '<strong>' + user.prenom + '</strong>';
 
-    // Colonne statut
-    const tdStatus = document.createElement('td');
-    tdStatus.innerHTML = `<span class="status-badge status-${status}">${statusText}</span>`;
+    var online = user.is_online;
+    var tdStatus = document.createElement('td');
+    tdStatus.innerHTML = '<span class="status-badge status-' + (online ? 'online' : 'offline') + '">' +
+      (online ? 'En ligne' : 'Hors ligne') + '</span>';
 
-    // Colonne date
-    const tdDate = document.createElement('td');
-    tdDate.textContent = createdDate;
+    var tdDate = document.createElement('td');
+    tdDate.textContent = new Date(user.created_at).toLocaleDateString('fr-FR');
 
-    // Colonne actions — FIX principal : addEventListener au lieu de onclick="..."
-    const tdActions = document.createElement('td');
-    const btnDel = document.createElement('button');
-    btnDel.className = 'btn btn-danger';
-    btnDel.textContent = 'Supprimer';
-    btnDel.addEventListener('click', () => deleteUser(user.prenom));
-    tdActions.appendChild(btnDel);
+    var tdActions = document.createElement('td');
+    var btn = document.createElement('button');
+    btn.className = 'btn btn-danger';
+    btn.textContent = 'Supprimer';
+    (function(p) {
+      btn.addEventListener('click', function() { deleteUser(p); });
+    })(user.prenom);
+    tdActions.appendChild(btn);
 
     row.appendChild(tdPhoto);
     row.appendChild(tdPrenom);
     row.appendChild(tdStatus);
     row.appendChild(tdDate);
     row.appendChild(tdActions);
-
     tbody.appendChild(row);
   });
 }
 
-// Charger messages
+// -- Charger messages --
 async function loadMessages() {
-  const { data: messages, error } = await supabase
-    .from('messages')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(20);
+  var res = await supabase.from('messages').select('*').order('created_at', { ascending: false }).limit(20);
 
-  if (error) {
-    console.error('Erreur chargement messages:', error);
+  if (res.error) {
+    logErr('[loadMessages]', res.error);
+    document.getElementById('messagesList').innerHTML =
+      '<div style="color:#fca5a5;padding:20px;text-align:center;">' +
+      readErr(res.error) + '</div>';
     return;
   }
 
-  const container = document.getElementById('messagesList');
+  var container = document.getElementById('messagesList');
   container.innerHTML = '';
 
-  messages?.forEach(msg => {
-    const time = new Date(msg.created_at).toLocaleString('fr-FR');
-
-    const item = document.createElement('div');
+  (res.data || []).forEach(function(msg) {
+    var item = document.createElement('div');
     item.className = 'message-item';
 
-    const header = document.createElement('div');
+    var header = document.createElement('div');
     header.className = 'message-header';
-    header.innerHTML = `<strong>${msg.prenom}</strong><span>${time}</span>`;
+    header.innerHTML = '<strong>' + msg.prenom + '</strong><span>' +
+      new Date(msg.created_at).toLocaleString('fr-FR') + '</span>';
 
-    const text = document.createElement('div');
+    var text = document.createElement('div');
     text.className = 'message-text';
     text.textContent = msg.message;
 
@@ -433,36 +284,37 @@ async function loadMessages() {
   });
 }
 
-// Effacer tous les messages — FIX: bouton attaché via addEventListener
+// -- Effacer tous les messages --
 async function clearAllMessages() {
   if (!confirm('Voulez-vous vraiment effacer TOUS les messages ?')) return;
 
-  const { error } = await supabase.from('messages').delete().neq('id', 0);
-  if (error) {
-    alert('Erreur : ' + error.message);
-    console.error('Erreur suppression messages:', error);
+  var res = await supabase.from('messages').delete().gt('id', 0);
+  if (res.error) {
+    logErr('[clearAllMessages]', res.error);
+    alert('Erreur : ' + readErr(res.error));
+    return;
+  }
+
+  // Verification
+  var check = await supabase.from('messages').select('id').limit(1);
+  if (check.data && check.data.length > 0) {
+    showAlert('<strong>Suppression bloquee par RLS</strong> — ajouter une politique DELETE sur la table messages.');
+    alert('Les messages n\'ont pas ete supprimes — bloque par RLS.');
     return;
   }
 
   await loadMessages();
   await loadStats();
-  alert('✅ Tous les messages ont été supprimés');
+  alert('Tous les messages ont ete supprimes.');
 }
 
-// Attacher le bouton "Effacer tous les messages" via addEventListener
 document.getElementById('clearMessagesBtn').addEventListener('click', clearAllMessages);
 
-// Chargement initial
+// Init
 loadStats();
 loadUsers();
 loadMessages();
-
-// Actualisation auto toutes les 10 secondes
-setInterval(() => {
-  loadStats();
-  loadUsers();
-  loadMessages();
-}, 10000);
+setInterval(function() { loadStats(); loadUsers(); loadMessages(); }, 10000);
 </script>
 
 </body>
