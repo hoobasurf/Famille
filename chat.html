@@ -403,12 +403,18 @@ document.getElementById('toggleSidebar').addEventListener('click', () => {
     document.getElementById('toggleText').textContent  = sidebarVisible ? 'Profils' : 'Chat';
 });
 
-/* Sur mobile, fermer la sidebar en cliquant hors de celle-ci */
+/* Sur mobile, fermer la sidebar en cliquant hors de celle-ci
+   — on exclut TOUT le panneau droit pour ne pas interférer avec Wizz / couleurs */
 document.addEventListener('click', e => {
     if (isMobile() && sidebarVisible) {
-        const panel  = document.getElementById('usersPanel');
-        const toggle = document.getElementById('toggleSidebar');
-        if (!panel.contains(e.target) && !toggle.contains(e.target)) {
+        const panel     = document.getElementById('usersPanel');
+        const toggle    = document.getElementById('toggleSidebar');
+        const rightPane = document.getElementById('rightPanel');
+        if (
+            !panel.contains(e.target) &&
+            !toggle.contains(e.target) &&
+            !rightPane.contains(e.target)
+        ) {
             sidebarVisible = false;
             panel.classList.add('hidden');
             document.getElementById('toggleIcon').textContent = '💬';
@@ -719,7 +725,11 @@ function switchToPrivateChat(profile) {
 
     loadPMHistory(profile.unique_id);
     markAllRead(profile.unique_id);
-    renderProfiles();
+    /* Supprime juste le badge sans recréer tout le DOM */
+    document.querySelectorAll('.notif-badge').forEach(b => {
+        const item = b.closest('.user-item');
+        if (item?.dataset.uid === profile.unique_id) b.remove();
+    });
     pmPollInterval = setInterval(() => pollNewPMs(profile.unique_id), 2500);
 }
 
