@@ -279,7 +279,7 @@ transform: translateY(-2px);
     <h2>⚙️ Actions</h2>
     <div class="actions">
       <button class="btn" onclick="location.reload()">🔄 Actualiser</button>
-      <button class="btn btn-danger" onclick="clearAllMessages()">🗑️ Effacer tous les messages</button>
+      <button class="btn btn-danger" id="clearMessagesBtn">🗑️ Effacer tous les messages</button>
       <button class="btn" onclick="window.location.href='chat.html'">💬 Aller au chat</button>
     </div>
   </div>
@@ -295,7 +295,7 @@ const supabase = createClient(
 
 // Vérifier que c'est bien Steph
 const currentUser = localStorage.getItem('prenom');
-if(currentUser !== 'Steph') {
+if (currentUser !== 'Steph') {
   window.location.href = 'chat.html';
 }
 
@@ -303,99 +303,154 @@ if(currentUser !== 'Steph') {
 async function loadStats() {
   const { data: users } = await supabase.from('profiles').select('*');
   const { data: messages } = await supabase.from('messages').select('*');
-  
+
   const onlineCount = users?.filter(u => u.is_online).length || 0;
-  
+
   document.getElementById('totalUsers').textContent = users?.length || 0;
   document.getElementById('onlineUsers').textContent = onlineCount;
   document.getElementById('totalMessages').textContent = messages?.length || 0;
 }
 
-// Charger utilisateurs
+// Supprimer un utilisateur — FIX: bouton créé par JS pour éviter les problèmes de portée
+async function deleteUser(prenom) {
+  if (!confirm(`Voulez-vous vraiment supprimer l'utilisateur ${prenom} ?`)) return;
+
+  // Supprimer les messages d'abord (clé étrangère éventuelle)
+  const { error: msgError } = await supabase.from('messages').delete().eq('prenom', prenom);
+  if (msgError) {
+    console.error('Erreur suppression messages:', msgError);
+  }
+
+  // Puis supprimer le profil
+  const { error: profileError } = await supabase.from('profiles').delete().eq('prenom', prenom);
+  if (profileError) {
+    alert('Erreur lors de la suppression : ' + profileError.message);
+    console.error('Erreur suppression profil:', profileError);
+    return;
+  }
+
+  await loadUsers();
+  await loadStats();
+  await loadMessages();
+}
+
+// Charger utilisateurs — FIX: boutons créés via addEventListener (pas de onclick inline)
 async function loadUsers() {
-  const { data: users } = await supabase
+  const { data: users, error } = await supabase
     .from('profiles')
     .select('*')
     .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Erreur chargement utilisateurs:', error);
+    return;
+  }
 
   const tbody = document.getElementById('usersTableBody');
   tbody.innerHTML = '';
 
   users?.forEach(user => {
-    const row = document.createElement('tr');
     const status = user.is_online ? 'online' : 'offline';
     const statusText = user.is_online ? 'En ligne' : 'Hors ligne';
     const createdDate = new Date(user.created_at).toLocaleDateString('fr-FR');
-    
-    row.innerHTML = `
-      <td>
-        <img class="user-photo" src="${user.photo_url || ''}" alt="${user.prenom}" 
-             onerror="this.style.display='none'">
-      </td>
-      <td><strong>${user.prenom}</strong></td>
-      <td>
-        <span class="status-badge status-${status}">${statusText}</span>
-      </td>
-      <td>${createdDate}</td>
-      <td>
-        <button class="btn btn-danger" onclick="deleteUser('${user.prenom}')">Supprimer</button>
-      </td>
-    `;
-    
+
+    const row = document.createElement('tr');
+
+    // Colonne photo
+    const tdPhoto = document.createElement('td');
+    if (user.photo_url) {
+      const img = document.createElement('img');
+      img.className = 'user-photo';
+      img.src = user.photo_url;
+      img.alt = user.prenom;
+      img.onerror = () => { img.style.display = 'none'; };
+      tdPhoto.appendChild(img);
+    }
+
+    // Colonne prénom
+    const tdPrenom = document.createElement('td');
+    tdPrenom.innerHTML = `<strong>${user.prenom}</strong>`;
+
+    // Colonne statut
+    const tdStatus = document.createElement('td');
+    tdStatus.innerHTML = `<span class="status-badge status-${status}">${statusText}</span>`;
+
+    // Colonne date
+    const tdDate = document.createElement('td');
+    tdDate.textContent = createdDate;
+
+    // Colonne actions — FIX principal : addEventListener au lieu de onclick="..."
+    const tdActions = document.createElement('td');
+    const btnDel = document.createElement('button');
+    btnDel.className = 'btn btn-danger';
+    btnDel.textContent = 'Supprimer';
+    btnDel.addEventListener('click', () => deleteUser(user.prenom));
+    tdActions.appendChild(btnDel);
+
+    row.appendChild(tdPhoto);
+    row.appendChild(tdPrenom);
+    row.appendChild(tdStatus);
+    row.appendChild(tdDate);
+    row.appendChild(tdActions);
+
     tbody.appendChild(row);
   });
 }
 
 // Charger messages
 async function loadMessages() {
-  const { data: messages } = await supabase
+  const { data: messages, error } = await supabase
     .from('messages')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(20);
+
+  if (error) {
+    console.error('Erreur chargement messages:', error);
+    return;
+  }
 
   const container = document.getElementById('messagesList');
   container.innerHTML = '';
 
   messages?.forEach(msg => {
     const time = new Date(msg.created_at).toLocaleString('fr-FR');
-    
+
     const item = document.createElement('div');
     item.className = 'message-item';
-    item.innerHTML = `
-      <div class="message-header">
-        <strong>${msg.prenom}</strong>
-        <span>${time}</span>
-      </div>
-      <div class="message-text">${msg.message}</div>
-    `;
-    
+
+    const header = document.createElement('div');
+    header.className = 'message-header';
+    header.innerHTML = `<strong>${msg.prenom}</strong><span>${time}</span>`;
+
+    const text = document.createElement('div');
+    text.className = 'message-text';
+    text.textContent = msg.message;
+
+    item.appendChild(header);
+    item.appendChild(text);
     container.appendChild(item);
   });
 }
 
-// Supprimer utilisateur
-window.deleteUser = async (prenom) => {
-  if(!confirm(`Voulez-vous vraiment supprimer l'utilisateur ${prenom} ?`)) return;
-  
-  await supabase.from('profiles').delete().eq('prenom', prenom);
-  await supabase.from('messages').delete().eq('prenom', prenom);
-  
-  loadUsers();
-  loadStats();
-  loadMessages();
-};
+// Effacer tous les messages — FIX: bouton attaché via addEventListener
+async function clearAllMessages() {
+  if (!confirm('Voulez-vous vraiment effacer TOUS les messages ?')) return;
 
-// Effacer tous les messages
-window.clearAllMessages = async () => {
-  if(!confirm('Voulez-vous vraiment effacer TOUS les messages ?')) return;
-  
-  await supabase.from('messages').delete().neq('id', 0);
-  
-  loadMessages();
-  loadStats();
+  const { error } = await supabase.from('messages').delete().neq('id', 0);
+  if (error) {
+    alert('Erreur : ' + error.message);
+    console.error('Erreur suppression messages:', error);
+    return;
+  }
+
+  await loadMessages();
+  await loadStats();
   alert('✅ Tous les messages ont été supprimés');
-};
+}
+
+// Attacher le bouton "Effacer tous les messages" via addEventListener
+document.getElementById('clearMessagesBtn').addEventListener('click', clearAllMessages);
 
 // Chargement initial
 loadStats();
