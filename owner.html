@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BubbleChat - Création</title>
+<title>BubbleChat - Admin</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -34,12 +34,12 @@ h2 { font-size: 28px; font-weight: 300; margin-bottom: 25px; display: flex; alig
 .stat-label { font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
 .users-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
 .users-table th { background: rgba(255,255,255,0.1); padding: 15px; text-align: left; font-weight: 600; border-bottom: 2px solid rgba(255,255,255,0.2); }
-.users-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.users-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); vertical-align: middle; }
 .users-table tr:hover { background: rgba(255,255,255,0.05); }
 .user-photo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.4); }
 .status-badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
 .status-online  { background: rgba(74,222,128,0.3); border: 1px solid rgba(74,222,128,0.6); }
-.status-offline { background: rgba(239,68,68,0.3);  border: 1px solid rgba(239,68,68,0.6);  }
+.status-offline { background: rgba(239,68,68,0.3);  border: 1px solid rgba(239,68,68,0.6); }
 .btn {
   padding: 12px 25px; border: none; border-radius: 15px; font-size: 15px; font-weight: 600;
   cursor: pointer; transition: all 0.3s ease; background: rgba(255,255,255,0.2); color: white;
@@ -81,7 +81,9 @@ h2 { font-size: 28px; font-weight: 300; margin-bottom: 25px; display: flex; alig
   <div class="admin-card">
     <h2>👥 Gestion des utilisateurs</h2>
     <table class="users-table">
-      <thead><tr><th>Photo</th><th>Prénom</th><th>Statut</th><th>Inscrit le</th><th>Actions</th></tr></thead>
+      <thead>
+        <tr><th>Photo</th><th>Prénom</th><th>Statut</th><th>Inscrit le</th><th>Actions</th></tr>
+      </thead>
       <tbody id="usersTableBody"></tbody>
     </table>
   </div>
@@ -102,11 +104,11 @@ h2 { font-size: 28px; font-weight: 300; margin-bottom: 25px; display: flex; alig
 </div>
 
 <script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 const supabase = createClient(
-  "https://eeikriwrwuynwpzodbbt.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWtyaXdyd3V5bndwem9kYmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzQ3NjYsImV4cCI6MjA4NjE1MDc2Nn0.MJ6CSmrttEWcrdfy5C7nP4sE_pe19sGNE-WasASPDNc"
+  'https://eeikriwrwuynwpzodbbt.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWtyaXdyd3V5bndwem9kYmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzQ3NjYsImV4cCI6MjA4NjE1MDc2Nn0.MJ6CSmrttEWcrdfy5C7nP4sE_pe19sGNE-WasASPDNc'
 );
 
 if (localStorage.getItem('prenom') !== 'Steph') {
@@ -115,36 +117,21 @@ if (localStorage.getItem('prenom') !== 'Steph') {
 
 // ── Stats ──
 async function loadStats() {
-  const { data: users }    = await supabase.from('profiles').select('*');
-  const { data: messages } = await supabase.from('messages').select('*');
-  document.getElementById('totalUsers').textContent    = users?.length || 0;
-  document.getElementById('onlineUsers').textContent   = users?.filter(u => u.is_online).length || 0;
+  const { data: users }    = await supabase.from('profiles').select('id');
+  const { data: messages } = await supabase.from('messages').select('id');
+  const { data: online }   = await supabase.from('profiles').select('id').eq('is_online', true);
+
+  document.getElementById('totalUsers').textContent    = users?.length    || 0;
+  document.getElementById('onlineUsers').textContent   = online?.length   || 0;
   document.getElementById('totalMessages').textContent = messages?.length || 0;
-}
-
-// ── Supprimer un utilisateur ──
-async function deleteUser(prenom, id) {
-  if (!confirm(`Supprimer "${prenom}" et tous ses messages ?`)) return;
-
-  // Supprimer les messages de cet utilisateur
-  await supabase.from('messages').delete().eq('prenom', prenom);
-
-  // Supprimer le profil par son UUID
-  const { error } = await supabase.from('profiles').delete().eq('id', id);
-  if (error) {
-    alert('Erreur suppression profil : ' + error.message);
-    return;
-  }
-
-  await loadUsers();
-  await loadStats();
-  await loadMessages();
 }
 
 // ── Charger utilisateurs ──
 async function loadUsers() {
   const { data: users, error } = await supabase
-    .from('profiles').select('*').order('created_at', { ascending: false });
+    .from('profiles')
+    .select('id, unique_id, prenom, photo_url, is_online, created_at')
+    .order('created_at', { ascending: false });
 
   if (error) {
     document.getElementById('usersTableBody').innerHTML =
@@ -158,32 +145,42 @@ async function loadUsers() {
   (users || []).forEach(user => {
     const row = document.createElement('tr');
 
+    // Photo
     const tdPhoto = document.createElement('td');
     if (user.photo_url) {
       const img = document.createElement('img');
       img.className = 'user-photo';
       img.src = user.photo_url;
-      img.alt = user.prenom;
+      img.alt = user.prenom || '';
       img.onerror = () => img.style.display = 'none';
       tdPhoto.appendChild(img);
     }
 
+    // Prénom
     const tdPrenom = document.createElement('td');
-    tdPrenom.innerHTML = `<strong>${user.prenom}</strong>`;
+    const strong = document.createElement('strong');
+    strong.textContent = user.prenom || '(inconnu)';
+    tdPrenom.appendChild(strong);
 
+    // Statut
     const tdStatus = document.createElement('td');
-    tdStatus.innerHTML = `<span class="status-badge status-${user.is_online ? 'online' : 'offline'}">
-      ${user.is_online ? 'En ligne' : 'Hors ligne'}</span>`;
+    const badge = document.createElement('span');
+    badge.className = 'status-badge ' + (user.is_online ? 'status-online' : 'status-offline');
+    badge.textContent = user.is_online ? 'En ligne' : 'Hors ligne';
+    tdStatus.appendChild(badge);
 
+    // Date
     const tdDate = document.createElement('td');
-    tdDate.textContent = new Date(user.created_at).toLocaleDateString('fr-FR');
+    tdDate.textContent = user.created_at
+      ? new Date(user.created_at).toLocaleDateString('fr-FR')
+      : '—';
 
+    // Bouton supprimer
     const tdActions = document.createElement('td');
     const btn = document.createElement('button');
     btn.className = 'btn btn-danger';
     btn.textContent = 'Supprimer';
-    // On passe l'UUID (user.id) pour éviter tout problème de type
-    btn.addEventListener('click', () => deleteUser(user.prenom, user.id));
+    btn.addEventListener('click', () => deleteUser(user));
     tdActions.appendChild(btn);
 
     row.append(tdPhoto, tdPrenom, tdStatus, tdDate, tdActions);
@@ -191,10 +188,38 @@ async function loadUsers() {
   });
 }
 
-// ── Charger messages ──
+// ── Supprimer un utilisateur ──
+// On supprime : messages par prenom + private_messages par unique_id + profil par id
+async function deleteUser(user) {
+  const prenom = user.prenom || '?';
+  if (!confirm(`Supprimer "${prenom}" et tous ses messages ?`)) return;
+
+  // 1. Messages publics (colonne prenom)
+  await supabase.from('messages').delete().eq('prenom', prenom);
+
+  // 2. Messages privés envoyés et reçus (colonne unique_id)
+  if (user.unique_id) {
+    await supabase.from('private_messages').delete().eq('sender_unique_id', user.unique_id);
+    await supabase.from('private_messages').delete().eq('receiver_unique_id', user.unique_id);
+  }
+
+  // 3. Profil (par id UUID)
+  const { error } = await supabase.from('profiles').delete().eq('id', user.id);
+  if (error) {
+    alert('❌ Erreur suppression profil : ' + error.message);
+    return;
+  }
+
+  await Promise.all([loadUsers(), loadStats(), loadMessages()]);
+}
+
+// ── Charger messages récents ──
 async function loadMessages() {
   const { data: messages, error } = await supabase
-    .from('messages').select('*').order('created_at', { ascending: false }).limit(20);
+    .from('messages')
+    .select('id, prenom, message, created_at')
+    .order('created_at', { ascending: false })
+    .limit(20);
 
   if (error) {
     document.getElementById('messagesList').innerHTML =
@@ -216,53 +241,47 @@ async function loadMessages() {
 
     const header = document.createElement('div');
     header.className = 'message-header';
-    header.innerHTML = `<strong>${msg.prenom}</strong><span>${new Date(msg.created_at).toLocaleString('fr-FR')}</span>`;
+    const s = document.createElement('strong');
+    s.textContent = msg.prenom || '?';
+    const t = document.createElement('span');
+    t.textContent = msg.created_at
+      ? new Date(msg.created_at).toLocaleString('fr-FR')
+      : '';
+    header.append(s, t);
 
     const text = document.createElement('div');
     text.className = 'message-text';
-    text.textContent = msg.message;
+    // La colonne s'appelle 'message' dans ta table
+    text.textContent = msg.message || '';
 
     item.append(header, text);
     container.appendChild(item);
   });
 }
 
-// ── Effacer tous les messages ──
-// FIX : on récupère d'abord les IDs (UUID) puis on supprime un par un
+// ── Effacer TOUS les messages ──
+// La table messages a un id UUID → on supprime avec is_null = false sur prenom
 async function clearAllMessages() {
-  if (!confirm('Effacer TOUS les messages ? Irréversible.')) return;
+  if (!confirm('Effacer TOUS les messages du chat général ? Irréversible.')) return;
 
-  // Récupérer tous les IDs
-  const { data: rows, error: fetchErr } = await supabase
-    .from('messages').select('id');
-
-  if (fetchErr) {
-    alert('Erreur : ' + fetchErr.message);
-    return;
-  }
-
-  if (!rows || rows.length === 0) {
-    alert('Aucun message à supprimer.');
-    return;
-  }
-
-  // Supprimer par liste d'UUIDs
-  const ids = rows.map(r => r.id);
-  const { error } = await supabase.from('messages').delete().in('id', ids);
+  // Supprimer tous les messages où prenom n'est pas null (= tous les vrais messages)
+  const { error } = await supabase
+    .from('messages')
+    .delete()
+    .not('prenom', 'is', null);
 
   if (error) {
-    alert('Erreur suppression : ' + error.message);
+    alert('❌ Erreur : ' + error.message);
     return;
   }
 
-  await loadMessages();
-  await loadStats();
+  await Promise.all([loadMessages(), loadStats()]);
   alert('✅ Tous les messages ont été supprimés');
 }
 
 document.getElementById('clearMessagesBtn').addEventListener('click', clearAllMessages);
 
-// Init
+// ── Init ──
 loadStats();
 loadUsers();
 loadMessages();
