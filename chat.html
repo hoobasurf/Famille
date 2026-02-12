@@ -25,11 +25,7 @@
 
     .app-wrapper { position:relative; z-index:1; max-width:1500px; margin:0 auto; padding:20px; min-height:100vh; display:flex; flex-direction:column; gap:20px; }
 
-    .chat-header {
-        background:rgba(255,255,255,.05); backdrop-filter:blur(10px); border-radius:20px;
-        padding:14px 28px; border:1px solid rgba(255,255,255,.15);
-        display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
-    }
+    .chat-header { background:rgba(255,255,255,.05); backdrop-filter:blur(10px); border-radius:20px; padding:14px 28px; border:1px solid rgba(255,255,255,.15); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
     .theme-selector { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
     .theme-label    { color:white; font-weight:600; text-shadow:0 2px 5px rgba(0,0,0,.3); }
     .theme-options  { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
@@ -298,15 +294,19 @@ document.addEventListener('click', e => {
 });
 
 /* ══ ÉTAT GLOBAL ══ */
-let currentChatType    = 'public';
-let currentChatUser    = null;
-let profiles           = [];
-const pmBadges         = {};
-// FIX : on utilise created_at (string ISO) au lieu de id (UUID) pour le polling
-let lastPublicMsgTime  = null;
-let lastPMId           = 0;
-let pmPollInterval     = null;
-let lastInboxId        = 0;
+let currentChatType   = 'public';
+let currentChatUser   = null;
+let profiles          = [];
+const pmBadges        = {};
+
+// ── Polling public : on utilise l'id (bigint) pour éviter les problèmes de timezone ──
+let lastPublicId   = 0;
+let publicLoaded   = false;
+
+// ── Polling privé ──
+let lastPMId       = 0;
+let pmPollInterval = null;
+let lastInboxId    = 0;
 
 /* ══ COULEUR BULLES ══ */
 const PRESETS = [
@@ -492,43 +492,60 @@ document.getElementById('wizzBtn').addEventListener('click', async () => {
 });
 
 /* ══ CHAT PUBLIC ══
-   FIX : on trie par created_at et on mémorise le dernier timestamp
-   pour éviter le problème de comparaison UUID > 0 */
+   FIX PRINCIPAL : suppression du filtre .is('to_user', null) qui bloquait tous les messages.
+   On utilise désormais l'id (bigint auto-incrémenté) pour le polling, fiable et sans problème de timezone. */
 async function loadPublicMessages() {
-    let query = supabase
-        .from('messages')
-        .select('id, prenom, message, created_at, photo_url')
-        .is('to_user', null)
-        .order('created_at', { ascending: true })
-        .limit(60);
+    if (currentChatType !== 'public') return;
 
-    // Polling : on ne prend que les messages plus récents que le dernier connu
-    if (lastPublicMsgTime) {
-        query = query.gt('created_at', lastPublicMsgTime);
-    }
+    // Premier chargement : récupérer les 60 derniers messages
+    if (!publicLoaded) {
+        const { data, error } = await supabase
+            .from('messages')
+            .select('id, prenom, message, created_at, photo_url')
+            .order('created_at', { ascending: false })
+            .limit(60);
 
-    const { data, error } = await query;
-    if (error) { logErr('Messages publics', error); return; }
-    if (!data?.length) return;
+        if (error) { logErr('Messages publics init', error); return; }
 
-    // Premier chargement : vider la zone
-    if (!lastPublicMsgTime) {
+        const msgs = (data || []).reverse(); // remettre dans l'ordre chronologique
         document.getElementById('messagesArea').innerHTML = '';
-    }
 
-    data.forEach(msg => {
-        // Mémoriser le timestamp le plus récent
-        if (!lastPublicMsgTime || msg.created_at > lastPublicMsgTime) {
-            lastPublicMsgTime = msg.created_at;
-        }
-        if (currentChatType === 'public') {
+        msgs.forEach(msg => {
+            if (msg.id > lastPublicId) lastPublicId = msg.id;
             renderPublicMessage({
-                author: msg.prenom || 'Anonyme',
+                author: msg.prenom   || 'Anonyme',
                 text:   msg.message,
                 photo:  msg.photo_url,
                 time:   fmtTime(msg.created_at)
             });
-        }
+        });
+
+        publicLoaded = true;
+        const area = document.getElementById('messagesArea');
+        area.scrollTop = area.scrollHeight;
+        return;
+    }
+
+    // Polling : seulement les nouveaux messages (id > lastPublicId)
+    if (lastPublicId === 0) return;
+
+    const { data, error } = await supabase
+        .from('messages')
+        .select('id, prenom, message, created_at, photo_url')
+        .gt('id', lastPublicId)
+        .order('id', { ascending: true });
+
+    if (error) { logErr('Messages publics poll', error); return; }
+    if (!data?.length) return;
+
+    data.forEach(msg => {
+        if (msg.id > lastPublicId) lastPublicId = msg.id;
+        renderPublicMessage({
+            author: msg.prenom   || 'Anonyme',
+            text:   msg.message,
+            photo:  msg.photo_url,
+            time:   fmtTime(msg.created_at)
+        });
     });
 }
 
@@ -560,15 +577,13 @@ async function sendPublicMessage(text) {
     const { data, error } = await supabase.from('messages').insert({
         prenom:    currentUserPrenom,
         message:   text,
-        photo_url: currentUserPhoto || null,
-        to_user:   null
-    }).select('created_at').single();
+        photo_url: currentUserPhoto || null
+        // NE PAS inclure to_user — pas de filtre dessus
+    }).select('id').single();
 
     if (error) { logErr('Envoi public', error); return; }
-    // Mettre à jour le timestamp pour ne pas recharger ce message
-    if (data?.created_at && data.created_at > (lastPublicMsgTime || '')) {
-        lastPublicMsgTime = data.created_at;
-    }
+    // Mettre à jour lastPublicId pour ne pas recharger ce message
+    if (data?.id && data.id > lastPublicId) lastPublicId = data.id;
 }
 
 setInterval(loadPublicMessages, 2500);
@@ -585,9 +600,10 @@ function setHeader(avatarHtml, name, statusTxt, isOnline, showWizz) {
 
 function switchToPublicChat() {
     if (pmPollInterval) { clearInterval(pmPollInterval); pmPollInterval = null; }
-    currentChatType   = 'public';
-    currentChatUser   = null;
-    lastPublicMsgTime = null; // Reset pour recharger tous les messages
+    currentChatType = 'public';
+    currentChatUser = null;
+    lastPublicId    = 0;
+    publicLoaded    = false; // ← reset pour recharger l'historique
 
     setHeader('🌐', 'Chat général', '● Public', true, false);
     document.getElementById('bubbleColorPicker').style.display = 'none';
