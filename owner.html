@@ -34,6 +34,7 @@ h2 { font-size: 28px; font-weight: 300; margin-bottom: 25px; display: flex; alig
 .btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
 .btn-danger { background: rgba(239,68,68,0.3); border-color: rgba(239,68,68,0.6); }
 .btn-danger:hover { background: rgba(239,68,68,0.5); }
+.btn-small { padding: 7px 14px; font-size: 13px; margin: 2px; border-radius: 10px; }
 .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
 .messages-list { max-height: 400px; overflow-y: auto; margin-top: 20px; }
 .message-item { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.2); }
@@ -41,7 +42,30 @@ h2 { font-size: 28px; font-weight: 300; margin-bottom: 25px; display: flex; alig
 .message-text { font-size: 15px; line-height: 1.5; }
 .back-btn { position: fixed; top: 20px; left: 20px; padding: 10px 20px; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); border-radius: 20px; color: white; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s ease; z-index: 1000; font-weight: 600; }
 .back-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+
+/* ── Styles conversations privées ── */
+.conv-list { margin-top: 20px; }
+.conv-item { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 18px; margin-bottom: 14px; overflow: hidden; }
+.conv-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; cursor: pointer; transition: background 0.2s; }
+.conv-header:hover { background: rgba(255,255,255,0.08); }
+.conv-title { font-weight: 600; font-size: 16px; }
+.conv-meta { font-size: 13px; opacity: 0.7; }
+.conv-actions { display: flex; gap: 8px; align-items: center; }
+.conv-toggle { font-size: 18px; transition: transform 0.3s; }
+.conv-toggle.open { transform: rotate(180deg); }
+.conv-messages { display: none; padding: 0 20px 16px; max-height: 350px; overflow-y: auto; }
+.conv-messages.open { display: block; }
+.pm-item { background: rgba(255,255,255,0.07); padding: 10px 14px; border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.12); display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.pm-body { flex: 1; }
+.pm-from { font-size: 12px; opacity: 0.7; margin-bottom: 3px; }
+.pm-text { font-size: 14px; line-height: 1.4; }
+.pm-time { font-size: 12px; opacity: 0.6; white-space: nowrap; margin-top: 3px; }
+.pm-delete { background: rgba(239,68,68,0.3); border: 1px solid rgba(239,68,68,0.5); color: white; border-radius: 8px; padding: 4px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.pm-delete:hover { background: rgba(239,68,68,0.6); transform: scale(1.05); }
+.empty-msg { opacity: 0.55; text-align: center; padding: 15px; font-size: 14px; }
+.loading-msg { opacity: 0.7; text-align: center; padding: 15px; }
 </style>
+
 </head>
 <body>
 
@@ -50,14 +74,19 @@ h2 { font-size: 28px; font-weight: 300; margin-bottom: 25px; display: flex; alig
 <div class="container">
   <h1>🎨 Espace Création - Admin</h1>
 
+  <!-- Stats -->
+
   <div class="admin-card">
     <h2>📊 Statistiques</h2>
     <div class="stats-grid">
       <div class="stat-box"><div class="stat-number" id="totalUsers">0</div><div class="stat-label">Utilisateurs</div></div>
       <div class="stat-box"><div class="stat-number" id="onlineUsers">0</div><div class="stat-label">En ligne</div></div>
       <div class="stat-box"><div class="stat-number" id="totalMessages">0</div><div class="stat-label">Messages</div></div>
+      <div class="stat-box"><div class="stat-number" id="totalPrivate">0</div><div class="stat-label">Messages privés</div></div>
     </div>
   </div>
+
+  <!-- Utilisateurs -->
 
   <div class="admin-card">
     <h2>👥 Gestion des utilisateurs</h2>
@@ -67,16 +96,30 @@ h2 { font-size: 28px; font-weight: 300; margin-bottom: 25px; display: flex; alig
     </table>
   </div>
 
+  <!-- Messages récents -->
+
   <div class="admin-card">
-    <h2>💬 Messages récents</h2>
+    <h2>💬 Messages récents (chat général)</h2>
     <div class="messages-list" id="messagesList"></div>
   </div>
+
+  <!-- Conversations privées -->
+
+  <div class="admin-card">
+    <h2>🔒 Conversations privées</h2>
+    <div id="convList" class="conv-list">
+      <div class="loading-msg">Chargement des conversations…</div>
+    </div>
+  </div>
+
+  <!-- Actions -->
 
   <div class="admin-card">
     <h2>⚙️ Actions</h2>
     <div class="actions">
       <button class="btn" onclick="location.reload()">🔄 Actualiser</button>
-      <button class="btn btn-danger" id="clearMessagesBtn">🗑️ Effacer tous les messages</button>
+      <button class="btn btn-danger" id="clearMessagesBtn">🗑️ Effacer tous les messages publics</button>
+      <button class="btn btn-danger" id="clearAllPrivateBtn">🔐 Effacer tous les messages privés</button>
       <button class="btn" onclick="window.location.href='chat.html'">💬 Aller au chat</button>
     </div>
   </div>
@@ -94,19 +137,25 @@ if (localStorage.getItem('prenom') !== 'Steph') {
   window.location.href = 'chat.html';
 }
 
-// ── Stats ──
+// ══════════════════════════════════════════════
+// Stats
+// ══════════════════════════════════════════════
 async function loadStats() {
-  const { data: users }    = await supabase.from('profiles').select('id');
-  const { data: online }   = await supabase.from('profiles').select('id').eq('is_online', true);
-  // Les messages publics sont dans 'messages'
-  const { data: messages } = await supabase.from('messages').select('id');
-
+  const [{ data: users }, { data: online }, { data: messages }, { data: privates }] = await Promise.all([
+    supabase.from('profiles').select('id'),
+    supabase.from('profiles').select('id').eq('is_online', true),
+    supabase.from('messages').select('id'),
+    supabase.from('private_messages').select('id'),
+  ]);
   document.getElementById('totalUsers').textContent    = users?.length    || 0;
   document.getElementById('onlineUsers').textContent   = online?.length   || 0;
   document.getElementById('totalMessages').textContent = messages?.length || 0;
+  document.getElementById('totalPrivate').textContent  = privates?.length || 0;
 }
 
-// ── Charger utilisateurs ──
+// ══════════════════════════════════════════════
+// Utilisateurs
+// ══════════════════════════════════════════════
 async function loadUsers() {
   const { data: users, error } = await supabase
     .from('profiles')
@@ -161,31 +210,24 @@ async function loadUsers() {
   });
 }
 
-// ── Supprimer un utilisateur ──
 async function deleteUser(user) {
   const prenom = user.prenom || '?';
   if (!confirm(`Supprimer "${prenom}" et tous ses messages ?`)) return;
 
-  // 1. Messages publics (table 'messages', colonne 'prenom')
   await supabase.from('messages').delete().eq('prenom', prenom);
-
-  // 2. Messages privés envoyés et reçus (table 'private_messages', colonne 'unique_id')
   if (user.unique_id) {
     await supabase.from('private_messages').delete().eq('sender_unique_id',   user.unique_id);
     await supabase.from('private_messages').delete().eq('receiver_unique_id', user.unique_id);
   }
-
-  // 3. Profil (par id)
   const { error } = await supabase.from('profiles').delete().eq('id', user.id);
-  if (error) {
-    alert('❌ Erreur suppression profil : ' + error.message);
-    return;
-  }
+  if (error) { alert('❌ Erreur suppression profil : ' + error.message); return; }
 
-  await Promise.all([loadUsers(), loadStats(), loadMessages()]);
+  await Promise.all([loadUsers(), loadStats(), loadMessages(), loadPrivateConversations()]);
 }
 
-// ── Charger messages récents ──
+// ══════════════════════════════════════════════
+// Messages publics
+// ══════════════════════════════════════════════
 async function loadMessages() {
   const { data: messages, error } = await supabase
     .from('messages')
@@ -193,24 +235,18 @@ async function loadMessages() {
     .order('created_at', { ascending: false })
     .limit(20);
 
-  if (error) {
-    document.getElementById('messagesList').innerHTML =
-      `<div style="color:#fca5a5;padding:20px;text-align:center">${error.message}</div>`;
-    return;
-  }
-
   const container = document.getElementById('messagesList');
+  if (error) { container.innerHTML = `<div style="color:#fca5a5;padding:20px;text-align:center">${error.message}</div>`; return; }
   container.innerHTML = '';
 
   if (!messages?.length) {
-    container.innerHTML = '<div style="opacity:0.6;text-align:center;padding:20px">Aucun message.</div>';
+    container.innerHTML = '<div class="empty-msg">Aucun message.</div>';
     return;
   }
 
   messages.forEach(msg => {
     const item = document.createElement('div');
     item.className = 'message-item';
-
     const header = document.createElement('div');
     header.className = 'message-header';
     const s = document.createElement('strong');
@@ -218,42 +254,201 @@ async function loadMessages() {
     const t = document.createElement('span');
     t.textContent = msg.created_at ? new Date(msg.created_at).toLocaleString('fr-FR') : '';
     header.append(s, t);
-
     const text = document.createElement('div');
     text.className = 'message-text';
     text.textContent = msg.message || '';
-
     item.append(header, text);
     container.appendChild(item);
   });
 }
 
-// ── Effacer tous les messages du chat général ──
-// FIX : on supprime par created_at (pas par id UUID)
 async function clearAllMessages() {
   if (!confirm('Effacer TOUS les messages du chat général ? Irréversible.')) return;
+  const { error } = await supabase.from('messages').delete().not('created_at', 'is', null);
+  if (error) { alert('❌ Erreur : ' + error.message); return; }
+  await Promise.all([loadMessages(), loadStats()]);
+  alert('✅ Tous les messages publics ont été supprimés');
+}
 
-  const { error } = await supabase
-    .from('messages')
-    .delete()
-    .not('created_at', 'is', null);
+// ══════════════════════════════════════════════
+// Conversations privées
+// ══════════════════════════════════════════════
+async function loadPrivateConversations() {
+  const container = document.getElementById('convList');
+  container.innerHTML = '<div class="loading-msg">Chargement…</div>';
+
+  // Récupérer tous les messages privés
+  const { data: allPM, error } = await supabase
+    .from('private_messages')
+    .select('id, sender_unique_id, receiver_unique_id, message, created_at, sender_prenom, receiver_prenom')
+    .order('created_at', { ascending: false });
 
   if (error) {
-    alert('❌ Erreur : ' + error.message);
+    container.innerHTML = `<div style="color:#fca5a5;padding:20px;text-align:center">${error.message}</div>`;
     return;
   }
 
-  await Promise.all([loadMessages(), loadStats()]);
-  alert('✅ Tous les messages ont été supprimés');
+  if (!allPM?.length) {
+    container.innerHTML = '<div class="empty-msg">Aucun message privé.</div>';
+    return;
+  }
+
+  // Regrouper par paire (clé = sorted unique_ids pour éviter les doublons A↔B)
+  const convsMap = new Map();
+  allPM.forEach(msg => {
+    const ids   = [msg.sender_unique_id, msg.receiver_unique_id].sort();
+    const key   = ids.join('__');
+    const names = [
+      msg.sender_prenom   || msg.sender_unique_id   || '?',
+      msg.receiver_prenom || msg.receiver_unique_id || '?'
+    ];
+    // Toujours dans le même ordre que les ids triés
+    const sortedNames = msg.sender_unique_id <= msg.receiver_unique_id
+      ? [msg.sender_prenom || '?', msg.receiver_prenom || '?']
+      : [msg.receiver_prenom || '?', msg.sender_prenom || '?'];
+
+    if (!convsMap.has(key)) {
+      convsMap.set(key, {
+        key,
+        id1: ids[0], id2: ids[1],
+        name1: sortedNames[0], name2: sortedNames[1],
+        messages: []
+      });
+    }
+    convsMap.get(key).messages.push(msg);
+  });
+
+  container.innerHTML = '';
+
+  convsMap.forEach(conv => {
+    // Trier les messages par date décroissante
+    conv.messages.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    const item = document.createElement('div');
+    item.className = 'conv-item';
+
+    // ── En-tête cliquable ──
+    const header = document.createElement('div');
+    header.className = 'conv-header';
+
+    const titleWrap = document.createElement('div');
+    const title = document.createElement('div');
+    title.className = 'conv-title';
+    title.textContent = `💬 ${conv.name1} ↔ ${conv.name2}`;
+    const meta = document.createElement('div');
+    meta.className = 'conv-meta';
+    meta.textContent = `${conv.messages.length} message${conv.messages.length > 1 ? 's' : ''}`;
+    titleWrap.append(title, meta);
+
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'conv-actions';
+
+    // Bouton supprimer toute la conversation
+    const delConvBtn = document.createElement('button');
+    delConvBtn.className = 'btn btn-danger btn-small';
+    delConvBtn.textContent = '🗑️ Supprimer la conversation';
+    delConvBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!confirm(`Supprimer toute la conversation entre ${conv.name1} et ${conv.name2} ?`)) return;
+      const ids = conv.messages.map(m => m.id);
+      const { error } = await supabase.from('private_messages').delete().in('id', ids);
+      if (error) { alert('❌ ' + error.message); return; }
+      item.remove();
+      await Promise.all([loadStats()]);
+      // Recalcule le compteur total
+      const remaining = document.querySelectorAll('.conv-item').length;
+      if (remaining === 0) container.innerHTML = '<div class="empty-msg">Aucun message privé.</div>';
+    });
+
+    const toggle = document.createElement('span');
+    toggle.className = 'conv-toggle';
+    toggle.textContent = '▼';
+
+    actionsDiv.append(delConvBtn, toggle);
+    header.append(titleWrap, actionsDiv);
+
+    // ── Liste des messages ──
+    const msgContainer = document.createElement('div');
+    msgContainer.className = 'conv-messages';
+
+    conv.messages.forEach(msg => {
+      const pmItem = document.createElement('div');
+      pmItem.className = 'pm-item';
+      pmItem.dataset.id = msg.id;
+
+      const body = document.createElement('div');
+      body.className = 'pm-body';
+
+      const from = document.createElement('div');
+      from.className = 'pm-from';
+      from.textContent = `De : ${msg.sender_prenom || msg.sender_unique_id || '?'} → ${msg.receiver_prenom || msg.receiver_unique_id || '?'}`;
+
+      const text = document.createElement('div');
+      text.className = 'pm-text';
+      text.textContent = msg.message || '';
+
+      const time = document.createElement('div');
+      time.className = 'pm-time';
+      time.textContent = msg.created_at ? new Date(msg.created_at).toLocaleString('fr-FR') : '';
+
+      body.append(from, text, time);
+
+      // Bouton supprimer message individuel
+      const delBtn = document.createElement('button');
+      delBtn.className = 'pm-delete';
+      delBtn.textContent = '✕';
+      delBtn.title = 'Supprimer ce message';
+      delBtn.addEventListener('click', async () => {
+        if (!confirm('Supprimer ce message privé ?')) return;
+        const { error } = await supabase.from('private_messages').delete().eq('id', msg.id);
+        if (error) { alert('❌ ' + error.message); return; }
+        pmItem.remove();
+        // Mise à jour compteur
+        const remaining = msgContainer.querySelectorAll('.pm-item').length;
+        meta.textContent = `${remaining} message${remaining > 1 ? 's' : ''}`;
+        if (remaining === 0) {
+          item.remove();
+          if (document.querySelectorAll('.conv-item').length === 0)
+            container.innerHTML = '<div class="empty-msg">Aucun message privé.</div>';
+        }
+        await loadStats();
+      });
+
+      pmItem.append(body, delBtn);
+      msgContainer.appendChild(pmItem);
+    });
+
+    // Toggle ouverture
+    header.addEventListener('click', (e) => {
+      if (e.target === delConvBtn || delConvBtn.contains(e.target)) return;
+      const isOpen = msgContainer.classList.toggle('open');
+      toggle.classList.toggle('open', isOpen);
+    });
+
+    item.append(header, msgContainer);
+    container.appendChild(item);
+  });
 }
 
+// ── Effacer tous les messages privés ──
+async function clearAllPrivate() {
+  if (!confirm('Effacer TOUS les messages privés ? Irréversible.')) return;
+  const { error } = await supabase.from('private_messages').delete().not('created_at', 'is', null);
+  if (error) { alert('❌ Erreur : ' + error.message); return; }
+  await Promise.all([loadPrivateConversations(), loadStats()]);
+  alert('✅ Tous les messages privés ont été supprimés');
+}
+
+// ── Listeners ──
 document.getElementById('clearMessagesBtn').addEventListener('click', clearAllMessages);
+document.getElementById('clearAllPrivateBtn').addEventListener('click', clearAllPrivate);
 
 // ── Init ──
 loadStats();
 loadUsers();
 loadMessages();
-setInterval(() => { loadStats(); loadUsers(); loadMessages(); }, 10000);
+loadPrivateConversations();
+setInterval(() => { loadStats(); }, 15000);
 </script>
 
 </body>
