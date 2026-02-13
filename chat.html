@@ -48,49 +48,6 @@
     .user-profile-photo:hover { transform:scale(1.15); }
     .user-profile-photo img { width:100%; height:100%; object-fit:cover; }
 
-    /* Bouton Visio - Style néon violet futuriste */
-    .visio-btn-main {
-        width:45px;
-        height:45px;
-        border-radius:50%;
-        border:3px solid rgba(147,51,234,.8);
-        background:linear-gradient(135deg,#9333ea,#7c3aed);
-        cursor:pointer;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:22px;
-        transition:all .3s;
-        flex-shrink:0;
-        box-shadow:0 0 20px rgba(147,51,234,.6), 0 0 40px rgba(124,58,237,.4);
-        animation:neonPulseVisio 2s ease-in-out infinite;
-        position:relative;
-    }
-    .visio-btn-main::before {
-        content:'';
-        position:absolute;
-        inset:-4px;
-        border-radius:50%;
-        padding:4px;
-        background:linear-gradient(45deg,#9333ea,#c084fc,#9333ea);
-        -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite:xor;
-        mask-composite:exclude;
-        animation:neonRotate 3s linear infinite;
-    }
-    @keyframes neonPulseVisio {
-        0%,100%{ box-shadow:0 0 20px rgba(147,51,234,.6),0 0 40px rgba(124,58,237,.4); }
-        50%{ box-shadow:0 0 35px rgba(147,51,234,.9),0 0 65px rgba(124,58,237,.6),0 0 85px rgba(147,51,234,.4); }
-    }
-    @keyframes neonRotate {
-        0%{transform:rotate(0deg)}
-        100%{transform:rotate(360deg)}
-    }
-    .visio-btn-main:hover {
-        transform:scale(1.15);
-        box-shadow:0 0 30px rgba(147,51,234,.8),0 0 60px rgba(124,58,237,.6);
-    }
-
     /* Bouton notifications */
     .notif-toggle-btn { width:45px; height:45px; border-radius:50%; border:3px solid rgba(255,255,255,.5); background:rgba(255,255,255,.1); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; transition:all .3s; flex-shrink:0; }
     .notif-toggle-btn:hover { transform:scale(1.15); border-color:white; }
@@ -194,309 +151,6 @@
     .pm-toast-name { font-weight:700; color:#ff6b9d; margin-bottom:6px; }
     .pm-toast-text { opacity:.8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-    /* ══════════════════════════════════════════
-       MODAL VISIO NÉON VIOLET FUTURISTE
-    ══════════════════════════════════════════ */
-    .visio-modal-overlay {
-        position:fixed;
-        inset:0;
-        background:rgba(0,0,0,.92);
-        backdrop-filter:blur(15px);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        z-index:5000;
-        opacity:0;
-        visibility:hidden;
-        transition:all .5s ease;
-    }
-    .visio-modal-overlay.active {
-        opacity:1;
-        visibility:visible;
-    }
-
-    /* Modal avec bordure néon animée */
-    .visio-modal {
-        position:relative;
-        width:90%;
-        max-width:1000px;
-        max-height:85vh;
-        background:rgba(17,17,27,.98);
-        border-radius:24px;
-        padding:32px;
-        overflow-y:auto;
-        transform:scale(.85) rotateX(25deg);
-        opacity:0;
-        transition:all .6s cubic-bezier(.68,-.55,.265,1.55);
-        box-shadow:
-            0 0 60px rgba(147,51,234,.7),
-            0 0 100px rgba(124,58,237,.5),
-            0 25px 80px rgba(0,0,0,.8);
-    }
-    .visio-modal::before {
-        content:'';
-        position:absolute;
-        inset:-4px;
-        border-radius:24px;
-        padding:4px;
-        background:linear-gradient(45deg, #9333ea, #c084fc, #e879f9, #9333ea);
-        -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite:xor;
-        mask-composite:exclude;
-        animation:neonBorderRotate 4s linear infinite;
-        pointer-events:none;
-    }
-    @keyframes neonBorderRotate {
-        0%{filter:hue-rotate(0deg)}
-        100%{filter:hue-rotate(360deg)}
-    }
-    .visio-modal-overlay.active .visio-modal {
-        transform:scale(1) rotateX(0deg);
-        opacity:1;
-    }
-
-    /* Header */
-    .visio-modal-header {
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        margin-bottom:28px;
-        padding-bottom:20px;
-        border-bottom:2px solid rgba(147,51,234,.3);
-    }
-    .visio-modal-title {
-        font-size:28px;
-        font-weight:800;
-        background:linear-gradient(135deg,#c084fc,#e879f9);
-        -webkit-background-clip:text;
-        -webkit-text-fill-color:transparent;
-        text-shadow:0 0 40px rgba(147,51,234,.8);
-        display:flex;
-        align-items:center;
-        gap:12px;
-    }
-    .visio-modal-controls {
-        display:flex;
-        gap:12px;
-    }
-    .visio-modal-btn {
-        width:48px;
-        height:48px;
-        border-radius:50%;
-        border:2px solid rgba(147,51,234,.6);
-        background:rgba(147,51,234,.15);
-        color:#c084fc;
-        font-size:24px;
-        font-weight:700;
-        cursor:pointer;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        transition:all .3s;
-        box-shadow:0 0 20px rgba(147,51,234,.3);
-    }
-    .visio-modal-btn:hover {
-        background:rgba(147,51,234,.3);
-        border-color:#c084fc;
-        box-shadow:0 0 30px rgba(147,51,234,.6);
-        transform:scale(1.1);
-    }
-    .visio-modal-btn.close:hover {
-        background:rgba(239,68,68,.2);
-        border-color:#f87171;
-        box-shadow:0 0 30px rgba(239,68,68,.5);
-        transform:rotate(90deg) scale(1.1);
-    }
-
-    /* Vidéo container */
-    .visio-video-area {
-        position:relative;
-        width:100%;
-        padding-bottom:56.25%;
-        background:rgba(0,0,0,.7);
-        border-radius:16px;
-        margin-bottom:24px;
-        overflow:hidden;
-        border:2px solid rgba(147,51,234,.4);
-        box-shadow:
-            inset 0 0 60px rgba(147,51,234,.2),
-            0 8px 32px rgba(0,0,0,.6);
-    }
-    .visio-video-placeholder {
-        position:absolute;
-        inset:0;
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        gap:16px;
-    }
-    .visio-video-icon {
-        font-size:72px;
-        opacity:.7;
-        animation:floatIcon 3s ease-in-out infinite;
-    }
-    @keyframes floatIcon {
-        0%,100%{transform:translateY(0px)}
-        50%{transform:translateY(-10px)}
-    }
-    .visio-video-text {
-        color:rgba(192,132,252,.8);
-        font-size:18px;
-        font-weight:600;
-    }
-
-    /* Section participants */
-    .visio-section {
-        background:rgba(147,51,234,.08);
-        border:1px solid rgba(147,51,234,.2);
-        border-radius:16px;
-        padding:20px;
-        margin-bottom:20px;
-    }
-    .visio-section-title {
-        color:#c084fc;
-        font-weight:700;
-        font-size:16px;
-        margin-bottom:14px;
-        display:flex;
-        align-items:center;
-        gap:8px;
-    }
-    .visio-participant {
-        display:flex;
-        align-items:center;
-        gap:12px;
-        padding:12px;
-        background:rgba(147,51,234,.12);
-        border-radius:12px;
-        border:1px solid rgba(147,51,234,.15);
-        margin-bottom:10px;
-        transition:all .3s;
-    }
-    .visio-participant:hover {
-        background:rgba(147,51,234,.2);
-        border-color:rgba(147,51,234,.4);
-        transform:translateX(6px);
-    }
-    .visio-participant-avatar {
-        width:42px;
-        height:42px;
-        border-radius:50%;
-        background:linear-gradient(135deg,#9333ea,#c084fc);
-        border:2px solid rgba(192,132,252,.5);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:20px;
-        color:white;
-        font-weight:700;
-    }
-    .visio-participant-name {
-        flex:1;
-        color:#e9d5ff;
-        font-weight:600;
-        font-size:15px;
-    }
-    .visio-participant-status {
-        font-size:11px;
-        padding:4px 10px;
-        background:rgba(74,222,128,.2);
-        color:#4ade80;
-        border-radius:12px;
-        border:1px solid rgba(74,222,128,.4);
-    }
-
-    /* Invite */
-    .visio-invite-row {
-        display:flex;
-        gap:10px;
-    }
-    .visio-input {
-        flex:1;
-        padding:12px 16px;
-        background:rgba(147,51,234,.1);
-        border:2px solid rgba(147,51,234,.3);
-        border-radius:12px;
-        color:#e9d5ff;
-        font-size:14px;
-        transition:all .3s;
-    }
-    .visio-input:focus {
-        outline:none;
-        background:rgba(147,51,234,.18);
-        border-color:rgba(192,132,252,.6);
-        box-shadow:0 0 20px rgba(147,51,234,.3);
-    }
-    .visio-input::placeholder {
-        color:rgba(192,132,252,.5);
-    }
-    .visio-btn {
-        padding:12px 24px;
-        background:linear-gradient(135deg,#9333ea,#c084fc);
-        border:none;
-        border-radius:12px;
-        color:white;
-        font-weight:700;
-        cursor:pointer;
-        transition:all .3s;
-        box-shadow:0 0 20px rgba(147,51,234,.4);
-        white-space:nowrap;
-    }
-    .visio-btn:hover {
-        transform:translateY(-2px);
-        box-shadow:0 0 30px rgba(147,51,234,.7);
-    }
-
-    /* Contrôles */
-    .visio-controls {
-        display:flex;
-        justify-content:center;
-        gap:12px;
-        flex-wrap:wrap;
-        margin-top:20px;
-    }
-    .visio-control-btn {
-        padding:14px 28px;
-        background:rgba(147,51,234,.15);
-        border:2px solid rgba(147,51,234,.4);
-        border-radius:14px;
-        color:#c084fc;
-        font-size:15px;
-        font-weight:600;
-        cursor:pointer;
-        transition:all .3s;
-        display:flex;
-        align-items:center;
-        gap:8px;
-    }
-    .visio-control-btn:hover {
-        background:rgba(147,51,234,.25);
-        border-color:rgba(192,132,252,.6);
-        transform:translateY(-2px);
-        box-shadow:0 0 20px rgba(147,51,234,.4);
-    }
-    .visio-control-btn.active {
-        background:rgba(147,51,234,.3);
-        border-color:#c084fc;
-        box-shadow:0 0 25px rgba(147,51,234,.5);
-    }
-    .visio-control-btn.danger {
-        background:rgba(239,68,68,.15);
-        border-color:rgba(239,68,68,.4);
-        color:#f87171;
-    }
-    .visio-control-btn.danger:hover {
-        background:rgba(239,68,68,.25);
-        border-color:#f87171;
-        box-shadow:0 0 20px rgba(239,68,68,.4);
-    }
-
-    /* Scrollbar */
-    .visio-modal::-webkit-scrollbar { width:8px; }
-    .visio-modal::-webkit-scrollbar-track { background:rgba(147,51,234,.1); border-radius:10px; }
-    .visio-modal::-webkit-scrollbar-thumb { background:linear-gradient(135deg,#9333ea,#c084fc); border-radius:10px; }
-
     .users-panel::-webkit-scrollbar, .messages-area::-webkit-scrollbar { width:7px; }
     .users-panel::-webkit-scrollbar-track, .messages-area::-webkit-scrollbar-track { background:rgba(255,255,255,.05); border-radius:10px; }
     .users-panel::-webkit-scrollbar-thumb  { background:rgba(255,255,255,.2); border-radius:10px; }
@@ -511,7 +165,7 @@
         .app-wrapper { padding:10px; gap:10px; }
         .chat-header { padding:10px 14px; }
         .theme-label { display:none; }
-        .theme-btn, .theme-btn-custom, .user-profile-photo, .notif-toggle-btn, .visio-btn-main { width:36px; height:36px; font-size:16px; }
+        .theme-btn, .theme-btn-custom, .user-profile-photo, .notif-toggle-btn { width:36px; height:36px; font-size:16px; }
         .toggle-sidebar-btn { left:6px; padding:10px 12px; border-radius:12px; }
         .toggle-icon { font-size:20px; }
         .chat-panel-header { padding:14px 16px; }
@@ -522,8 +176,6 @@
         .pm-msg-wrap { max-width:90%; }
         .users-panel { position:fixed; top:0; left:0; height:100%; z-index:200; max-height:100vh; border-radius:0 20px 20px 0; width:280px; transform:translateX(0); transition:transform .4s cubic-bezier(.4,0,.2,1), opacity .4s; }
         .users-panel.hidden { transform:translateX(-100%); width:280px; opacity:0; pointer-events:none; }
-        .visio-modal { padding:24px; }
-        .visio-modal-title { font-size:22px; }
     }
 </style>
 ```
@@ -546,7 +198,7 @@
                 <div class="theme-btn" data-theme="chasse"    style="background:linear-gradient(135deg,#3e2723,#795548)"  title="Chasse"></div>
                 <div class="theme-btn" data-theme="aquarium"  style="background:linear-gradient(135deg,#00416a,#ffe000)"  title="Aquarium"></div>
                 <div class="theme-btn-custom" title="Photo personnalisée">📷<input type="file" id="customBgInput" accept="image/*"></div>
-                <div class="visio-btn-main" id="openVisioBtn" title="Lancer la Visio">📹</div>
+                <!-- Bouton notifications -->
                 <div class="notif-toggle-btn" id="notifBtn" title="Activer les notifications">🔔</div>
                 <div class="user-profile-photo" id="userProfilePhoto" title="Mon profil">💬</div>
             </div>
@@ -602,53 +254,10 @@
 
 </div>
 
-<!-- MODAL VISIO NÉON VIOLET -->
-
-<div class="visio-modal-overlay" id="visioModalOverlay">
-    <div class="visio-modal" id="visioModal">
-        <div class="visio-modal-header">
-            <h2 class="visio-modal-title">✨ Appel Visio</h2>
-            <div class="visio-modal-controls">
-                <button class="visio-modal-btn close" id="closeVisioBtn" title="Fermer">×</button>
-            </div>
-        </div>
-
-```
-    <div class="visio-video-area">
-        <div class="visio-video-placeholder">
-            <div class="visio-video-icon">📹</div>
-            <div class="visio-video-text">La caméra s'activera ici</div>
-        </div>
-    </div>
-
-    <div class="visio-section">
-        <h3 class="visio-section-title">👥 Participants (1)</h3>
-        <div id="visioParticipantsList">
-            <div class="visio-participant">
-                <div class="visio-participant-avatar">👤</div>
-                <span class="visio-participant-name">Vous</span>
-                <span class="visio-participant-status">En ligne</span>
-            </div>
-        </div>
-        <div class="visio-invite-row" style="margin-top:14px;">
-            <input type="text" class="visio-input" id="visioInviteInput" placeholder="Entrez un prénom pour inviter...">
-            <button class="visio-btn" id="visioInviteBtn">➕ Inviter</button>
-        </div>
-    </div>
-
-    <div class="visio-controls">
-        <button class="visio-control-btn active" id="visioMicBtn">🎤 Micro ON</button>
-        <button class="visio-control-btn active" id="visioCameraBtn">📹 Caméra ON</button>
-        <button class="visio-control-btn" id="visioScreenBtn">🖥️ Partager écran</button>
-        <button class="visio-control-btn danger" id="visioHangupBtn">📞 Raccrocher</button>
-    </div>
-</div>
-```
-
-</div>
+<!-- Son de notification (inline base64 bip) -->
 
 <audio id="notifSound" preload="auto">
-    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2ozHTh/rt3fwpFkOTyLs+Psu5hqS0ybtO3yvKF1V1mhue7yuqJzV1qiue/yuqJ0WVmiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu8=" type="audio/wav">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2ozHTh/rt3fwpFkOTyLs+Psu5hqS0ybtO3yvKF1V1mhue7yuqJzV1qiue/yuqJ0WVmiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu8=" type="audio/wav">
 </audio>
 
 <script type="module">
@@ -692,83 +301,12 @@ console.log('BubbleChat – ' + currentUserPrenom + ' | ID: ' + currentUniqueId)
 })();
 
 /* ══════════════════════════════════════════
-   MODAL VISIO
-══════════════════════════════════════════ */
-var visioParticipants = [{ name: 'Vous', status: 'En ligne', avatar: '👤' }];
-
-document.getElementById('openVisioBtn').addEventListener('click', function() {
-    document.getElementById('visioModalOverlay').classList.add('active');
-});
-
-document.getElementById('closeVisioBtn').addEventListener('click', function() {
-    document.getElementById('visioModalOverlay').classList.remove('active');
-});
-
-document.getElementById('visioHangupBtn').addEventListener('click', function() {
-    document.getElementById('visioModalOverlay').classList.remove('active');
-});
-
-document.getElementById('visioModalOverlay').addEventListener('click', function(e) {
-    if (e.target === document.getElementById('visioModalOverlay')) {
-        document.getElementById('visioModalOverlay').classList.remove('active');
-    }
-});
-
-document.getElementById('visioInviteBtn').addEventListener('click', function() {
-    var input = document.getElementById('visioInviteInput');
-    var name = input.value.trim();
-    if (!name) return;
-    if (visioParticipants.some(function(p) { return p.name.toLowerCase() === name.toLowerCase(); })) {
-        alert('Cette personne est déjà dans l\'appel !');
-        return;
-    }
-    var avatars = ['👨', '👩', '🧑', '👦', '👧', '🧔', '👴', '👵'];
-    visioParticipants.push({
-        name: name,
-        status: 'Connexion...',
-        avatar: avatars[Math.floor(Math.random() * avatars.length)]
-    });
-    renderVisioParticipants();
-    input.value = '';
-    setTimeout(function() {
-        visioParticipants[visioParticipants.length - 1].status = 'En ligne';
-        renderVisioParticipants();
-    }, 1500);
-});
-
-function renderVisioParticipants() {
-    var container = document.getElementById('visioParticipantsList');
-    container.innerHTML = visioParticipants.map(function(p) {
-        return '<div class="visio-participant"><div class="visio-participant-avatar">' + p.avatar + '</div><span class="visio-participant-name">' + esc(p.name) + '</span><span class="visio-participant-status">' + p.status + '</span></div>';
-    }).join('');
-}
-
-var visioMicOn = true, visioCameraOn = true, visioScreenOn = false;
-
-document.getElementById('visioMicBtn').addEventListener('click', function() {
-    visioMicOn = !visioMicOn;
-    this.classList.toggle('active');
-    this.textContent = visioMicOn ? '🎤 Micro ON' : '🔇 Micro OFF';
-});
-
-document.getElementById('visioCameraBtn').addEventListener('click', function() {
-    visioCameraOn = !visioCameraOn;
-    this.classList.toggle('active');
-    this.textContent = visioCameraOn ? '📹 Caméra ON' : '📹 Caméra OFF';
-});
-
-document.getElementById('visioScreenBtn').addEventListener('click', function() {
-    visioScreenOn = !visioScreenOn;
-    this.classList.toggle('active');
-    this.textContent = visioScreenOn ? '🔴 Arrêter partage' : '🖥️ Partager écran';
-});
-
-/* ══════════════════════════════════════════
    SYSTÈME DE NOTIFICATIONS PUSH
 ══════════════════════════════════════════ */
 var swRegistration = null;
 var notifGranted   = false;
 
+/* 1. Enregistrer le Service Worker */
 async function registerSW() {
     if (!('serviceWorker' in navigator)) { console.log('SW non supporté'); return; }
     try {
@@ -778,6 +316,7 @@ async function registerSW() {
     } catch(e) { console.log('SW erreur: ' + e); }
 }
 
+/* 2. Demander la permission */
 async function requestNotifPermission() {
     if (!('Notification' in window)) {
         alert('Votre navigateur ne supporte pas les notifications.\nSur iPhone : installez l\'app via "Ajouter à l\'écran d\'accueil" dans Safari.');
@@ -797,11 +336,13 @@ async function requestNotifPermission() {
         notifGranted = (result === 'granted');
         updateNotifBtn();
         if (notifGranted) {
+            /* Test notification */
             sendPushNotif('BubbleChat 💬', 'Notifications activées ! 🎉', '🌐');
         }
     } catch(e) { console.log('Notif permission err: ' + e); }
 }
 
+/* 3. Mettre à jour l'icône du bouton */
 function updateNotifBtn() {
     var btn = document.getElementById('notifBtn');
     if (!btn) return;
@@ -824,15 +365,21 @@ function updateNotifBtn() {
     }
 }
 
+/* 4. Envoyer une notification via le SW */
 function sendPushNotif(title, body, senderPhoto) {
+    /* Son */
     try {
         var audio = document.getElementById('notifSound');
         if (audio) { audio.currentTime = 0; audio.play().catch(function(){}); }
     } catch(e) {}
 
+    /* Si l'app est au premier plan → juste le son, pas de popup */
     if (!document.hidden) return;
+
+    /* Si pas de permission → rien */
     if (!notifGranted) return;
 
+    /* Via Service Worker (fonctionne en arrière-plan) */
     if (swRegistration && swRegistration.active) {
         swRegistration.active.postMessage({
             type:  'NEW_MESSAGE',
@@ -843,6 +390,7 @@ function sendPushNotif(title, body, senderPhoto) {
             url:   '/chat.html'
         });
     } else {
+        /* Fallback : Notification directe */
         try {
             new Notification(title, {
                 body:    body,
@@ -854,7 +402,10 @@ function sendPushNotif(title, body, senderPhoto) {
     }
 }
 
+/* Bouton notifications */
 document.getElementById('notifBtn').addEventListener('click', requestNotifPermission);
+
+/* Init SW */
 registerSW();
 updateNotifBtn();
 
@@ -1040,6 +591,7 @@ async function pollInbox() {
                 renderProfiles();
                 showToast(msg, sid);
 
+                /* 🔔 NOTIFICATION PUSH message privé */
                 var sender = profiles.find(function(p) { return p.unique_id === sid; });
                 var senderName = sender ? sender.prenom : 'Quelqu\'un';
                 var senderPhoto = sender ? sender.photo_url : null;
@@ -1107,6 +659,7 @@ async function loadPublicMessages() {
                 var isNew = !isFirst && msg.prenom !== currentUserPrenom;
                 renderPublicMessage({ author: msg.prenom || 'Anonyme', text: msg.message, photo: msg.photo_url, time: fmtTime(msg.created_at) });
 
+                /* 🔔 NOTIFICATION PUSH message public (seulement nouveaux messages des autres) */
                 if (isNew) {
                     sendPushNotif(
                         '🌐 ' + (msg.prenom || 'Anonyme'),
