@@ -159,38 +159,85 @@
         .vt-btn.danger { background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3); }
         .vt-btn.danger:hover { background:rgba(239,68,68,.3); }
         .vt-icon { font-size:16px; }
-        .users-panel::-webkit-scrollbar, .messages-area::-webkit-scrollbar { width:7px; }
-        .users-panel::-webkit-scrollbar-track, .messages-area::-webkit-scrollbar-track { background:rgba(255,255,255,.05); border-radius:10px; }
-        .users-panel::-webkit-scrollbar-thumb  { background:rgba(255,255,255,.2); border-radius:10px; }
-        .messages-area::-webkit-scrollbar-thumb { background:linear-gradient(135deg,#ff6b9d,#c06fff); border-radius:10px; }
-        @media (max-width:900px) {
-            .users-panel { width:260px; }
-            .toggle-sidebar-btn { left:10px; padding:12px 14px; }
-            .toggle-text { display:none; }
-            #visioContainer { width:96vw; height:75vh; }
-            #visioContainer.pip { width:280px; height:200px; bottom:16px; right:16px; }
+
+```
+    /* ══ MODAL ARCADE PLEIN ÉCRAN ══ */
+    #arcadeModal {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        background: #0a0a0f;
+        display: none;
+        overflow-y: auto;
+    }
+    #arcadeModal.open {
+        display: block;
+    }
+    #arcadeModalClose {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10001;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: rgba(255, 107, 157, 0.2);
+        border: 2px solid rgba(255, 107, 157, 0.6);
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        backdrop-filter: blur(10px);
+    }
+    #arcadeModalClose:hover {
+        background: rgba(255, 107, 157, 0.4);
+        transform: scale(1.1);
+    }
+    
+    .users-panel::-webkit-scrollbar, .messages-area::-webkit-scrollbar { width:7px; }
+    .users-panel::-webkit-scrollbar-track, .messages-area::-webkit-scrollbar-track { background:rgba(255,255,255,.05); border-radius:10px; }
+    .users-panel::-webkit-scrollbar-thumb  { background:rgba(255,255,255,.2); border-radius:10px; }
+    .messages-area::-webkit-scrollbar-thumb { background:linear-gradient(135deg,#ff6b9d,#c06fff); border-radius:10px; }
+    @media (max-width:900px) {
+        .users-panel { width:260px; }
+        .toggle-sidebar-btn { left:10px; padding:12px 14px; }
+        .toggle-text { display:none; }
+        #visioContainer { width:96vw; height:75vh; }
+        #visioContainer.pip { width:280px; height:200px; bottom:16px; right:16px; }
+    }
+    @media (max-width:600px) {
+        .app-wrapper { padding:10px; gap:10px; }
+        .chat-header { padding:10px 14px; }
+        .theme-label { display:none; }
+        .theme-btn, .theme-btn-custom, .user-profile-photo, .notif-toggle-btn, .arcade-btn { width:36px; height:36px; font-size:16px; }
+        .toggle-sidebar-btn { left:6px; padding:10px 12px; border-radius:12px; }
+        .toggle-icon { font-size:20px; }
+        .chat-panel-header { padding:14px 16px; }
+        .messages-area { padding:16px; }
+        .input-area { padding:14px 16px; gap:10px; }
+        .message-input { min-width:0; padding:12px 16px; font-size:14px; }
+        .send-btn { padding:12px 20px; font-size:14px; }
+        .pm-msg-wrap { max-width:90%; }
+        .users-panel { position:fixed; top:0; left:0; height:100%; z-index:200; max-height:100vh; border-radius:0 20px 20px 0; width:280px; transform:translateX(0); transition:transform .4s cubic-bezier(.4,0,.2,1), opacity .4s; }
+        .users-panel.hidden { transform:translateX(-100%); width:280px; opacity:0; pointer-events:none; }
+        #visioContainer.pip { width:240px; height:180px; }
+        #visioToolbar { gap:6px; padding:8px 12px; }
+        .vt-btn { padding:7px 10px; font-size:13px; }
+        .vt-btn span { display:none; }
+        #arcadeModalClose {
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
         }
-        @media (max-width:600px) {
-            .app-wrapper { padding:10px; gap:10px; }
-            .chat-header { padding:10px 14px; }
-            .theme-label { display:none; }
-            .theme-btn, .theme-btn-custom, .user-profile-photo, .notif-toggle-btn, .arcade-btn { width:36px; height:36px; font-size:16px; }
-            .toggle-sidebar-btn { left:6px; padding:10px 12px; border-radius:12px; }
-            .toggle-icon { font-size:20px; }
-            .chat-panel-header { padding:14px 16px; }
-            .messages-area { padding:16px; }
-            .input-area { padding:14px 16px; gap:10px; }
-            .message-input { min-width:0; padding:12px 16px; font-size:14px; }
-            .send-btn { padding:12px 20px; font-size:14px; }
-            .pm-msg-wrap { max-width:90%; }
-            .users-panel { position:fixed; top:0; left:0; height:100%; z-index:200; max-height:100vh; border-radius:0 20px 20px 0; width:280px; transform:translateX(0); transition:transform .4s cubic-bezier(.4,0,.2,1), opacity .4s; }
-            .users-panel.hidden { transform:translateX(-100%); width:280px; opacity:0; pointer-events:none; }
-            #visioContainer.pip { width:240px; height:180px; }
-            #visioToolbar { gap:6px; padding:8px 12px; }
-            .vt-btn { padding:7px 10px; font-size:13px; }
-            .vt-btn span { display:none; }
-        }
-    </style>
+    }
+</style>
+```
+
 </head>
 <body class="theme-futuriste">
 <div class="particles" id="particles"></div>
@@ -208,7 +255,7 @@
                 <div class="theme-btn" data-theme="chasse"    style="background:linear-gradient(135deg,#3e2723,#795548)"  title="Chasse"></div>
                 <div class="theme-btn" data-theme="aquarium"  style="background:linear-gradient(135deg,#00416a,#ffe000)"  title="Aquarium"></div>
                 <div class="theme-btn-custom" title="Photo personnalisée">📷<input type="file" id="customBgInput" accept="image/*"></div>
-                <a href="arcade.html" class="arcade-btn" title="🕹️ Arcade — Jeux">🕹️</a>
+                <div class="arcade-btn" id="arcadeBtn" title="🕹️ Arcade — Jeux">🕹️</div>
                 <div class="notif-toggle-btn" id="notifBtn" title="Activer les notifications">🔔</div>
                 <div class="user-profile-photo" id="userProfilePhoto" title="Mon profil">💬</div>
             </div>
@@ -258,6 +305,14 @@
         </div>
     </div>
 </div>
+
+<!-- MODAL ARCADE -->
+
+<div id="arcadeModal">
+    <button id="arcadeModalClose">✕</button>
+    <iframe id="arcadeIframe" style="width: 100%; height: 100vh; border: none;"></iframe>
+</div>
+
 <div id="visioOverlay"></div>
 <div id="visioContainer">
     <div id="visioTitleBar">
@@ -376,7 +431,36 @@ document.getElementById('customBgInput').addEventListener('change',function(e){v
 (function(){var c=document.getElementById('particles');for(var i=0;i<40;i++){var p=document.createElement('div');p.className='particle';p.style.left=(Math.random()*100)+'%';p.style.animationDelay=(Math.random()*20)+'s';p.style.animationDuration=(Math.random()*15+15)+'s';c.appendChild(p);}})();
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmtTime(iso){if(!iso)return '';var d=new Date(iso),now=new Date();var hm=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});return d.toDateString()===now.toDateString()?hm:d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})+' '+hm;}
+
+// ══ GESTION MODAL ARCADE ══
+document.getElementById(‘arcadeBtn’).addEventListener(‘click’, function() {
+var modal = document.getElementById(‘arcadeModal’);
+var iframe = document.getElementById(‘arcadeIframe’);
+iframe.src = ‘arcade.html’;
+modal.classList.add(‘open’);
+document.body.style.overflow = ‘hidden’;
+});
+
+document.getElementById(‘arcadeModalClose’).addEventListener(‘click’, function() {
+var modal = document.getElementById(‘arcadeModal’);
+var iframe = document.getElementById(‘arcadeIframe’);
+modal.classList.remove(‘open’);
+iframe.src = ‘’;
+document.body.style.overflow = ‘’;
+});
+
+// Fermeture avec la touche Escape
+document.addEventListener(‘keydown’, function(e) {
+if (e.key === ‘Escape’) {
+var modal = document.getElementById(‘arcadeModal’);
+if (modal.classList.contains(‘open’)) {
+document.getElementById(‘arcadeModalClose’).click();
+}
+}
+});
+
 switchToPublicChat();
 </script>
+
 </body>
 </html>
