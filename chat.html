@@ -48,7 +48,6 @@
     .user-profile-photo:hover { transform:scale(1.15); }
     .user-profile-photo img { width:100%; height:100%; object-fit:cover; }
 
-    /* Bouton notifications */
     .notif-toggle-btn { width:45px; height:45px; border-radius:50%; border:3px solid rgba(255,255,255,.5); background:rgba(255,255,255,.1); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; transition:all .3s; flex-shrink:0; }
     .notif-toggle-btn:hover { transform:scale(1.15); border-color:white; }
     .notif-toggle-btn.active { border-color:#4caf50; box-shadow:0 0 0 4px rgba(76,175,80,.3); background:rgba(76,175,80,.2); }
@@ -104,7 +103,8 @@
     .chat-panel-header-status { font-size:14px; margin-top:4px; font-weight:600; }
     .chat-panel-header-status.online  { color:#4caf50; }
     .chat-panel-header-status.offline { color:rgba(255,255,255,.6); }
-    
+
+    /* ══ BOUTON VISIO HEADER ══ */
     .visio-btn-header {
         padding:10px 20px;
         background:linear-gradient(135deg,#ff6b9d,#c06fff);
@@ -115,14 +115,17 @@
         cursor:pointer;
         transition:all .3s;
         font-size:14px;
-        display:none;
         align-items:center;
         gap:6px;
         box-shadow:0 4px 15px rgba(192,111,255,.4);
+        display:none;
     }
     .visio-btn-header:hover {
         transform:translateY(-2px);
         box-shadow:0 6px 20px rgba(192,111,255,.6);
+    }
+    .visio-btn-header.visible {
+        display:flex;
     }
 
     .messages-area { flex:1; padding:28px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
@@ -172,153 +175,283 @@
     .pm-toast-text { opacity:.8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
     /* ══════════════════════════════════════════
-       MODAL VISIO SIMPLE - MÊME THÈME QUE LA PAGE
+       VISIO JITSI - MODAL PRINCIPAL
     ══════════════════════════════════════════ */
-    .visio-modal-overlay {
-        position:fixed;
-        inset:0;
-        background:rgba(0,0,0,.6);
-        backdrop-filter:blur(10px);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        z-index:5000;
-        opacity:0;
-        visibility:hidden;
-        transition:all .4s ease;
+
+    /* Overlay sombre derrière le modal (s'efface en mode PiP) */
+    #visioOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.7);
+        backdrop-filter: blur(8px);
+        z-index: 9000;
+        display: none;
+        align-items: center;
+        justify-content: center;
     }
-    .visio-modal-overlay.active {
-        opacity:1;
-        visibility:visible;
+    #visioOverlay.open       { display: flex; }
+    #visioOverlay.pip-mode   { background: transparent; backdrop-filter: none; pointer-events: none; }
+
+    /* Le container draggable du modal */
+    #visioContainer {
+        position: fixed;
+        z-index: 9999;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 25px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.15);
+        display: none;
+        flex-direction: column;
+        background: #0d0d1a;
+
+        /* Taille plein modal par défaut (centré) */
+        width: 88vw;
+        max-width: 1100px;
+        height: 82vh;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: box-shadow .3s;
+    }
+    #visioContainer.open { display: flex; }
+
+    /* Mode Picture-in-Picture : petit coin bas-droite */
+    #visioContainer.pip {
+        width: 360px;
+        height: 260px;
+        top: auto;
+        left: auto;
+        bottom: 24px;
+        right: 24px;
+        transform: none;
+        border-radius: 16px;
+        cursor: move;
+        box-shadow: 0 12px 50px rgba(0,0,0,.8), 0 0 0 2px rgba(255,107,157,.4);
+    }
+    #visioContainer.pip #visioIframeWrap { flex: 1; }
+    #visioContainer.pip #visioToolbar    { padding: 8px 12px; }
+    #visioContainer.pip .vt-label       { display: none; }
+    #visioContainer.pip .vt-btn span    { display: none; }
+    #visioContainer.pip .vt-btn         { padding: 6px 10px; font-size: 16px; }
+    #visioContainer.pip #visioTitleBar  { padding: 8px 12px; }
+    #visioContainer.pip #visioRoomInfo  { display: none; }
+
+    /* Mode plein écran */
+    #visioContainer.fullscreen {
+        width: 100vw;
+        height: 100vh;
+        top: 0; left: 0;
+        transform: none;
+        border-radius: 0;
+        max-width: none;
     }
 
-    .visio-modal {
-        position:relative;
-        width:90%;
-        max-width:900px;
-        background:rgba(255,255,255,.05);
-        backdrop-filter:blur(20px);
-        border-radius:20px;
-        border:1px solid rgba(255,255,255,.15);
-        padding:30px;
-        transform:scale(.9);
-        opacity:0;
-        transition:all .5s cubic-bezier(.68,-.55,.265,1.55);
-        box-shadow:0 20px 60px rgba(0,0,0,.3);
+    /* Barre de titre du modal visio */
+    #visioTitleBar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 20px;
+        background: linear-gradient(90deg, rgba(255,107,157,.15), rgba(192,111,255,.15));
+        border-bottom: 1px solid rgba(255,255,255,.1);
+        user-select: none;
+        flex-shrink: 0;
     }
-    .visio-modal-overlay.active .visio-modal {
-        transform:scale(1);
-        opacity:1;
+    #visioTitleBar .vtb-icon { font-size: 22px; }
+    #visioTitleBar .vtb-title {
+        flex: 1;
+        color: white;
+        font-weight: 700;
+        font-size: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-
-    .visio-modal-header {
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        margin-bottom:24px;
-        padding-bottom:16px;
-        border-bottom:2px solid rgba(255,255,255,.15);
-    }
-    .visio-modal-title {
-        font-size:24px;
-        font-weight:700;
-        color:white;
-        text-shadow:0 2px 10px rgba(0,0,0,.3);
-        display:flex;
-        align-items:center;
-        gap:10px;
-    }
-    .visio-close-btn {
-        width:44px;
-        height:44px;
-        border-radius:50%;
-        border:2px solid rgba(255,255,255,.3);
-        background:rgba(255,255,255,.1);
-        color:white;
-        font-size:28px;
-        cursor:pointer;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        transition:all .3s;
-    }
-    .visio-close-btn:hover {
-        background:linear-gradient(135deg,#ff6b9d,#c06fff);
-        border-color:rgba(255,255,255,.5);
-        transform:rotate(90deg) scale(1.1);
-        box-shadow:0 4px 15px rgba(192,111,255,.4);
+    #visioRoomInfo {
+        font-size: 12px;
+        color: rgba(255,255,255,.5);
+        font-weight: 400;
+        margin-top: 2px;
     }
 
-    .visio-video-area {
-        position:relative;
-        width:100%;
-        padding-bottom:56.25%;
-        background:rgba(0,0,0,.3);
-        border-radius:16px;
-        margin-bottom:20px;
-        overflow:hidden;
-        border:1px solid rgba(255,255,255,.15);
+    /* Boutons de fenêtre (macOS style) */
+    .vtb-win-btns { display:flex; gap:8px; }
+    .vtb-win-btn  {
+        width: 16px; height: 16px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        transition: opacity .2s, transform .2s;
+        font-size: 10px;
+        display: flex; align-items: center; justify-content: center;
+        color: transparent;
+        font-weight: 900;
     }
-    .visio-video-placeholder {
-        position:absolute;
-        inset:0;
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        gap:12px;
-        color:rgba(255,255,255,.7);
+    .vtb-win-btn:hover { opacity: .85; transform: scale(1.15); color: rgba(0,0,0,.6); }
+    .vtb-win-btn.close  { background: #ff5f57; }
+    .vtb-win-btn.mini   { background: #febc2e; }
+    .vtb-win-btn.full   { background: #28c840; }
+
+    /* Zone de l'iframe Jitsi */
+    #visioIframeWrap {
+        flex: 1;
+        position: relative;
+        background: #000;
     }
-    .visio-video-icon {
-        font-size:64px;
-        opacity:.6;
-    }
-    .visio-video-text {
-        font-size:16px;
-        font-weight:600;
+    #visioIframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
     }
 
-    .visio-controls {
-        display:flex;
-        justify-content:center;
-        gap:12px;
-        flex-wrap:wrap;
+    /* Bannière de chargement */
+    #visioLoading {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        background: #0d0d1a;
+        color: white;
+        z-index: 2;
+        transition: opacity .5s;
     }
-    .visio-control-btn {
-        padding:14px 28px;
-        background:rgba(255,255,255,.12);
-        border:2px solid rgba(255,255,255,.25);
-        border-radius:14px;
-        color:white;
-        font-size:15px;
-        font-weight:600;
-        cursor:pointer;
-        transition:all .3s;
-        display:flex;
-        align-items:center;
-        gap:8px;
+    #visioLoading.hide { opacity: 0; pointer-events: none; }
+    .vl-spinner {
+        width: 56px; height: 56px;
+        border: 4px solid rgba(255,255,255,.1);
+        border-top-color: #ff6b9d;
+        border-radius: 50%;
+        animation: spin .9s linear infinite;
     }
-    .visio-control-btn:hover {
-        background:rgba(255,255,255,.2);
-        border-color:rgba(255,255,255,.4);
-        transform:translateY(-2px);
-        box-shadow:0 4px 15px rgba(0,0,0,.2);
-    }
-    .visio-control-btn.active {
-        background:linear-gradient(135deg,#ff6b9d,#c06fff);
-        border-color:rgba(255,107,157,.6);
-        box-shadow:0 6px 20px rgba(192,111,255,.4);
-    }
-    .visio-control-btn.danger {
-        background:rgba(239,68,68,.2);
-        border-color:rgba(239,68,68,.4);
-    }
-    .visio-control-btn.danger:hover {
-        background:rgba(239,68,68,.3);
-        border-color:rgba(239,68,68,.6);
-        box-shadow:0 4px 15px rgba(239,68,68,.3);
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .vl-text { font-size: 15px; color: rgba(255,255,255,.7); }
+    .vl-room {
+        font-size: 13px;
+        color: rgba(255,107,157,.8);
+        font-weight: 600;
+        letter-spacing: 1px;
+        background: rgba(255,107,157,.1);
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: 1px solid rgba(255,107,157,.3);
     }
 
+    /* Barre d'outils du bas */
+    #visioToolbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        background: rgba(0,0,0,.5);
+        border-top: 1px solid rgba(255,255,255,.08);
+        flex-wrap: wrap;
+        flex-shrink: 0;
+    }
+    .vt-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: rgba(255,255,255,.08);
+        border: 1px solid rgba(255,255,255,.15);
+        border-radius: 10px;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .25s;
+        white-space: nowrap;
+    }
+    .vt-btn:hover { background: rgba(255,255,255,.15); transform: translateY(-1px); }
+    .vt-btn.active {
+        background: linear-gradient(135deg, rgba(255,107,157,.3), rgba(192,111,255,.3));
+        border-color: rgba(255,107,157,.5);
+    }
+    .vt-btn.danger {
+        background: rgba(239,68,68,.15);
+        border-color: rgba(239,68,68,.3);
+    }
+    .vt-btn.danger:hover {
+        background: rgba(239,68,68,.3);
+        box-shadow: 0 4px 15px rgba(239,68,68,.3);
+    }
+    .vt-btn .vt-icon { font-size: 18px; }
+    .vt-label { flex: 1; }
+
+    /* Lien d'invitation */
+    #visioInviteBox {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+    #visioInviteInput {
+        flex: 1;
+        padding: 8px 12px;
+        background: rgba(255,255,255,.08);
+        border: 1px solid rgba(255,255,255,.15);
+        border-radius: 8px;
+        color: white;
+        font-size: 12px;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    #visioInviteInput:focus { outline: none; border-color: rgba(255,107,157,.5); }
+    #visioCopyBtn {
+        padding: 8px 14px;
+        background: linear-gradient(135deg,#ff6b9d,#c06fff);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all .25s;
+    }
+    #visioCopyBtn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(192,111,255,.4); }
+    #visioCopyBtn.copied {
+        background: linear-gradient(135deg,#43e97b,#38f9d7);
+    }
+
+    /* Toast copié */
+    .copy-toast {
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(67,233,123,.9);
+        color: white;
+        font-weight: 700;
+        padding: 10px 24px;
+        border-radius: 30px;
+        font-size: 14px;
+        z-index: 99999;
+        pointer-events: none;
+        animation: toastPop .3s ease;
+    }
+    @keyframes toastPop { from{opacity:0;transform:translateX(-50%) translateY(10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+    /* Drag handle visuel en mode PiP */
+    #visioContainer.pip::before {
+        content: '⠿';
+        position: absolute;
+        top: 6px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgba(255,255,255,.3);
+        font-size: 14px;
+        letter-spacing: 2px;
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    /* Scrollbars */
     .users-panel::-webkit-scrollbar, .messages-area::-webkit-scrollbar { width:7px; }
     .users-panel::-webkit-scrollbar-track, .messages-area::-webkit-scrollbar-track { background:rgba(255,255,255,.05); border-radius:10px; }
     .users-panel::-webkit-scrollbar-thumb  { background:rgba(255,255,255,.2); border-radius:10px; }
@@ -328,6 +461,8 @@
         .users-panel { width:260px; }
         .toggle-sidebar-btn { left:10px; padding:12px 14px; }
         .toggle-text { display:none; }
+        #visioContainer { width:96vw; height:75vh; }
+        #visioContainer.pip { width:280px; height:200px; bottom:16px; right:16px; }
     }
     @media (max-width:600px) {
         .app-wrapper { padding:10px; gap:10px; }
@@ -344,9 +479,10 @@
         .pm-msg-wrap { max-width:90%; }
         .users-panel { position:fixed; top:0; left:0; height:100%; z-index:200; max-height:100vh; border-radius:0 20px 20px 0; width:280px; transform:translateX(0); transition:transform .4s cubic-bezier(.4,0,.2,1), opacity .4s; }
         .users-panel.hidden { transform:translateX(-100%); width:280px; opacity:0; pointer-events:none; }
-        .visio-modal { padding:20px; }
-        .visio-modal-title { font-size:20px; }
-        .visio-btn-header { padding:8px 14px; font-size:13px; }
+        #visioContainer.pip { width:240px; height:180px; }
+        #visioToolbar { gap:6px; padding:8px 12px; }
+        .vt-btn { padding:7px 10px; font-size:13px; }
+        .vt-btn span { display:none; }
     }
 </style>
 ```
@@ -406,7 +542,8 @@
                 <div class="chat-panel-header-name"   id="chatHeaderName">Chat général</div>
                 <div class="chat-panel-header-status online" id="chatHeaderStatus">● Public</div>
             </div>
-            <button class="visio-btn-header" id="visioBtn" style="display:none;">📹 Visio</button>
+            <!-- BOUTON VISIO - visible pour tout le monde (privé ET public) -->
+            <button class="visio-btn-header visible" id="visioBtn">📹 <span>Visio</span></button>
             <button class="wizz-btn" id="wizzBtn" style="display:none;">⚡ WIZZ!</button>
         </div>
         <div class="messages-area" id="messagesArea"></div>
@@ -425,36 +562,77 @@
 
 </div>
 
-<!-- MODAL VISIO SIMPLE -->
+<!-- ══════════════════════════════════════════
+     VISIO JITSI MEET - MODAL DRAGGABLE
+══════════════════════════════════════════ -->
 
-<div class="visio-modal-overlay" id="visioModalOverlay">
-    <div class="visio-modal" id="visioModal">
-        <div class="visio-modal-header">
-            <h2 class="visio-modal-title">📹 Appel vidéo</h2>
-            <button class="visio-close-btn" id="closeVisioBtn" title="Fermer">×</button>
-        </div>
+<!-- Overlay (fond sombre) -->
+
+<div id="visioOverlay"></div>
+
+<!-- Container principal de la visio -->
+
+<div id="visioContainer">
 
 ```
-    <div class="visio-video-area">
-        <div class="visio-video-placeholder">
-            <div class="visio-video-icon">📹</div>
-            <div class="visio-video-text">Caméra désactivée</div>
+<!-- Barre de titre -->
+<div id="visioTitleBar" id="visioDragHandle">
+    <span class="vtb-icon">📹</span>
+    <div style="flex:1;min-width:0;">
+        <div class="vtb-title" id="visioTitleText">Visio en cours</div>
+        <div id="visioRoomInfo">Salle : chargement...</div>
+    </div>
+    <!-- Boutons style macOS -->
+    <div class="vtb-win-btns">
+        <button class="vtb-win-btn close"  id="visioCloseBtn"  title="Fermer">✕</button>
+        <button class="vtb-win-btn mini"   id="visioPipBtn"    title="Réduire (PiP)">−</button>
+        <button class="vtb-win-btn full"   id="visioFullBtn"   title="Plein écran">+</button>
+    </div>
+</div>
+
+<!-- Zone Jitsi -->
+<div id="visioIframeWrap">
+    <!-- Ecran de chargement -->
+    <div id="visioLoading">
+        <div class="vl-spinner"></div>
+        <div class="vl-text">Connexion à la salle...</div>
+        <div class="vl-room" id="visioLoadingRoom">—</div>
+        <div style="color:rgba(255,255,255,.4);font-size:12px;text-align:center;max-width:260px;line-height:1.8;">
+            Jitsi Meet s'ouvre directement ici.<br>Aucun lien externe, aucune redirection.
         </div>
     </div>
+    <!-- L'iframe Jitsi sera injectée ici -->
+</div>
 
-    <div class="visio-controls">
-        <button class="visio-control-btn active" id="visioMicBtn">🎤 Micro</button>
-        <button class="visio-control-btn active" id="visioCameraBtn">📹 Caméra</button>
-        <button class="visio-control-btn" id="visioScreenBtn">🖥️ Partager</button>
-        <button class="visio-control-btn danger" id="visioHangupBtn">📞 Raccrocher</button>
+<!-- Barre d'outils -->
+<div id="visioToolbar">
+    <!-- Lien d'invitation -->
+    <div id="visioInviteBox">
+        <input id="visioInviteInput" readonly placeholder="Lien d'invitation..." />
+        <button id="visioCopyBtn">📋 Copier</button>
     </div>
+    <!-- Bouton PiP -->
+    <button class="vt-btn" id="visioToolPip">
+        <span class="vt-icon">📌</span>
+        <span>Réduire</span>
+    </button>
+    <!-- Bouton plein écran -->
+    <button class="vt-btn" id="visioToolFull">
+        <span class="vt-icon">⛶</span>
+        <span>Plein écran</span>
+    </button>
+    <!-- Raccrocher -->
+    <button class="vt-btn danger" id="visioToolHangup">
+        <span class="vt-icon">📞</span>
+        <span>Raccrocher</span>
+    </button>
 </div>
 ```
 
 </div>
 
 <audio id="notifSound" preload="auto">
-    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2ozHTh/rt3fwpFkOTyLs+Psu5hqS0ybtO3yvKF1V1mhue7yuqJzV1qiue/yuqJ0WVmiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu8=" type="audio/wav">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2ozHTh/rt3fwpFkOTyLs+Psu5hqS0ybtO3yvKF1V1mhue7yuqJzV1qiue/yuqJ0WVmiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu8=" type="audio/wav">
 </audio>
 
 <script type="module">
@@ -489,8 +667,6 @@ var fingerprint         = getOrCreateFingerprint();
 var currentUniqueId     = currentUserPrenom + '_' + fingerprint;
 var savedPhotoUrl       = localStorage.getItem('userPhotoUrl') || localStorage.getItem('tempPhotoPreview');
 
-console.log('BubbleChat – ' + currentUserPrenom + ' | ID: ' + currentUniqueId);
-
 (function initPhoto() {
     var el = document.getElementById('userProfilePhoto');
     if (savedPhotoUrl) { el.innerHTML = '<img src="' + savedPhotoUrl + '" alt="Profil">'; currentUserPhoto = savedPhotoUrl; }
@@ -498,48 +674,287 @@ console.log('BubbleChat – ' + currentUserPrenom + ' | ID: ' + currentUniqueId)
 })();
 
 /* ══════════════════════════════════════════
-   MODAL VISIO SIMPLE
+   SYSTÈME VISIO JITSI MEET
+   - Salle unique par conversation (prénom1_prénom2)
+   - 100% dans la page, aucun lien externe
+   - Draggable en mode PiP
+   - Plein écran, réductible
+   - Gratuit, illimité, multi-participants
 ══════════════════════════════════════════ */
+
+var visioState = {
+    open:       false,
+    pip:        false,
+    fullscreen: false,
+    roomName:   null,
+    dragging:   false,
+    dragOffX:   0,
+    dragOffY:   0
+};
+
+var elOverlay   = document.getElementById('visioOverlay');
+var elContainer = document.getElementById('visioContainer');
+var elIframeWrap= document.getElementById('visioIframeWrap');
+var elLoading   = document.getElementById('visioLoading');
+var elTitleBar  = document.getElementById('visioTitleBar');
+var elTitleText = document.getElementById('visioTitleText');
+var elRoomInfo  = document.getElementById('visioRoomInfo');
+var elLoadRoom  = document.getElementById('visioLoadingRoom');
+var elInvite    = document.getElementById('visioInviteInput');
+var elCopyBtn   = document.getElementById('visioCopyBtn');
+
+/* Génère un nom de salle stable à partir de la conversation */
+function buildRoomName(chatType, otherPrenom) {
+    var prefix = 'bubblechat';
+    if (chatType === 'public') {
+        return prefix + '-general';
+    }
+    // Pour une conv privée : tri alphabétique pour que les 2 côtés aient la même salle
+    var names = [currentUserPrenom.toLowerCase(), (otherPrenom || 'user').toLowerCase()].sort();
+    return prefix + '-' + names[0] + '-' + names[1];
+}
+
+/* Construit l'URL Jitsi avec paramètres d'UI */
+function buildJitsiUrl(roomName) {
+    var displayName = encodeURIComponent(currentUserPrenom);
+    var params = [
+        'config.prejoinPageEnabled=false',
+        'config.startWithAudioMuted=false',
+        'config.startWithVideoMuted=false',
+        'config.disableDeepLinking=true',
+        'config.toolbarButtons=["microphone","camera","closedcaptions","desktop","fullscreen","fodeviceselection","hangup","profile","chat","settings","raisehand","videoquality","filmstrip","tileview","help","mute-everyone"]',
+        'interfaceConfig.SHOW_JITSI_WATERMARK=false',
+        'interfaceConfig.SHOW_WATERMARK_FOR_GUESTS=false',
+        'interfaceConfig.SHOW_BRAND_WATERMARK=false',
+        'interfaceConfig.SHOW_CHROME_EXTENSION_BANNER=false',
+        'interfaceConfig.DEFAULT_REMOTE_DISPLAY_NAME=' + displayName,
+        'userInfo.displayName=' + displayName
+    ];
+    return 'https://meet.jit.si/' + encodeURIComponent(roomName) + '#' + params.join('&');
+}
+
+/* Ouvre la visio */
+function openVisio(chatType, otherPrenom) {
+    var roomName = buildRoomName(chatType, otherPrenom);
+    visioState.roomName = roomName;
+    visioState.open = true;
+    visioState.pip  = false;
+    visioState.fullscreen = false;
+
+    // Affiche
+    elOverlay.classList.add('open');
+    elContainer.classList.add('open');
+    elContainer.classList.remove('pip', 'fullscreen');
+
+    // Reset position (centré via CSS transform)
+    elContainer.style.bottom = '';
+    elContainer.style.right  = '';
+    elContainer.style.top    = '50%';
+    elContainer.style.left   = '50%';
+    elContainer.style.transform = 'translate(-50%, -50%)';
+    elContainer.style.width  = '';
+    elContainer.style.height = '';
+
+    // Titre
+    var titleLabel = chatType === 'public'
+        ? 'Visio — Chat général'
+        : 'Visio avec ' + (otherPrenom || 'utilisateur');
+    elTitleText.textContent = titleLabel;
+    elRoomInfo.textContent  = 'Salle : ' + roomName;
+    elLoadRoom.textContent  = roomName;
+
+    // Lien d'invitation (lien direct Jitsi partageable)
+    var inviteUrl = 'https://meet.jit.si/' + encodeURIComponent(roomName);
+    elInvite.value = inviteUrl;
+
+    // Loader
+    elLoading.classList.remove('hide');
+
+    // Injecte l'iframe Jitsi
+    var existing = elIframeWrap.querySelector('iframe');
+    if (existing) existing.remove();
+
+    var iframe = document.createElement('iframe');
+    iframe.id = 'visioIframe';
+    iframe.allow = 'camera; microphone; display-capture; fullscreen; autoplay; clipboard-write';
+    iframe.allowFullscreen = true;
+    iframe.src = buildJitsiUrl(roomName);
+    iframe.onload = function() {
+        setTimeout(function() { elLoading.classList.add('hide'); }, 1500);
+    };
+    elIframeWrap.appendChild(iframe);
+
+    // Bloque le scroll de la page
+    document.body.style.overflow = 'hidden';
+}
+
+/* Ferme la visio */
+function closeVisio() {
+    visioState.open = false;
+    visioState.pip  = false;
+    visioState.fullscreen = false;
+
+    elOverlay.classList.remove('open', 'pip-mode');
+    elContainer.classList.remove('open', 'pip', 'fullscreen');
+
+    // Détruit l'iframe pour couper caméra/micro
+    var iframe = elIframeWrap.querySelector('iframe');
+    if (iframe) iframe.remove();
+
+    document.body.style.overflow = '';
+    resetContainerPos();
+}
+
+/* Mode Picture-in-Picture */
+function togglePip() {
+    if (!visioState.open) return;
+    visioState.pip = !visioState.pip;
+
+    if (visioState.pip) {
+        visioState.fullscreen = false;
+        elContainer.classList.add('pip');
+        elContainer.classList.remove('fullscreen');
+        elOverlay.classList.add('pip-mode');
+        // Position PiP fixe (CSS gère bottom/right)
+        elContainer.style.transform = 'none';
+        elContainer.style.top   = 'auto';
+        elContainer.style.left  = 'auto';
+        elContainer.style.width  = '';
+        elContainer.style.height = '';
+    } else {
+        elContainer.classList.remove('pip');
+        elOverlay.classList.remove('pip-mode');
+        resetContainerPos();
+    }
+    document.body.style.overflow = visioState.pip ? '' : 'hidden';
+}
+
+/* Mode plein écran */
+function toggleFullscreen() {
+    if (!visioState.open) return;
+    visioState.fullscreen = !visioState.fullscreen;
+
+    if (visioState.fullscreen) {
+        visioState.pip = false;
+        elContainer.classList.add('fullscreen');
+        elContainer.classList.remove('pip');
+        elOverlay.classList.remove('pip-mode');
+        elContainer.style.transform = 'none';
+        elContainer.style.top    = '0';
+        elContainer.style.left   = '0';
+        elContainer.style.width  = '100vw';
+        elContainer.style.height = '100vh';
+        document.body.style.overflow = 'hidden';
+    } else {
+        elContainer.classList.remove('fullscreen');
+        resetContainerPos();
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function resetContainerPos() {
+    elContainer.style.bottom = '';
+    elContainer.style.right  = '';
+    elContainer.style.top    = '50%';
+    elContainer.style.left   = '50%';
+    elContainer.style.transform = 'translate(-50%, -50%)';
+    elContainer.style.width  = '';
+    elContainer.style.height = '';
+}
+
+/* Copier le lien d'invitation */
+elCopyBtn.addEventListener('click', function() {
+    navigator.clipboard.writeText(elInvite.value).then(function() {
+        elCopyBtn.classList.add('copied');
+        elCopyBtn.textContent = '✓ Copié !';
+        var toast = document.createElement('div');
+        toast.className = 'copy-toast';
+        toast.textContent = '✅ Lien copié — partagez-le pour inviter !';
+        document.body.appendChild(toast);
+        setTimeout(function() { toast.remove(); }, 2500);
+        setTimeout(function() {
+            elCopyBtn.classList.remove('copied');
+            elCopyBtn.textContent = '📋 Copier';
+        }, 2500);
+    }).catch(function() {
+        elInvite.select();
+        document.execCommand('copy');
+    });
+});
+
+/* Boutons de la barre de titre */
+document.getElementById('visioCloseBtn').addEventListener('click', closeVisio);
+document.getElementById('visioPipBtn').addEventListener('click', togglePip);
+document.getElementById('visioFullBtn').addEventListener('click', toggleFullscreen);
+
+/* Boutons de la toolbar */
+document.getElementById('visioToolPip').addEventListener('click', togglePip);
+document.getElementById('visioToolFull').addEventListener('click', toggleFullscreen);
+document.getElementById('visioToolHangup').addEventListener('click', closeVisio);
+
+/* Bouton Visio dans le header du chat */
 document.getElementById('visioBtn').addEventListener('click', function() {
-    document.getElementById('visioModalOverlay').classList.add('active');
+    var chatType   = currentChatType;
+    var otherPrenom = (currentChatType === 'private' && currentChatUser) ? currentChatUser.prenom : null;
+    openVisio(chatType, otherPrenom);
 });
 
-document.getElementById('closeVisioBtn').addEventListener('click', function() {
-    document.getElementById('visioModalOverlay').classList.remove('active');
+/* Overlay click = ferme si non PiP */
+elOverlay.addEventListener('click', function(e) {
+    if (e.target === elOverlay && !visioState.pip) closeVisio();
 });
 
-document.getElementById('visioHangupBtn').addEventListener('click', function() {
-    document.getElementById('visioModalOverlay').classList.remove('active');
-});
+/* ══ DRAG (mode PiP uniquement) ══ */
+elContainer.addEventListener('mousedown', startDrag);
+elContainer.addEventListener('touchstart', startDrag, { passive: true });
+document.addEventListener('mousemove', onDrag);
+document.addEventListener('touchmove', onDrag, { passive: false });
+document.addEventListener('mouseup', stopDrag);
+document.addEventListener('touchend', stopDrag);
 
-document.getElementById('visioModalOverlay').addEventListener('click', function(e) {
-    if (e.target === document.getElementById('visioModalOverlay')) {
-        document.getElementById('visioModalOverlay').classList.remove('active');
+function startDrag(e) {
+    if (!visioState.pip) return;
+    // Ne pas déclencher si clic sur bouton
+    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.closest('button') || e.target.closest('input')) return;
+    visioState.dragging = true;
+    var rect = elContainer.getBoundingClientRect();
+    var cx = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+    var cy = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+    visioState.dragOffX = cx - rect.left;
+    visioState.dragOffY = cy - rect.top;
+    elContainer.style.cursor = 'grabbing';
+}
+
+function onDrag(e) {
+    if (!visioState.dragging || !visioState.pip) return;
+    if (e.type === 'touchmove') e.preventDefault();
+    var cx = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+    var cy = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+    var x = cx - visioState.dragOffX;
+    var y = cy - visioState.dragOffY;
+    // Contraindre dans la fenêtre
+    var w = elContainer.offsetWidth;
+    var h = elContainer.offsetHeight;
+    x = Math.max(0, Math.min(window.innerWidth  - w, x));
+    y = Math.max(0, Math.min(window.innerHeight - h, y));
+    elContainer.style.left   = x + 'px';
+    elContainer.style.top    = y + 'px';
+    elContainer.style.right  = 'auto';
+    elContainer.style.bottom = 'auto';
+    elContainer.style.transform = 'none';
+}
+
+function stopDrag() {
+    visioState.dragging = false;
+    elContainer.style.cursor = '';
+}
+
+/* Touche Echap = sortir plein écran ou fermer */
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (visioState.fullscreen) toggleFullscreen();
+        else if (visioState.open && !visioState.pip) closeVisio();
     }
-});
-
-var visioMicOn = true, visioCameraOn = true, visioScreenOn = false;
-
-document.getElementById('visioMicBtn').addEventListener('click', function() {
-    visioMicOn = !visioMicOn;
-    this.classList.toggle('active');
-    this.textContent = visioMicOn ? '🎤 Micro' : '🔇 Muet';
-});
-
-document.getElementById('visioCameraBtn').addEventListener('click', function() {
-    visioCameraOn = !visioCameraOn;
-    this.classList.toggle('active');
-    this.textContent = visioCameraOn ? '📹 Caméra' : '📹 Arrêtée';
-    var placeholder = document.querySelector('.visio-video-placeholder .visio-video-text');
-    if (placeholder) {
-        placeholder.textContent = visioCameraOn ? 'Caméra activée' : 'Caméra désactivée';
-    }
-});
-
-document.getElementById('visioScreenBtn').addEventListener('click', function() {
-    visioScreenOn = !visioScreenOn;
-    this.classList.toggle('active');
-    this.textContent = visioScreenOn ? '🔴 Arrêter' : '🖥️ Partager';
 });
 
 /* ══════════════════════════════════════════
@@ -549,12 +964,11 @@ var swRegistration = null;
 var notifGranted   = false;
 
 async function registerSW() {
-    if (!('serviceWorker' in navigator)) { console.log('SW non supporté'); return; }
+    if (!('serviceWorker' in navigator)) return;
     try {
         swRegistration = await navigator.serviceWorker.register('/sw.js');
-        console.log('SW enregistré');
         updateNotifBtn();
-    } catch(e) { console.log('SW erreur: ' + e); }
+    } catch(e) {}
 }
 
 async function requestNotifPermission() {
@@ -562,74 +976,33 @@ async function requestNotifPermission() {
         alert('Votre navigateur ne supporte pas les notifications.\nSur iPhone : installez l\'app via "Ajouter à l\'écran d\'accueil" dans Safari.');
         return;
     }
-    if (Notification.permission === 'granted') {
-        notifGranted = true;
-        updateNotifBtn();
-        return;
-    }
-    if (Notification.permission === 'denied') {
-        alert('Notifications bloquées.\nVeuillez les autoriser dans les réglages de votre navigateur.');
-        return;
-    }
+    if (Notification.permission === 'granted') { notifGranted = true; updateNotifBtn(); return; }
+    if (Notification.permission === 'denied')  { alert('Notifications bloquées.\nVeuillez les autoriser dans les réglages de votre navigateur.'); return; }
     try {
         var result = await Notification.requestPermission();
         notifGranted = (result === 'granted');
         updateNotifBtn();
-        if (notifGranted) {
-            sendPushNotif('BubbleChat 💬', 'Notifications activées ! 🎉', '🌐');
-        }
-    } catch(e) { console.log('Notif permission err: ' + e); }
+        if (notifGranted) sendPushNotif('BubbleChat 💬', 'Notifications activées ! 🎉', '🌐');
+    } catch(e) {}
 }
 
 function updateNotifBtn() {
     var btn = document.getElementById('notifBtn');
     if (!btn) return;
     var perm = ('Notification' in window) ? Notification.permission : 'unsupported';
-    if (perm === 'granted') {
-        btn.textContent = '🔔';
-        btn.classList.add('active');
-        btn.classList.remove('denied');
-        btn.title = 'Notifications activées';
-        notifGranted = true;
-    } else if (perm === 'denied') {
-        btn.textContent = '🔕';
-        btn.classList.add('denied');
-        btn.classList.remove('active');
-        btn.title = 'Notifications bloquées';
-    } else {
-        btn.textContent = '🔔';
-        btn.classList.remove('active', 'denied');
-        btn.title = 'Activer les notifications';
-    }
+    if (perm === 'granted')      { btn.textContent = '🔔'; btn.classList.add('active'); btn.classList.remove('denied'); btn.title = 'Notifications activées'; notifGranted = true; }
+    else if (perm === 'denied')  { btn.textContent = '🔕'; btn.classList.add('denied'); btn.classList.remove('active'); btn.title = 'Notifications bloquées'; }
+    else                         { btn.textContent = '🔔'; btn.classList.remove('active','denied'); btn.title = 'Activer les notifications'; }
 }
 
 function sendPushNotif(title, body, senderPhoto) {
-    try {
-        var audio = document.getElementById('notifSound');
-        if (audio) { audio.currentTime = 0; audio.play().catch(function(){}); }
-    } catch(e) {}
-
+    try { var a = document.getElementById('notifSound'); if (a) { a.currentTime=0; a.play().catch(function(){}); } } catch(e) {}
     if (!document.hidden) return;
     if (!notifGranted) return;
-
     if (swRegistration && swRegistration.active) {
-        swRegistration.active.postMessage({
-            type:  'NEW_MESSAGE',
-            title: title,
-            body:  body,
-            icon:  senderPhoto || '/icon-192.png',
-            tag:   'bubblechat-' + Date.now(),
-            url:   '/chat.html'
-        });
+        swRegistration.active.postMessage({ type:'NEW_MESSAGE', title, body, icon:senderPhoto||'/icon-192.png', tag:'bubblechat-'+Date.now(), url:'/chat.html' });
     } else {
-        try {
-            new Notification(title, {
-                body:    body,
-                icon:    '/icon-192.png',
-                badge:   '/icon-192.png',
-                vibrate: [200, 100, 200]
-            });
-        } catch(e) {}
+        try { new Notification(title, { body, icon:'/icon-192.png', badge:'/icon-192.png', vibrate:[200,100,200] }); } catch(e) {}
     }
 }
 
@@ -715,9 +1088,7 @@ document.getElementById('customColorInput').addEventListener('input', function(e
 
 /* ══ STATUT EN LIGNE ══ */
 async function setOnlineStatus(online) {
-    try {
-        await supabase.from('profiles').update({ is_online: online, last_seen: new Date().toISOString() }).eq('unique_id', currentUniqueId);
-    } catch(e) {}
+    try { await supabase.from('profiles').update({ is_online: online, last_seen: new Date().toISOString() }).eq('unique_id', currentUniqueId); } catch(e) {}
 }
 setOnlineStatus(true);
 setInterval(function() { setOnlineStatus(true); }, 30000);
@@ -727,69 +1098,39 @@ document.addEventListener('visibilitychange', function() { setOnlineStatus(!docu
 /* ══ PROFILS ══ */
 async function loadProfiles() {
     try {
-        var res = await supabase
-            .from('profiles')
-            .select('unique_id, prenom, photo_url, is_online, last_seen')
-            .order('is_online', { ascending: false })
-            .order('prenom',    { ascending: true });
-
-        if (res.error) { console.log('ERR Profils: ' + res.error.message); return; }
-
-        profiles = (res.data || [])
-            .filter(function(p) { return p.unique_id !== currentUniqueId; })
-            .map(function(p) { return {
-                unique_id: p.unique_id || '',
-                prenom:    p.prenom    || 'Anonyme',
-                photo_url: p.photo_url || null,
-                is_online: !!p.is_online
-            }; });
+        var res = await supabase.from('profiles').select('unique_id, prenom, photo_url, is_online, last_seen').order('is_online', { ascending: false }).order('prenom', { ascending: true });
+        if (res.error) return;
+        profiles = (res.data || []).filter(function(p) { return p.unique_id !== currentUniqueId; }).map(function(p) { return { unique_id: p.unique_id||'', prenom: p.prenom||'Anonyme', photo_url: p.photo_url||null, is_online: !!p.is_online }; });
         renderProfiles();
-    } catch(e) { console.log('ERR loadProfiles'); }
+    } catch(e) {}
 }
 
 function renderProfiles() {
     var container = document.getElementById('profileList');
     var countEl   = document.getElementById('profileCount');
     container.innerHTML = '';
-
     var onlineCount = profiles.filter(function(p) { return p.is_online; }).length;
     countEl.textContent = profiles.length + ' utilisateur' + (profiles.length > 1 ? 's' : '') + ' · ' + onlineCount + ' en ligne';
-
     profiles.forEach(function(profile) {
         var item = document.createElement('div');
         item.className = 'user-item' + (currentChatType === 'private' && currentChatUser && currentChatUser.unique_id === profile.unique_id ? ' active' : '');
         item.dataset.uid = profile.unique_id;
-
         var av = document.createElement('div');
         av.className = 'user-avatar';
         av.innerHTML = profile.photo_url ? '<img src="' + profile.photo_url + '" alt="' + esc(profile.prenom) + '">' : profile.prenom[0].toUpperCase();
         var dot = document.createElement('div');
         dot.className = 'status-dot ' + (profile.is_online ? 'online' : 'offline');
         av.appendChild(dot);
-
         var info = document.createElement('div');
         info.className = 'user-info';
         info.innerHTML = '<div class="user-name">' + esc(profile.prenom) + '</div><div class="user-status-txt ' + (profile.is_online ? 'online' : 'offline') + '">' + (profile.is_online ? '● En ligne' : '● Hors ligne') + '</div>';
-
         item.appendChild(av);
         item.appendChild(info);
-
         var unread = pmBadges[profile.unique_id] || 0;
-        if (unread > 0) {
-            var badge = document.createElement('div');
-            badge.className = 'notif-badge';
-            badge.textContent = unread > 99 ? '99+' : unread;
-            item.appendChild(badge);
-        }
-
+        if (unread > 0) { var badge = document.createElement('div'); badge.className='notif-badge'; badge.textContent=unread>99?'99+':unread; item.appendChild(badge); }
         item.addEventListener('click', function() {
             switchToPrivateChat(profile);
-            if (isMobile()) {
-                sidebarVisible = false;
-                document.getElementById('usersPanel').classList.add('hidden');
-                document.getElementById('toggleIcon').textContent = '💬';
-                document.getElementById('toggleText').textContent  = 'Chat';
-            }
+            if (isMobile()) { sidebarVisible=false; document.getElementById('usersPanel').classList.add('hidden'); document.getElementById('toggleIcon').textContent='💬'; document.getElementById('toggleText').textContent='Chat'; }
         });
         container.appendChild(item);
     });
@@ -801,16 +1142,8 @@ loadProfiles();
 /* ══ INBOX POLLING ══ */
 async function pollInbox() {
     try {
-        var res = await supabase
-            .from('private_messages')
-            .select('id, sender_unique_id, message')
-            .eq('receiver_unique_id', currentUniqueId)
-            .eq('is_read', false)
-            .gt('id', lastInboxId)
-            .order('id', { ascending: true });
-
+        var res = await supabase.from('private_messages').select('id, sender_unique_id, message').eq('receiver_unique_id', currentUniqueId).eq('is_read', false).gt('id', lastInboxId).order('id', { ascending: true });
         if (res.error || !res.data || !res.data.length) return;
-
         res.data.forEach(function(msg) {
             if (msg.id > lastInboxId) lastInboxId = msg.id;
             var sid = msg.sender_unique_id;
@@ -818,18 +1151,11 @@ async function pollInbox() {
                 pmBadges[sid] = (pmBadges[sid] || 0) + 1;
                 renderProfiles();
                 showToast(msg, sid);
-
                 var sender = profiles.find(function(p) { return p.unique_id === sid; });
-                var senderName = sender ? sender.prenom : 'Quelqu\'un';
-                var senderPhoto = sender ? sender.photo_url : null;
-                sendPushNotif(
-                    '💌 ' + senderName,
-                    msg.message === '⚡ WIZZ !' ? '⚡ WIZZ !' : msg.message,
-                    senderPhoto || '/icon-192.png'
-                );
+                sendPushNotif('💌 ' + (sender ? sender.prenom : 'Quelqu\'un'), msg.message === '⚡ WIZZ !' ? '⚡ WIZZ !' : msg.message, sender ? sender.photo_url : null);
             }
         });
-    } catch(e) { console.log('ERR pollInbox'); }
+    } catch(e) {}
 }
 setInterval(pollInbox, 3000);
 
@@ -839,13 +1165,9 @@ function showToast(msg, senderId) {
     var toast  = document.createElement('div');
     toast.className = 'pm-toast';
     toast.innerHTML = '<div class="pm-toast-name">💌 ' + esc(name) + '</div><div class="pm-toast-text">' + esc(msg.message) + '</div>';
-    toast.addEventListener('click', function() {
-        var prof = profiles.find(function(p) { return p.unique_id === senderId; });
-        if (prof) switchToPrivateChat(prof);
-        toast.remove();
-    });
+    toast.addEventListener('click', function() { var prof = profiles.find(function(p) { return p.unique_id === senderId; }); if (prof) switchToPrivateChat(prof); toast.remove(); });
     document.body.appendChild(toast);
-    setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 400); }, 5000);
+    setTimeout(function() { toast.style.opacity='0'; setTimeout(function() { toast.remove(); }, 400); }, 5000);
 }
 
 /* ══ WIZZ ══ */
@@ -853,66 +1175,40 @@ document.getElementById('wizzBtn').addEventListener('click', async function() {
     if (!currentChatUser) return;
     document.getElementById('rightPanel').classList.add('wizzing');
     setTimeout(function() { document.getElementById('rightPanel').classList.remove('wizzing'); }, 600);
-    try {
-        await supabase.from('private_messages').insert({ sender_unique_id: currentUniqueId, receiver_unique_id: currentChatUser.unique_id, message: '⚡ WIZZ !', is_read: false });
-    } catch(e) {}
+    try { await supabase.from('private_messages').insert({ sender_unique_id: currentUniqueId, receiver_unique_id: currentChatUser.unique_id, message: '⚡ WIZZ !', is_read: false }); } catch(e) {}
 });
 
 /* ══ CHAT PUBLIC ══ */
 async function loadPublicMessages() {
     try {
-        var query = supabase
-            .from('messages')
-            .select('id, prenom, message, created_at, photo_url')
-            .is('to_user', null)
-            .order('created_at', { ascending: true })
-            .limit(60);
-
-        if (lastPublicMsgTime) {
-            query = query.gt('created_at', lastPublicMsgTime);
-        }
-
+        var query = supabase.from('messages').select('id, prenom, message, created_at, photo_url').is('to_user', null).order('created_at', { ascending: true }).limit(60);
+        if (lastPublicMsgTime) query = query.gt('created_at', lastPublicMsgTime);
         var res = await query;
         if (res.error || !res.data || !res.data.length) return;
-
         var isFirst = !lastPublicMsgTime;
         if (isFirst) document.getElementById('messagesArea').innerHTML = '';
-
         res.data.forEach(function(msg) {
-            if (!lastPublicMsgTime || msg.created_at > lastPublicMsgTime) {
-                lastPublicMsgTime = msg.created_at;
-            }
+            if (!lastPublicMsgTime || msg.created_at > lastPublicMsgTime) lastPublicMsgTime = msg.created_at;
             if (currentChatType === 'public') {
                 var isNew = !isFirst && msg.prenom !== currentUserPrenom;
-                renderPublicMessage({ author: msg.prenom || 'Anonyme', text: msg.message, photo: msg.photo_url, time: fmtTime(msg.created_at) });
-
-                if (isNew) {
-                    sendPushNotif(
-                        '🌐 ' + (msg.prenom || 'Anonyme'),
-                        msg.message,
-                        msg.photo_url || '/icon-192.png'
-                    );
-                }
+                renderPublicMessage({ author: msg.prenom||'Anonyme', text: msg.message, photo: msg.photo_url, time: fmtTime(msg.created_at) });
+                if (isNew) sendPushNotif('🌐 ' + (msg.prenom||'Anonyme'), msg.message, msg.photo_url||'/icon-192.png');
             }
         });
-    } catch(e) { console.log('ERR loadPublicMessages'); }
+    } catch(e) {}
 }
 
 function renderPublicMessage(opts) {
     var area = document.getElementById('messagesArea');
-    var el   = document.createElement('div');
+    var el = document.createElement('div');
     el.className = 'message';
-
     var av = document.createElement('div');
     av.className = 'message-avatar';
     av.innerHTML = opts.photo ? '<img src="' + opts.photo + '" alt="' + esc(opts.author) + '">' : (opts.author ? opts.author[0] : '?').toUpperCase();
-
     var content = document.createElement('div');
     content.className = 'message-content';
     content.innerHTML = '<div class="message-author">' + esc(opts.author) + '</div><div class="message-text">' + esc(opts.text) + '</div><div class="message-time">' + opts.time + '</div>';
-
-    el.appendChild(av);
-    el.appendChild(content);
+    el.appendChild(av); el.appendChild(content);
     area.appendChild(el);
     area.scrollTop = area.scrollHeight;
 }
@@ -920,10 +1216,8 @@ function renderPublicMessage(opts) {
 async function sendPublicMessage(text) {
     renderPublicMessage({ author: currentUserPrenom, text: text, photo: currentUserPhoto, time: fmtTime(new Date().toISOString()) });
     try {
-        var res = await supabase.from('messages').insert({ prenom: currentUserPrenom, message: text, photo_url: currentUserPhoto || null, to_user: null }).select('created_at').single();
-        if (!res.error && res.data && res.data.created_at && (!lastPublicMsgTime || res.data.created_at > lastPublicMsgTime)) {
-            lastPublicMsgTime = res.data.created_at;
-        }
+        var res = await supabase.from('messages').insert({ prenom: currentUserPrenom, message: text, photo_url: currentUserPhoto||null, to_user: null }).select('created_at').single();
+        if (!res.error && res.data && res.data.created_at && (!lastPublicMsgTime || res.data.created_at > lastPublicMsgTime)) lastPublicMsgTime = res.data.created_at;
     } catch(e) {}
 }
 
@@ -937,7 +1231,7 @@ function setHeader(avatarHtml, name, statusTxt, isOnline, showWizz) {
     st.className  = 'chat-panel-header-status ' + (isOnline ? 'online' : 'offline');
     st.textContent = statusTxt;
     document.getElementById('wizzBtn').style.display = showWizz ? 'block' : 'none';
-    document.getElementById('visioBtn').style.display = showWizz ? 'flex' : 'none';
+    // Le bouton visio reste toujours visible
 }
 
 function switchToPublicChat() {
@@ -945,7 +1239,6 @@ function switchToPublicChat() {
     currentChatType   = 'public';
     currentChatUser   = null;
     lastPublicMsgTime = null;
-
     setHeader('🌐', 'Chat général', '● Public', true, false);
     document.getElementById('bubbleColorPicker').style.display = 'none';
     document.querySelectorAll('.user-item').forEach(function(i) { i.classList.remove('active'); });
@@ -960,92 +1253,51 @@ function switchToPrivateChat(profile) {
     currentChatUser = profile;
     lastPMId        = 0;
     pmBadges[profile.unique_id] = 0;
-
-    console.log('switchToPrivateChat:', profile.prenom, profile.unique_id);
-
-    var avHtml = profile.photo_url
-        ? '<img src="' + profile.photo_url + '" alt="' + esc(profile.prenom) + '">'
-        : profile.prenom[0].toUpperCase();
+    var avHtml = profile.photo_url ? '<img src="' + profile.photo_url + '" alt="' + esc(profile.prenom) + '">' : profile.prenom[0].toUpperCase();
     setHeader(avHtml, profile.prenom, profile.is_online ? '🟢 En ligne' : '🔴 Hors ligne', profile.is_online, true);
-
     document.getElementById('bubbleColorPicker').style.display = 'flex';
     document.querySelectorAll('.user-item').forEach(function(i) { i.classList.remove('active'); });
     document.querySelectorAll('.user-item[data-uid="' + profile.unique_id + '"]').forEach(function(i) { i.classList.add('active'); });
     document.getElementById('publicChatBtn').classList.remove('active');
-
     loadPMHistory(profile.unique_id);
     markAllRead(profile.unique_id);
-    document.querySelectorAll('.notif-badge').forEach(function(b) {
-        var item = b.closest('.user-item');
-        if (item && item.dataset.uid === profile.unique_id) b.remove();
-    });
-    
-    pmPollInterval = setInterval(function() { 
-        console.log('pmPollInterval tick for', profile.unique_id);
-        pollNewPMs(profile.unique_id); 
-    }, 2500);
-    console.log('pmPollInterval started:', pmPollInterval);
+    document.querySelectorAll('.notif-badge').forEach(function(b) { var item = b.closest('.user-item'); if (item && item.dataset.uid === profile.unique_id) b.remove(); });
+    pmPollInterval = setInterval(function() { pollNewPMs(profile.unique_id); }, 2500);
 }
 
 document.getElementById('publicChatBtn').addEventListener('click', function() {
     switchToPublicChat();
-    if (isMobile()) {
-        sidebarVisible = false;
-        document.getElementById('usersPanel').classList.add('hidden');
-        document.getElementById('toggleIcon').textContent = '💬';
-        document.getElementById('toggleText').textContent  = 'Chat';
-    }
+    if (isMobile()) { sidebarVisible=false; document.getElementById('usersPanel').classList.add('hidden'); document.getElementById('toggleIcon').textContent='💬'; document.getElementById('toggleText').textContent='Chat'; }
 });
 
 /* ══ MESSAGES PRIVÉS ══ */
 async function loadPMHistory(otherId) {
     var area = document.getElementById('messagesArea');
     area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">💬</span>Chargement...</div>';
-
     try {
-        var res = await supabase
-            .from('private_messages')
-            .select('id, sender_unique_id, message, created_at, is_read')
-            .or('and(sender_unique_id.eq.' + currentUniqueId + ',receiver_unique_id.eq.' + otherId + '),and(sender_unique_id.eq.' + otherId + ',receiver_unique_id.eq.' + currentUniqueId + ')')
-            .order('created_at', { ascending: true })
-            .limit(150);
-
+        var res = await supabase.from('private_messages').select('id, sender_unique_id, message, created_at, is_read').or('and(sender_unique_id.eq.' + currentUniqueId + ',receiver_unique_id.eq.' + otherId + '),and(sender_unique_id.eq.' + otherId + ',receiver_unique_id.eq.' + currentUniqueId + ')').order('created_at', { ascending: true }).limit(150);
         if (res.error) { area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">⚠️</span>Erreur chargement</div>'; return; }
-
         area.innerHTML = '';
-        if (!res.data || !res.data.length) {
-            area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">💌</span>Aucun message</div>';
-            return;
-        }
-
-        res.data.forEach(function(msg) {
-            if (msg.id > lastPMId) lastPMId = msg.id;
-            appendPMBubble({ id: msg.id, text: msg.message, fromMe: msg.sender_unique_id === currentUniqueId, time: fmtTime(msg.created_at), is_read: msg.is_read });
-        });
+        if (!res.data || !res.data.length) { area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">💌</span>Aucun message</div>'; return; }
+        res.data.forEach(function(msg) { if (msg.id > lastPMId) lastPMId = msg.id; appendPMBubble({ id: msg.id, text: msg.message, fromMe: msg.sender_unique_id === currentUniqueId, time: fmtTime(msg.created_at), is_read: msg.is_read }); });
         area.scrollTop = area.scrollHeight;
-    } catch(e) { console.log('ERR loadPMHistory'); }
-}
-
-function buildBubble(opts) {
-    var wrap = document.createElement('div');
-    wrap.className  = 'pm-msg-wrap ' + (opts.fromMe ? 'sent' : 'received');
-    wrap.dataset.msgId = opts.id;
-
-    var bubble = document.createElement('div');
-    bubble.className = 'pm-msg ' + (opts.fromMe ? 'sent' : 'received');
-    if (opts.fromMe) bubble.style.background = myBubbleStyle;
-
-    var tick = opts.fromMe ? '<span class="pm-tick ' + (opts.is_read ? 'read' : '') + '">' + (opts.is_read ? '✓✓' : '✓') + '</span>' : '';
-    bubble.innerHTML = esc(opts.text) + '<div class="pm-msg-meta">' + opts.time + ' ' + tick + '</div>';
-    wrap.appendChild(bubble);
-    return wrap;
+    } catch(e) {}
 }
 
 function appendPMBubble(msg) {
     var area  = document.getElementById('messagesArea');
     var empty = area.querySelector('.pm-empty');
     if (empty) empty.remove();
-    area.appendChild(buildBubble(msg));
+    var wrap = document.createElement('div');
+    wrap.className = 'pm-msg-wrap ' + (msg.fromMe ? 'sent' : 'received');
+    wrap.dataset.msgId = msg.id;
+    var bubble = document.createElement('div');
+    bubble.className = 'pm-msg ' + (msg.fromMe ? 'sent' : 'received');
+    if (msg.fromMe) bubble.style.background = myBubbleStyle;
+    var tick = msg.fromMe ? '<span class="pm-tick ' + (msg.is_read ? 'read' : '') + '">' + (msg.is_read ? '✓✓' : '✓') + '</span>' : '';
+    bubble.innerHTML = esc(msg.text) + '<div class="pm-msg-meta">' + msg.time + ' ' + tick + '</div>';
+    wrap.appendChild(bubble);
+    area.appendChild(wrap);
     area.scrollTop = area.scrollHeight;
 }
 
@@ -1055,10 +1307,8 @@ async function sendPM() {
     var text  = input.value.trim();
     if (!text) return;
     input.value = '';
-
     var tempId = 'tmp-' + Date.now();
     appendPMBubble({ id: tempId, text: text, fromMe: true, time: fmtTime(new Date().toISOString()), is_read: false });
-
     try {
         var res = await supabase.from('private_messages').insert({ sender_unique_id: currentUniqueId, receiver_unique_id: currentChatUser.unique_id, message: text, is_read: false }).select('id').single();
         if (res.error) { var el2 = document.querySelector('[data-msg-id="' + tempId + '"]'); if (el2) el2.remove(); input.value = text; return; }
@@ -1068,47 +1318,17 @@ async function sendPM() {
 }
 
 async function pollNewPMs(otherId) {
-    if (currentChatType !== 'private' || !currentChatUser || currentChatUser.unique_id !== otherId) {
-        console.log('pollNewPMs: skip - not in right chat', { currentChatType, currentChatUser: currentChatUser?.unique_id, otherId });
-        return;
-    }
+    if (currentChatType !== 'private' || !currentChatUser || currentChatUser.unique_id !== otherId) return;
     try {
-        var res = await supabase
-            .from('private_messages')
-            .select('id, message, created_at, is_read')
-            .eq('sender_unique_id',   otherId)
-            .eq('receiver_unique_id', currentUniqueId)
-            .gt('id', lastPMId)
-            .order('id', { ascending: true });
-
-        if (res.error) {
-            console.log('pollNewPMs: error', res.error);
-            return;
-        }
-        
-        if (!res.data || !res.data.length) return;
-
-        console.log('pollNewPMs: received ' + res.data.length + ' new messages');
-        res.data.forEach(function(msg) {
-            if (msg.id > lastPMId) lastPMId = msg.id;
-            appendPMBubble({ id: msg.id, text: msg.message, fromMe: false, time: fmtTime(msg.created_at), is_read: false });
-            markRead(msg.id);
-        });
-        if (res.data.some(function(m) { return m.message === '⚡ WIZZ !'; })) {
-            document.getElementById('rightPanel').classList.add('wizzing');
-            setTimeout(function() { document.getElementById('rightPanel').classList.remove('wizzing'); }, 600);
-        }
-    } catch(e) {
-        console.log('pollNewPMs: exception', e);
-    }
+        var res = await supabase.from('private_messages').select('id, message, created_at, is_read').eq('sender_unique_id', otherId).eq('receiver_unique_id', currentUniqueId).gt('id', lastPMId).order('id', { ascending: true });
+        if (res.error || !res.data || !res.data.length) return;
+        res.data.forEach(function(msg) { if (msg.id > lastPMId) lastPMId = msg.id; appendPMBubble({ id: msg.id, text: msg.message, fromMe: false, time: fmtTime(msg.created_at), is_read: false }); markRead(msg.id); });
+        if (res.data.some(function(m) { return m.message === '⚡ WIZZ !'; })) { document.getElementById('rightPanel').classList.add('wizzing'); setTimeout(function() { document.getElementById('rightPanel').classList.remove('wizzing'); }, 600); }
+    } catch(e) {}
 }
 
-async function markRead(id) {
-    try { await supabase.from('private_messages').update({ is_read: true }).eq('id', id); } catch(e) {}
-}
-async function markAllRead(senderId) {
-    try { await supabase.from('private_messages').update({ is_read: true }).eq('receiver_unique_id', currentUniqueId).eq('sender_unique_id', senderId).eq('is_read', false); } catch(e) {}
-}
+async function markRead(id) { try { await supabase.from('private_messages').update({ is_read: true }).eq('id', id); } catch(e) {} }
+async function markAllRead(senderId) { try { await supabase.from('private_messages').update({ is_read: true }).eq('receiver_unique_id', currentUniqueId).eq('sender_unique_id', senderId).eq('is_read', false); } catch(e) {} }
 
 /* ══ ENVOI UNIFIÉ ══ */
 function sendMessage() {
@@ -1155,9 +1375,7 @@ document.getElementById('customBgInput').addEventListener('change', function(e) 
 })();
 
 /* ══ UTILS ══ */
-function esc(s) {
-    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmtTime(iso) {
     if (!iso) return '';
     var d = new Date(iso), now = new Date();
