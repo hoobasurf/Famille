@@ -163,39 +163,40 @@
 ```
     /* ══ MODAL ARCADE PLEIN ÉCRAN ══ */
     #arcadeModal {
-        position: fixed;
-        inset: 0;
-        z-index: 10000;
-        background: #0a0a0f;
-        display: none;
-        overflow-y: auto;
-    }
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: #0a0a0f;
+    display: none;
+    overflow-y: auto;
+    position: relative;
+}
     #arcadeModal.open {
         display: block;
     }
     #arcadeModalClose {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 10001;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: rgba(255, 107, 157, 0.2);
-        border: 2px solid rgba(255, 107, 157, 0.6);
-        color: white;
-        font-size: 24px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s;
-        backdrop-filter: blur(10px);
-    }
-    #arcadeModalClose:hover {
-        background: rgba(255, 107, 157, 0.4);
-        transform: scale(1.1);
-    }
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10001;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 107, 157, 0.2);
+    border: 2px solid rgba(255, 107, 157, 0.6);
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    backdrop-filter: blur(10px);
+}
+#arcadeModalClose:hover {
+    background: rgba(255, 107, 157, 0.4);
+    transform: scale(1.1);
+}
     
     .users-panel::-webkit-scrollbar, .messages-area::-webkit-scrollbar { width:7px; }
     .users-panel::-webkit-scrollbar-track, .messages-area::-webkit-scrollbar-track { background:rgba(255,255,255,.05); border-radius:10px; }
