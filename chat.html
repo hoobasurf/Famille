@@ -174,282 +174,41 @@
     .pm-toast-name { font-weight:700; color:#ff6b9d; margin-bottom:6px; }
     .pm-toast-text { opacity:.8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-    /* ══════════════════════════════════════════
-       VISIO JITSI - MODAL PRINCIPAL
-    ══════════════════════════════════════════ */
+    /* ══ VISIO WebRTC ══ */
+    #visioOverlay { position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:9000;display:none; }
+    #visioOverlay.open { display:block; }
+    #visioOverlay.pip-mode { background:transparent;backdrop-filter:none;pointer-events:none; }
 
-    /* Overlay sombre derrière le modal (s'efface en mode PiP) */
-    #visioOverlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,.7);
-        backdrop-filter: blur(8px);
-        z-index: 9000;
-        display: none;
-        align-items: center;
-        justify-content: center;
-    }
-    #visioOverlay.open       { display: flex; }
-    #visioOverlay.pip-mode   { background: transparent; backdrop-filter: none; pointer-events: none; }
+    #visioContainer { position:fixed;z-index:9999;border-radius:20px;overflow:hidden;box-shadow:0 25px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.12);display:none;flex-direction:column;background:#0d0d1a;width:88vw;max-width:1100px;height:82vh;top:50%;left:50%;transform:translate(-50%,-50%); }
+    #visioContainer.open       { display:flex; }
+    #visioContainer.pip        { width:320px;height:240px;top:auto;left:auto;bottom:22px;right:22px;transform:none;border-radius:16px;cursor:move;box-shadow:0 12px 50px rgba(0,0,0,.9),0 0 0 2px rgba(255,107,157,.5); }
+    #visioContainer.fullscreen { width:100vw;height:100vh;top:0;left:0;transform:none;border-radius:0;max-width:none; }
 
-    /* Le container draggable du modal */
-    #visioContainer {
-        position: fixed;
-        z-index: 9999;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 25px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.15);
-        display: none;
-        flex-direction: column;
-        background: #0d0d1a;
+    #visioContainer.pip #visioRoomInfo            { display:none; }
+    #visioContainer.pip .vt-btn span:last-child   { display:none; }
+    #visioContainer.pip .vt-btn                   { padding:5px 9px;font-size:15px; }
+    #visioContainer.pip #visioTitleBar            { padding:6px 10px; }
+    #visioContainer.pip #visioToolbar             { padding:6px 10px;gap:6px; }
 
-        /* Taille plein modal par défaut (centré) */
-        width: 88vw;
-        max-width: 1100px;
-        height: 82vh;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        transition: box-shadow .3s;
-    }
-    #visioContainer.open { display: flex; }
+    #visioTitleBar { display:flex;align-items:center;gap:10px;padding:11px 16px;background:linear-gradient(90deg,rgba(255,107,157,.1),rgba(192,111,255,.1));border-bottom:1px solid rgba(255,255,255,.07);user-select:none;flex-shrink:0; }
+    .vtb-icon  { font-size:18px; }
+    .vtb-title { flex:1;color:white;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .vtb-win-btns { display:flex;gap:6px; }
+    .vtb-win-btn  { width:14px;height:14px;border-radius:50%;border:none;cursor:pointer;transition:opacity .2s,transform .2s;display:flex;align-items:center;justify-content:center;color:transparent;font-size:8px;font-weight:900; }
+    .vtb-win-btn:hover { opacity:.8;transform:scale(1.2);color:rgba(0,0,0,.5); }
+    .vtb-win-btn.close { background:#ff5f57; }
+    .vtb-win-btn.mini  { background:#febc2e; }
+    .vtb-win-btn.full  { background:#28c840; }
 
-    /* Mode Picture-in-Picture : petit coin bas-droite */
-    #visioContainer.pip {
-        width: 360px;
-        height: 260px;
-        top: auto;
-        left: auto;
-        bottom: 24px;
-        right: 24px;
-        transform: none;
-        border-radius: 16px;
-        cursor: move;
-        box-shadow: 0 12px 50px rgba(0,0,0,.8), 0 0 0 2px rgba(255,107,157,.4);
-    }
-    #visioContainer.pip #visioIframeWrap { flex: 1; }
-    #visioContainer.pip #visioToolbar    { padding: 8px 12px; }
-    #visioContainer.pip .vt-label       { display: none; }
-    #visioContainer.pip .vt-btn span    { display: none; }
-    #visioContainer.pip .vt-btn         { padding: 6px 10px; font-size: 16px; }
-    #visioContainer.pip #visioTitleBar  { padding: 8px 12px; }
-    #visioContainer.pip #visioRoomInfo  { display: none; }
+    #visioIframeWrap { flex:1;position:relative;background:#000;overflow:hidden; }
 
-    /* Mode plein écran */
-    #visioContainer.fullscreen {
-        width: 100vw;
-        height: 100vh;
-        top: 0; left: 0;
-        transform: none;
-        border-radius: 0;
-        max-width: none;
-    }
-
-    /* Barre de titre du modal visio */
-    #visioTitleBar {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 14px 20px;
-        background: linear-gradient(90deg, rgba(255,107,157,.15), rgba(192,111,255,.15));
-        border-bottom: 1px solid rgba(255,255,255,.1);
-        user-select: none;
-        flex-shrink: 0;
-    }
-    #visioTitleBar .vtb-icon { font-size: 22px; }
-    #visioTitleBar .vtb-title {
-        flex: 1;
-        color: white;
-        font-weight: 700;
-        font-size: 16px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    #visioRoomInfo {
-        font-size: 12px;
-        color: rgba(255,255,255,.5);
-        font-weight: 400;
-        margin-top: 2px;
-    }
-
-    /* Boutons de fenêtre (macOS style) */
-    .vtb-win-btns { display:flex; gap:8px; }
-    .vtb-win-btn  {
-        width: 16px; height: 16px;
-        border-radius: 50%;
-        border: none;
-        cursor: pointer;
-        transition: opacity .2s, transform .2s;
-        font-size: 10px;
-        display: flex; align-items: center; justify-content: center;
-        color: transparent;
-        font-weight: 900;
-    }
-    .vtb-win-btn:hover { opacity: .85; transform: scale(1.15); color: rgba(0,0,0,.6); }
-    .vtb-win-btn.close  { background: #ff5f57; }
-    .vtb-win-btn.mini   { background: #febc2e; }
-    .vtb-win-btn.full   { background: #28c840; }
-
-    /* Zone de l'iframe Jitsi */
-    #visioIframeWrap {
-        flex: 1;
-        position: relative;
-        background: #000;
-    }
-    #visioIframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-        display: block;
-    }
-
-    /* Bannière de chargement */
-    #visioLoading {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 20px;
-        background: #0d0d1a;
-        color: white;
-        z-index: 2;
-        transition: opacity .5s;
-    }
-    #visioLoading.hide { opacity: 0; pointer-events: none; }
-    .vl-spinner {
-        width: 56px; height: 56px;
-        border: 4px solid rgba(255,255,255,.1);
-        border-top-color: #ff6b9d;
-        border-radius: 50%;
-        animation: spin .9s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .vl-text { font-size: 15px; color: rgba(255,255,255,.7); }
-    .vl-room {
-        font-size: 13px;
-        color: rgba(255,107,157,.8);
-        font-weight: 600;
-        letter-spacing: 1px;
-        background: rgba(255,107,157,.1);
-        padding: 6px 14px;
-        border-radius: 20px;
-        border: 1px solid rgba(255,107,157,.3);
-    }
-
-    /* Barre d'outils du bas */
-    #visioToolbar {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 12px 20px;
-        background: rgba(0,0,0,.5);
-        border-top: 1px solid rgba(255,255,255,.08);
-        flex-wrap: wrap;
-        flex-shrink: 0;
-    }
-    .vt-btn {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        background: rgba(255,255,255,.08);
-        border: 1px solid rgba(255,255,255,.15);
-        border-radius: 10px;
-        color: white;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all .25s;
-        white-space: nowrap;
-    }
-    .vt-btn:hover { background: rgba(255,255,255,.15); transform: translateY(-1px); }
-    .vt-btn.active {
-        background: linear-gradient(135deg, rgba(255,107,157,.3), rgba(192,111,255,.3));
-        border-color: rgba(255,107,157,.5);
-    }
-    .vt-btn.danger {
-        background: rgba(239,68,68,.15);
-        border-color: rgba(239,68,68,.3);
-    }
-    .vt-btn.danger:hover {
-        background: rgba(239,68,68,.3);
-        box-shadow: 0 4px 15px rgba(239,68,68,.3);
-    }
-    .vt-btn .vt-icon { font-size: 18px; }
-    .vt-label { flex: 1; }
-
-    /* Lien d'invitation */
-    #visioInviteBox {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        min-width: 0;
-    }
-    #visioInviteInput {
-        flex: 1;
-        padding: 8px 12px;
-        background: rgba(255,255,255,.08);
-        border: 1px solid rgba(255,255,255,.15);
-        border-radius: 8px;
-        color: white;
-        font-size: 12px;
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    #visioInviteInput:focus { outline: none; border-color: rgba(255,107,157,.5); }
-    #visioCopyBtn {
-        padding: 8px 14px;
-        background: linear-gradient(135deg,#ff6b9d,#c06fff);
-        border: none;
-        border-radius: 8px;
-        color: white;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: all .25s;
-    }
-    #visioCopyBtn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(192,111,255,.4); }
-    #visioCopyBtn.copied {
-        background: linear-gradient(135deg,#43e97b,#38f9d7);
-    }
-
-    /* Toast copié */
-    .copy-toast {
-        position: fixed;
-        bottom: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(67,233,123,.9);
-        color: white;
-        font-weight: 700;
-        padding: 10px 24px;
-        border-radius: 30px;
-        font-size: 14px;
-        z-index: 99999;
-        pointer-events: none;
-        animation: toastPop .3s ease;
-    }
-    @keyframes toastPop { from{opacity:0;transform:translateX(-50%) translateY(10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
-
-    /* Drag handle visuel en mode PiP */
-    #visioContainer.pip::before {
-        content: '⠿';
-        position: absolute;
-        top: 6px;
-        left: 50%;
-        transform: translateX(-50%);
-        color: rgba(255,255,255,.3);
-        font-size: 14px;
-        letter-spacing: 2px;
-        pointer-events: none;
-        z-index: 10;
-    }
+    #visioToolbar { display:flex;align-items:center;gap:8px;padding:9px 14px;background:rgba(0,0,0,.65);border-top:1px solid rgba(255,255,255,.06);flex-wrap:wrap;flex-shrink:0; }
+    .vt-btn { display:flex;align-items:center;gap:5px;padding:7px 13px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);border-radius:9px;color:white;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap; }
+    .vt-btn:hover  { background:rgba(255,255,255,.16);transform:translateY(-1px); }
+    .vt-btn.active { background:linear-gradient(135deg,rgba(255,107,157,.3),rgba(192,111,255,.3));border-color:rgba(255,107,157,.5); }
+    .vt-btn.danger { background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3); }
+    .vt-btn.danger:hover { background:rgba(239,68,68,.3); }
+    .vt-icon { font-size:16px; }
 
     /* Scrollbars */
     .users-panel::-webkit-scrollbar, .messages-area::-webkit-scrollbar { width:7px; }
@@ -562,73 +321,29 @@
 
 </div>
 
-<!-- ══════════════════════════════════════════
-     VISIO JITSI MEET - MODAL DRAGGABLE
-══════════════════════════════════════════ -->
-
-<!-- Overlay (fond sombre) -->
+<!-- ══════════════════════════════
+     VISIO WebRTC — MODAL DRAGGABLE
+══════════════════════════════ -->
 
 <div id="visioOverlay"></div>
 
-<!-- Container principal de la visio -->
-
 <div id="visioContainer">
-
-```
-<!-- Barre de titre -->
-<div id="visioTitleBar" id="visioDragHandle">
-    <span class="vtb-icon">📹</span>
-    <div style="flex:1;min-width:0;">
-        <div class="vtb-title" id="visioTitleText">Visio en cours</div>
-        <div id="visioRoomInfo">Salle : chargement...</div>
-    </div>
-    <!-- Boutons style macOS -->
-    <div class="vtb-win-btns">
-        <button class="vtb-win-btn close"  id="visioCloseBtn"  title="Fermer">✕</button>
-        <button class="vtb-win-btn mini"   id="visioPipBtn"    title="Réduire (PiP)">−</button>
-        <button class="vtb-win-btn full"   id="visioFullBtn"   title="Plein écran">+</button>
-    </div>
-</div>
-
-<!-- Zone Jitsi -->
-<div id="visioIframeWrap">
-    <!-- Ecran de chargement -->
-    <div id="visioLoading">
-        <div class="vl-spinner"></div>
-        <div class="vl-text">Connexion à la salle...</div>
-        <div class="vl-room" id="visioLoadingRoom">—</div>
-        <div style="color:rgba(255,255,255,.4);font-size:12px;text-align:center;max-width:260px;line-height:1.8;">
-            Jitsi Meet s'ouvre directement ici.<br>Aucun lien externe, aucune redirection.
+    <!-- Barre de titre fine -->
+    <div id="visioTitleBar">
+        <span class="vtb-icon">📹</span>
+        <div style="flex:1;min-width:0;">
+            <div class="vtb-title" id="visioTitleText">Visio</div>
+            <div id="visioRoomInfo" style="font-size:12px;color:rgba(255,255,255,.4);"></div>
+        </div>
+        <div class="vtb-win-btns">
+            <button class="vtb-win-btn close" id="visioCloseBtn" title="Fermer">✕</button>
+            <button class="vtb-win-btn mini"  id="visioPipBtn"   title="Réduire">−</button>
+            <button class="vtb-win-btn full"  id="visioFullBtn"  title="Plein écran">+</button>
         </div>
     </div>
-    <!-- L'iframe Jitsi sera injectée ici -->
-</div>
-
-<!-- Barre d'outils -->
-<div id="visioToolbar">
-    <!-- Lien d'invitation -->
-    <div id="visioInviteBox">
-        <input id="visioInviteInput" readonly placeholder="Lien d'invitation..." />
-        <button id="visioCopyBtn">📋 Copier</button>
-    </div>
-    <!-- Bouton PiP -->
-    <button class="vt-btn" id="visioToolPip">
-        <span class="vt-icon">📌</span>
-        <span>Réduire</span>
-    </button>
-    <!-- Bouton plein écran -->
-    <button class="vt-btn" id="visioToolFull">
-        <span class="vt-icon">⛶</span>
-        <span>Plein écran</span>
-    </button>
-    <!-- Raccrocher -->
-    <button class="vt-btn danger" id="visioToolHangup">
-        <span class="vt-icon">📞</span>
-        <span>Raccrocher</span>
-    </button>
-</div>
-```
-
+    <!-- Les vidéos et boutons sont injectés dynamiquement ici -->
+    <div id="visioIframeWrap"></div>
+    <div id="visioToolbar"></div>
 </div>
 
 <audio id="notifSound" preload="auto">
@@ -674,195 +389,357 @@ var savedPhotoUrl       = localStorage.getItem('userPhotoUrl') || localStorage.g
 })();
 
 /* ══════════════════════════════════════════
-   SYSTÈME VISIO JITSI MEET
-   - Salle unique par conversation (prénom1_prénom2)
-   - 100% dans la page, aucun lien externe
-   - Draggable en mode PiP
-   - Plein écran, réductible
-   - Gratuit, illimité, multi-participants
+   VISIO — WebRTC pur via Supabase
+   Tu cliques → ta caméra s'ouvre direct.
+   Zéro lib tierce, zéro écran parasite.
+   Signalisation : table Supabase "visio_signals"
 ══════════════════════════════════════════ */
-
-var visioState = {
-    open:       false,
-    pip:        false,
-    fullscreen: false,
-    roomName:   null,
-    dragging:   false,
-    dragOffX:   0,
-    dragOffY:   0
-};
 
 var elOverlay   = document.getElementById('visioOverlay');
 var elContainer = document.getElementById('visioContainer');
 var elIframeWrap= document.getElementById('visioIframeWrap');
-var elLoading   = document.getElementById('visioLoading');
-var elTitleBar  = document.getElementById('visioTitleBar');
 var elTitleText = document.getElementById('visioTitleText');
 var elRoomInfo  = document.getElementById('visioRoomInfo');
-var elLoadRoom  = document.getElementById('visioLoadingRoom');
-var elInvite    = document.getElementById('visioInviteInput');
-var elCopyBtn   = document.getElementById('visioCopyBtn');
 
-/* Génère un nom de salle stable à partir de la conversation */
-function buildRoomName(chatType, otherPrenom) {
-    var prefix = 'BubbleChat';
-    if (chatType === 'public') return prefix + 'General';
-    var names = [currentUserPrenom.toLowerCase(), (otherPrenom || 'user').toLowerCase()].sort();
-    return prefix + names[0].replace(/[^a-z0-9]/g,'') + names[1].replace(/[^a-z0-9]/g,'');
+/* éléments vidéo créés dynamiquement */
+var vidLocal  = null;
+var vidRemote = null;
+
+var visioState = {
+    open: false, pip: false, fullscreen: false,
+    dragging: false, dragOffX: 0, dragOffY: 0,
+    roomId: null, isCaller: false,
+    micOn: true, camOn: true
+};
+
+var pc         = null;   // RTCPeerConnection
+var localStream= null;   // MediaStream local
+var sigChannel = null;   // Supabase realtime channel
+var sigPollInt = null;   // fallback polling
+
+var ICE_SERVERS = { iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' }
+]};
+
+/* ── Génère un roomId stable par conversation ── */
+function buildRoomId(chatType, otherUniqueId) {
+    if (chatType === 'public') return 'public_general';
+    var ids = [currentUniqueId, otherUniqueId || ''].sort();
+    return 'priv_' + ids[0].replace(/[^a-z0-9_]/gi,'') + '_' + ids[1].replace(/[^a-z0-9_]/gi,'');
 }
 
-var jitsiApi = null; // instance Jitsi External API
+/* ── Crée les éléments vidéo dans le wrapper ── */
+function buildVideoElements() {
+    elIframeWrap.innerHTML = '';
 
-/* Charge le script Jitsi External API si pas encore chargé */
-function loadJitsiScript(cb) {
-    if (window.JitsiMeetExternalAPI) { cb(); return; }
-    var s = document.createElement('script');
-    s.src = 'https://meet.jit.si/external_api.js';
-    s.onload  = cb;
-    s.onerror = function() { console.error('Impossible de charger Jitsi'); };
-    document.head.appendChild(s);
+    /* Vidéo distante — plein fond */
+    vidRemote = document.createElement('video');
+    vidRemote.autoplay = true;
+    vidRemote.playsInline = true;
+    vidRemote.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;';
+
+    /* Vidéo locale — petit coin */
+    vidLocal = document.createElement('video');
+    vidLocal.autoplay = true;
+    vidLocal.playsInline = true;
+    vidLocal.muted = true;
+    vidLocal.style.cssText = 'position:absolute;bottom:14px;right:14px;width:28%;max-width:200px;border-radius:12px;border:2px solid rgba(255,255,255,.3);object-fit:cover;aspect-ratio:4/3;z-index:2;background:#111;box-shadow:0 4px 20px rgba(0,0,0,.5);';
+
+    /* Overlay "En attente" */
+    var waiting = document.createElement('div');
+    waiting.id = 'visioWaiting';
+    waiting.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(0,0,0,.7);color:white;font-size:16px;z-index:3;transition:opacity .5s;';
+    waiting.innerHTML = '<div style="font-size:52px;">📹</div><div id="visioWaitingText" style="font-weight:600;">Caméra en cours...</div>';
+
+    elIframeWrap.appendChild(vidRemote);
+    elIframeWrap.appendChild(vidLocal);
+    elIframeWrap.appendChild(waiting);
 }
 
-/* Ouvre la visio — entrée directe, zéro écran intermédiaire */
-function openVisio(chatType, otherPrenom) {
-    var roomName = buildRoomName(chatType, otherPrenom);
-    visioState.roomName = roomName;
-    visioState.open = true;
-    visioState.pip  = false;
+/* ── Barre de contrôles visio ── */
+function buildToolbar() {
+    var tb = document.getElementById('visioToolbar');
+    tb.innerHTML = '';
+    tb.style.display = 'flex';
+
+    /* Micro */
+    var btnMic = document.createElement('button');
+    btnMic.className = 'vt-btn active';
+    btnMic.id = 'visioMicBtn';
+    btnMic.innerHTML = '<span class="vt-icon">🎤</span><span>Micro</span>';
+    btnMic.onclick = function() {
+        visioState.micOn = !visioState.micOn;
+        if (localStream) localStream.getAudioTracks().forEach(function(t){ t.enabled = visioState.micOn; });
+        btnMic.classList.toggle('active', visioState.micOn);
+        btnMic.querySelector('.vt-icon').textContent = visioState.micOn ? '🎤' : '🔇';
+    };
+
+    /* Caméra */
+    var btnCam = document.createElement('button');
+    btnCam.className = 'vt-btn active';
+    btnCam.id = 'visioCamBtn';
+    btnCam.innerHTML = '<span class="vt-icon">📹</span><span>Caméra</span>';
+    btnCam.onclick = function() {
+        visioState.camOn = !visioState.camOn;
+        if (localStream) localStream.getVideoTracks().forEach(function(t){ t.enabled = visioState.camOn; });
+        btnCam.classList.toggle('active', visioState.camOn);
+        btnCam.querySelector('.vt-icon').textContent = visioState.camOn ? '📹' : '🚫';
+    };
+
+    /* PiP */
+    var btnPip = document.createElement('button');
+    btnPip.className = 'vt-btn';
+    btnPip.innerHTML = '<span class="vt-icon">📌</span><span>Réduire</span>';
+    btnPip.onclick = togglePip;
+
+    /* Plein écran */
+    var btnFull = document.createElement('button');
+    btnFull.className = 'vt-btn';
+    btnFull.innerHTML = '<span class="vt-icon">⛶</span><span>Plein écran</span>';
+    btnFull.onclick = toggleFullscreen;
+
+    /* Raccrocher */
+    var btnHang = document.createElement('button');
+    btnHang.className = 'vt-btn danger';
+    btnHang.innerHTML = '<span class="vt-icon">📞</span><span>Raccrocher</span>';
+    btnHang.onclick = closeVisio;
+
+    [btnMic, btnCam, btnPip, btnFull, btnHang].forEach(function(b){ tb.appendChild(b); });
+}
+
+/* ── Envoie un signal via Supabase ── */
+async function sendSignal(roomId, type, payload) {
+    try {
+        await supabase.from('visio_signals').insert({
+            room_id:   roomId,
+            sender_id: currentUniqueId,
+            type:      type,
+            payload:   JSON.stringify(payload),
+            created_at: new Date().toISOString()
+        });
+    } catch(e) { console.log('signal err', e); }
+}
+
+/* ── Polling des signaux entrants ── */
+var lastSigTime = null;
+async function pollSignals(roomId) {
+    if (!visioState.open || visioState.roomId !== roomId) return;
+    try {
+        var q = supabase.from('visio_signals')
+            .select('*')
+            .eq('room_id', roomId)
+            .neq('sender_id', currentUniqueId)
+            .order('created_at', { ascending: true });
+        if (lastSigTime) q = q.gt('created_at', lastSigTime);
+        var res = await q;
+        if (res.error || !res.data || !res.data.length) return;
+        for (var i = 0; i < res.data.length; i++) {
+            var sig = res.data[i];
+            if (sig.created_at > (lastSigTime || '')) lastSigTime = sig.created_at;
+            await handleSignal(sig.type, JSON.parse(sig.payload || '{}'));
+        }
+    } catch(e) {}
+}
+
+/* ── Traite un signal reçu ── */
+async function handleSignal(type, payload) {
+    if (!pc && type !== 'offer' && type !== 'invite') return;
+
+    if (type === 'invite') {
+        /* Quelqu'un appelle — montre une notif toast avec bouton Rejoindre */
+        showVisioInvite(payload.fromName, payload.roomId);
+        return;
+    }
+
+    if (type === 'offer') {
+        if (!pc) await setupPC(visioState.roomId, false);
+        await pc.setRemoteDescription(new RTCSessionDescription(payload));
+        var answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        await sendSignal(visioState.roomId, 'answer', answer);
+        hideWaiting();
+        return;
+    }
+
+    if (type === 'answer') {
+        await pc.setRemoteDescription(new RTCSessionDescription(payload));
+        hideWaiting();
+        return;
+    }
+
+    if (type === 'ice') {
+        try { await pc.addIceCandidate(new RTCIceCandidate(payload)); } catch(e) {}
+        return;
+    }
+
+    if (type === 'bye') {
+        closeVisio();
+        return;
+    }
+}
+
+/* ── Crée et configure le RTCPeerConnection ── */
+async function setupPC(roomId, isCaller) {
+    pc = new RTCPeerConnection(ICE_SERVERS);
+
+    /* Ajoute les tracks locaux */
+    if (localStream) {
+        localStream.getTracks().forEach(function(t){ pc.addTrack(t, localStream); });
+    }
+
+    /* Reçoit le stream distant → l'affiche */
+    pc.ontrack = function(e) {
+        if (vidRemote && e.streams && e.streams[0]) {
+            vidRemote.srcObject = e.streams[0];
+            hideWaiting();
+        }
+    };
+
+    /* Envoie les ICE candidates */
+    pc.onicecandidate = function(e) {
+        if (e.candidate) sendSignal(roomId, 'ice', e.candidate.toJSON());
+    };
+
+    pc.onconnectionstatechange = function() {
+        if (pc && (pc.connectionState === 'disconnected' || pc.connectionState === 'failed')) {
+            setWaitingText('Connexion perdue…');
+        }
+    };
+
+    if (isCaller) {
+        var offer = await pc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true });
+        await pc.setLocalDescription(offer);
+        await sendSignal(roomId, 'offer', offer);
+    }
+}
+
+function hideWaiting() {
+    var w = document.getElementById('visioWaiting');
+    if (w) { w.style.opacity = '0'; setTimeout(function(){ w.style.display='none'; }, 500); }
+}
+function setWaitingText(txt) {
+    var el = document.getElementById('visioWaitingText');
+    if (el) el.textContent = txt;
+    var w = document.getElementById('visioWaiting');
+    if (w) { w.style.display='flex'; w.style.opacity='1'; }
+}
+
+/* ── Notif invite visio entrant ── */
+function showVisioInvite(fromName, roomId) {
+    var existing = document.getElementById('visioInviteToast');
+    if (existing) existing.remove();
+
+    var toast = document.createElement('div');
+    toast.id = 'visioInviteToast';
+    toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:9999;background:rgba(10,3,24,.97);border:2px solid rgba(255,107,157,.7);border-radius:18px;padding:20px 28px;color:white;text-align:center;box-shadow:0 15px 50px rgba(0,0,0,.8);animation:toastIn .4s cubic-bezier(.34,1.56,.64,1);';
+    toast.innerHTML = '<div style="font-size:28px;margin-bottom:8px;">📹</div>'
+        + '<div style="font-weight:700;font-size:16px;margin-bottom:4px;">' + esc(fromName) + ' t\'appelle</div>'
+        + '<div style="display:flex;gap:12px;margin-top:14px;justify-content:center;">'
+        + '<button id="visioAcceptBtn" style="padding:10px 24px;background:linear-gradient(135deg,#43e97b,#38f9d7);border:none;border-radius:12px;color:white;font-weight:700;font-size:15px;cursor:pointer;">✅ Rejoindre</button>'
+        + '<button id="visioDenyBtn"  style="padding:10px 24px;background:rgba(239,68,68,.3);border:1px solid rgba(239,68,68,.5);border-radius:12px;color:white;font-weight:700;font-size:15px;cursor:pointer;">❌ Refuser</button>'
+        + '</div>';
+    document.body.appendChild(toast);
+
+    document.getElementById('visioAcceptBtn').onclick = function() {
+        toast.remove();
+        visioState.roomId = roomId;
+        lastSigTime = null;
+        openVisioRoom(roomId, fromName, false);
+    };
+    document.getElementById('visioDenyBtn').onclick = function() { toast.remove(); };
+    setTimeout(function() { if (toast.parentNode) toast.remove(); }, 30000);
+}
+
+/* ── Ouvre la visio (caméra + modal) ── */
+async function openVisio(chatType, otherUser) {
+    var roomId = buildRoomId(chatType, otherUser ? otherUser.unique_id : null);
+    var label  = chatType === 'public' ? 'Chat général' : (otherUser ? otherUser.prenom : 'Visio');
+    lastSigTime = null;
+
+    /* Envoie l'invitation si conv privée */
+    if (chatType === 'private' && otherUser) {
+        await sendSignal(roomId, 'invite', { fromName: currentUserPrenom, roomId: roomId });
+    }
+
+    openVisioRoom(roomId, label, true);
+}
+
+async function openVisioRoom(roomId, label, isCaller) {
+    visioState.open     = true;
+    visioState.pip      = false;
     visioState.fullscreen = false;
+    visioState.roomId   = roomId;
+    visioState.isCaller = isCaller;
+    visioState.micOn    = true;
+    visioState.camOn    = true;
 
-    // Affiche le container
+    /* Affiche le container */
     elOverlay.classList.add('open');
     elContainer.classList.add('open');
-    elContainer.classList.remove('pip', 'fullscreen');
+    elContainer.classList.remove('pip','fullscreen');
+    resetContainerPos();
 
-    // Reset position centrée
-    elContainer.style.bottom = '';
-    elContainer.style.right  = '';
-    elContainer.style.top    = '50%';
-    elContainer.style.left   = '50%';
-    elContainer.style.transform = 'translate(-50%, -50%)';
-    elContainer.style.width  = '';
-    elContainer.style.height = '';
+    elTitleText.textContent = label;
+    elRoomInfo.textContent  = isCaller ? 'Appel en cours...' : 'Connexion...';
 
-    // Titre
-    var titleLabel = chatType === 'public' ? 'Visio — Chat général' : 'Visio avec ' + (otherPrenom || 'utilisateur');
-    elTitleText.textContent = titleLabel;
-    elRoomInfo.textContent  = 'Salle : ' + roomName;
-    elLoadRoom.textContent  = roomName;
+    /* Construit l'UI vidéo */
+    buildVideoElements();
+    buildToolbar();
 
-    // Lien d'invitation
-    var inviteUrl = 'https://meet.jit.si/' + roomName;
-    elInvite.value = inviteUrl;
+    /* Démarre la caméra */
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        vidLocal.srcObject = localStream;
+        setWaitingText(isCaller ? 'En attente de l\'autre personne…' : 'Connexion en cours…');
+    } catch(e) {
+        setWaitingText('Caméra indisponible');
+        return;
+    }
 
-    // Loader visible
-    elLoading.classList.remove('hide');
+    /* Lance WebRTC */
+    await setupPC(roomId, isCaller);
 
-    // Nettoie l'ancienne instance
-    if (jitsiApi) { try { jitsiApi.dispose(); } catch(e){} jitsiApi = null; }
-    elIframeWrap.querySelectorAll('iframe, div[id^="jitsiConference"]').forEach(function(el){ el.remove(); });
-
-    // Lance Jitsi via External API (entrée instantanée)
-    loadJitsiScript(function() {
-        try {
-            jitsiApi = new window.JitsiMeetExternalAPI('meet.jit.si', {
-                roomName: roomName,
-                parentNode: elIframeWrap,
-                width: '100%',
-                height: '100%',
-                userInfo: {
-                    displayName: currentUserPrenom || 'Invité'
-                },
-                configOverwrite: {
-                    prejoinPageEnabled:        false,   // ← PAS d'écran de prénom
-                    prejoinConfig:             { enabled: false },
-                    startWithAudioMuted:       false,
-                    startWithVideoMuted:       false,
-                    disableDeepLinking:        true,
-                    disableInviteFunctions:    false,
-                    enableWelcomePage:         false,
-                    disableThirdPartyRequests: false,
-                    defaultLanguage:           'fr',
-                    toolbarButtons: [
-                        'microphone','camera','desktop',
-                        'fullscreen','hangup','chat',
-                        'raisehand','tileview','videoquality'
-                    ]
-                },
-                interfaceConfigOverwrite: {
-                    SHOW_JITSI_WATERMARK:          false,
-                    SHOW_WATERMARK_FOR_GUESTS:     false,
-                    SHOW_BRAND_WATERMARK:          false,
-                    SHOW_CHROME_EXTENSION_BANNER:  false,
-                    MOBILE_APP_PROMO:              false,
-                    HIDE_INVITE_MORE_HEADER:       false,
-                    TOOLBAR_BUTTONS: [
-                        'microphone','camera','desktop',
-                        'fullscreen','hangup','chat',
-                        'raisehand','tileview','videoquality'
-                    ]
-                }
-            });
-
-            // Masque le loader dès que la conférence est prête
-            jitsiApi.addEventListener('videoConferenceJoined', function() {
-                elLoading.classList.add('hide');
-            });
-            // Fallback : masque après 4s quoi qu'il arrive
-            setTimeout(function() { elLoading.classList.add('hide'); }, 4000);
-
-            // Si l'utilisateur raccroche depuis Jitsi → ferme le modal
-            jitsiApi.addEventListener('readyToClose', function() { closeVisio(); });
-
-        } catch(err) {
-            console.error('Jitsi API error:', err);
-            elLoading.classList.add('hide');
-        }
-    });
+    /* Démarre le polling des signaux */
+    if (sigPollInt) clearInterval(sigPollInt);
+    sigPollInt = setInterval(function(){ pollSignals(roomId); }, 1500);
 
     document.body.style.overflow = 'hidden';
 }
 
-/* Ferme la visio et coupe caméra/micro */
+/* ── Ferme et nettoie tout ── */
 function closeVisio() {
     visioState.open = false;
     visioState.pip  = false;
     visioState.fullscreen = false;
 
-    elOverlay.classList.remove('open', 'pip-mode');
-    elContainer.classList.remove('open', 'pip', 'fullscreen');
+    if (visioState.roomId) sendSignal(visioState.roomId, 'bye', {});
 
-    // Dispose l'API Jitsi → coupe proprement caméra et micro
-    if (jitsiApi) {
-        try { jitsiApi.dispose(); } catch(e) {}
-        jitsiApi = null;
-    }
-    // Nettoie tout résidu DOM
-    elIframeWrap.querySelectorAll('iframe, div').forEach(function(el) {
-        if (el.id !== 'visioLoading') el.remove();
-    });
-    elLoading.classList.remove('hide');
+    if (sigPollInt) { clearInterval(sigPollInt); sigPollInt = null; }
 
+    if (pc)          { try { pc.close(); }          catch(e){} pc = null; }
+    if (localStream) { localStream.getTracks().forEach(function(t){ t.stop(); }); localStream = null; }
+
+    elOverlay.classList.remove('open','pip-mode');
+    elContainer.classList.remove('open','pip','fullscreen');
+    elIframeWrap.innerHTML = '';
+    document.getElementById('visioToolbar').innerHTML = '';
     document.body.style.overflow = '';
     resetContainerPos();
 }
 
-/* Mode Picture-in-Picture */
+/* ── PiP & Plein écran ── */
 function togglePip() {
     if (!visioState.open) return;
     visioState.pip = !visioState.pip;
-
     if (visioState.pip) {
         visioState.fullscreen = false;
         elContainer.classList.add('pip');
         elContainer.classList.remove('fullscreen');
         elOverlay.classList.add('pip-mode');
-        // Position PiP fixe (CSS gère bottom/right)
         elContainer.style.transform = 'none';
-        elContainer.style.top   = 'auto';
-        elContainer.style.left  = 'auto';
-        elContainer.style.width  = '';
-        elContainer.style.height = '';
+        elContainer.style.top = 'auto'; elContainer.style.left = 'auto';
+        elContainer.style.width = ''; elContainer.style.height = '';
     } else {
         elContainer.classList.remove('pip');
         elOverlay.classList.remove('pip-mode');
@@ -871,21 +748,17 @@ function togglePip() {
     document.body.style.overflow = visioState.pip ? '' : 'hidden';
 }
 
-/* Mode plein écran */
 function toggleFullscreen() {
     if (!visioState.open) return;
     visioState.fullscreen = !visioState.fullscreen;
-
     if (visioState.fullscreen) {
         visioState.pip = false;
         elContainer.classList.add('fullscreen');
         elContainer.classList.remove('pip');
         elOverlay.classList.remove('pip-mode');
         elContainer.style.transform = 'none';
-        elContainer.style.top    = '0';
-        elContainer.style.left   = '0';
-        elContainer.style.width  = '100vw';
-        elContainer.style.height = '100vh';
+        elContainer.style.top = '0'; elContainer.style.left = '0';
+        elContainer.style.width = '100vw'; elContainer.style.height = '100vh';
         document.body.style.overflow = 'hidden';
     } else {
         elContainer.classList.remove('fullscreen');
@@ -895,58 +768,13 @@ function toggleFullscreen() {
 }
 
 function resetContainerPos() {
-    elContainer.style.bottom = '';
-    elContainer.style.right  = '';
-    elContainer.style.top    = '50%';
-    elContainer.style.left   = '50%';
+    elContainer.style.bottom = ''; elContainer.style.right = '';
+    elContainer.style.top = '50%'; elContainer.style.left = '50%';
     elContainer.style.transform = 'translate(-50%, -50%)';
-    elContainer.style.width  = '';
-    elContainer.style.height = '';
+    elContainer.style.width = ''; elContainer.style.height = '';
 }
 
-/* Copier le lien d'invitation */
-elCopyBtn.addEventListener('click', function() {
-    navigator.clipboard.writeText(elInvite.value).then(function() {
-        elCopyBtn.classList.add('copied');
-        elCopyBtn.textContent = '✓ Copié !';
-        var toast = document.createElement('div');
-        toast.className = 'copy-toast';
-        toast.textContent = '✅ Lien copié — partagez-le pour inviter !';
-        document.body.appendChild(toast);
-        setTimeout(function() { toast.remove(); }, 2500);
-        setTimeout(function() {
-            elCopyBtn.classList.remove('copied');
-            elCopyBtn.textContent = '📋 Copier';
-        }, 2500);
-    }).catch(function() {
-        elInvite.select();
-        document.execCommand('copy');
-    });
-});
-
-/* Boutons de la barre de titre */
-document.getElementById('visioCloseBtn').addEventListener('click', closeVisio);
-document.getElementById('visioPipBtn').addEventListener('click', togglePip);
-document.getElementById('visioFullBtn').addEventListener('click', toggleFullscreen);
-
-/* Boutons de la toolbar */
-document.getElementById('visioToolPip').addEventListener('click', togglePip);
-document.getElementById('visioToolFull').addEventListener('click', toggleFullscreen);
-document.getElementById('visioToolHangup').addEventListener('click', closeVisio);
-
-/* Bouton Visio dans le header du chat */
-document.getElementById('visioBtn').addEventListener('click', function() {
-    var chatType   = currentChatType;
-    var otherPrenom = (currentChatType === 'private' && currentChatUser) ? currentChatUser.prenom : null;
-    openVisio(chatType, otherPrenom);
-});
-
-/* Overlay click = ferme si non PiP */
-elOverlay.addEventListener('click', function(e) {
-    if (e.target === elOverlay && !visioState.pip) closeVisio();
-});
-
-/* ══ DRAG (mode PiP uniquement) ══ */
+/* ── Drag (PiP) ── */
 elContainer.addEventListener('mousedown', startDrag);
 elContainer.addEventListener('touchstart', startDrag, { passive: true });
 document.addEventListener('mousemove', onDrag);
@@ -956,42 +784,68 @@ document.addEventListener('touchend', stopDrag);
 
 function startDrag(e) {
     if (!visioState.pip) return;
-    // Ne pas déclencher si clic sur bouton
-    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.closest('button') || e.target.closest('input')) return;
+    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'VIDEO' || e.target.closest('button')) return;
     visioState.dragging = true;
     var rect = elContainer.getBoundingClientRect();
     var cx = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
     var cy = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
     visioState.dragOffX = cx - rect.left;
     visioState.dragOffY = cy - rect.top;
-    elContainer.style.cursor = 'grabbing';
 }
-
 function onDrag(e) {
     if (!visioState.dragging || !visioState.pip) return;
     if (e.type === 'touchmove') e.preventDefault();
     var cx = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
     var cy = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-    var x = cx - visioState.dragOffX;
-    var y = cy - visioState.dragOffY;
-    // Contraindre dans la fenêtre
-    var w = elContainer.offsetWidth;
-    var h = elContainer.offsetHeight;
-    x = Math.max(0, Math.min(window.innerWidth  - w, x));
-    y = Math.max(0, Math.min(window.innerHeight - h, y));
-    elContainer.style.left   = x + 'px';
-    elContainer.style.top    = y + 'px';
-    elContainer.style.right  = 'auto';
-    elContainer.style.bottom = 'auto';
+    var x = Math.max(0, Math.min(window.innerWidth  - elContainer.offsetWidth,  cx - visioState.dragOffX));
+    var y = Math.max(0, Math.min(window.innerHeight - elContainer.offsetHeight, cy - visioState.dragOffY));
+    elContainer.style.left = x+'px'; elContainer.style.top = y+'px';
+    elContainer.style.right = 'auto'; elContainer.style.bottom = 'auto';
     elContainer.style.transform = 'none';
 }
+function stopDrag() { visioState.dragging = false; }
 
-function stopDrag() {
-    visioState.dragging = false;
-    elContainer.style.cursor = '';
-}
+/* ── Bouton visio dans le header ── */
+document.getElementById('visioBtn').addEventListener('click', function() {
+    openVisio(currentChatType, currentChatType === 'private' ? currentChatUser : null);
+});
 
-/* Touche Echap = sortir plein écran ou fermer */
+/* ── Overlay click = ferme si non PiP ── */
+elOverlay.addEventListener('click', function(e) {
+    if (e.target === elOverlay && !visioState.pip) closeVisio();
+});
+
+/* ── Boutons titre ── */
+document.getElementById('visioCloseBtn').addEventListener('click', closeVisio);
+document.getElementById('visioPipBtn').addEventListener('click', togglePip);
+document.getElementById('visioFullBtn').addEventListener('click', toggleFullscreen);
+
+/* ── Polling invite entrant (quand visio fermée) ── */
+var inviteCheckInt = setInterval(async function() {
+    if (visioState.open) return;
+    try {
+        var cutoff = new Date(Date.now() - 40000).toISOString();
+        var res = await supabase.from('visio_signals')
+            .select('*')
+            .neq('sender_id', currentUniqueId)
+            .eq('type', 'invite')
+            .gte('created_at', cutoff)
+            .order('created_at', { ascending: false })
+            .limit(1);
+        if (!res.data || !res.data.length) return;
+        var sig = res.data[0];
+        var p   = JSON.parse(sig.payload || '{}');
+        if (p.roomId) {
+            /* Vérifie si cette invite nous concerne (room contient notre ID) */
+            if (p.roomId.includes(currentUniqueId.replace(/[^a-z0-9_]/gi,''))) {
+                showVisioInvite(p.fromName || 'Quelqu\'un', p.roomId);
+                clearInterval(inviteCheckInt);
+            }
+        }
+    } catch(e) {}
+}, 3000);
+
+/* ── Echap ── */
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         if (visioState.fullscreen) toggleFullscreen();
