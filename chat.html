@@ -160,20 +160,20 @@
         .vt-btn.danger:hover { background:rgba(239,68,68,.3); }
         .vt-icon { font-size:16px; }
 
-```
-    /* ══ MODAL ARCADE PLEIN ÉCRAN ══ */
-    #arcadeModal {
+
+   /* ══ MODAL ARCADE PLEIN ÉCRAN ══ */
+#arcadeModal {
     position: fixed;
     inset: 0;
     z-index: 10000;
     background: #0a0a0f;
     display: none;
     overflow-y: auto;
-    position: relative;
 }
-    #arcadeModal.open {
-        display: block;
-    }
+#arcadeModal.open {
+    display: block;
+}
+
     #arcadeModalClose {
     position: absolute;
     top: 20px;
@@ -310,7 +310,6 @@
 <!-- MODAL ARCADE -->
 
 <div id="arcadeModal">
-    <button id="arcadeModalClose">✕</button>
     <iframe id="arcadeIframe" style="width: 100%; height: 100vh; border: none;"></iframe>
 </div>
 
@@ -433,39 +432,30 @@ document.getElementById(‘customBgInput’).addEventListener(‘change’,funct
 function esc(s){return String(s||’’).replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’).replace(/”/g,’"’);}
 function fmtTime(iso){if(!iso)return ‘’;var d=new Date(iso),now=new Date();var hm=d.toLocaleTimeString(‘fr-FR’,{hour:‘2-digit’,minute:‘2-digit’});return d.toDateString()===now.toDateString()?hm:d.toLocaleDateString(‘fr-FR’,{day:‘2-digit’,month:‘2-digit’})+’ ’+hm;}
 
-// ══ GESTION MODAL ARCADE ══
-document.getElementById(‘arcadeBtn’).addEventListener(‘click’, function() {
-var modal = document.getElementById(‘arcadeModal’);
-var iframe = document.getElementById(‘arcadeIframe’);
-iframe.src = ‘arcade.html’;
-modal.classList.add(‘open’);
-document.body.style.overflow = ‘hidden’;
+document.getElementById('arcadeBtn').addEventListener('click', function() {
+    var modal = document.getElementById('arcadeModal');
+    var iframe = document.getElementById('arcadeIframe');
+    iframe.src = 'arcade.html';
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
 });
 
-document.getElementById(‘arcadeModalClose’).addEventListener(‘click’, function() {
-var modal = document.getElementById(‘arcadeModal’);
-var iframe = document.getElementById(‘arcadeIframe’);
-modal.classList.remove(‘open’);
-iframe.src = ‘’;
-document.body.style.overflow = ‘’;
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (visioState.fullscreen) {
+            toggleFullscreen();
+        } else if (visioState.open && !visioState.pip) {
+            closeVisio();
+        }
+        var arcadeModal = document.getElementById('arcadeModal');
+        if (arcadeModal && arcadeModal.classList.contains('open')) {
+            arcadeModal.classList.remove('open');
+            document.getElementById('arcadeIframe').src = '';
+            document.body.style.overflow = '';
+        }
+    }
 });
 
-// Fermeture avec la touche Escape pour la modal arcade
-document.addEventListener(‘keydown’, function(e) {
-if (e.key === ‘Escape’) {
-// Gestion visio existante
-if (visioState.fullscreen) {
-toggleFullscreen();
-} else if (visioState.open && !visioState.pip) {
-closeVisio();
-}
-// Gestion modal arcade
-var arcadeModal = document.getElementById(‘arcadeModal’);
-if (arcadeModal && arcadeModal.classList.contains(‘open’)) {
-document.getElementById(‘arcadeModalClose’).click();
-}
-}
-});
 
 switchToPublicChat();
 </script>
