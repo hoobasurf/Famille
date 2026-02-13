@@ -172,12 +172,12 @@
     .pm-toast-text { opacity:.8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
     /* ══════════════════════════════════════════
-       MODAL VISIO SIMPLE
+       MODAL VISIO SIMPLE - MÊME THÈME QUE LA PAGE
     ══════════════════════════════════════════ */
     .visio-modal-overlay {
         position:fixed;
         inset:0;
-        background:rgba(0,0,0,.85);
+        background:rgba(0,0,0,.6);
         backdrop-filter:blur(10px);
         display:flex;
         align-items:center;
@@ -196,15 +196,15 @@
         position:relative;
         width:90%;
         max-width:900px;
-        background:rgba(255,255,255,.08);
+        background:rgba(255,255,255,.05);
         backdrop-filter:blur(20px);
         border-radius:20px;
-        border:2px solid rgba(255,255,255,.2);
+        border:1px solid rgba(255,255,255,.15);
         padding:30px;
         transform:scale(.9);
         opacity:0;
         transition:all .5s cubic-bezier(.68,-.55,.265,1.55);
-        box-shadow:0 20px 60px rgba(0,0,0,.5);
+        box-shadow:0 20px 60px rgba(0,0,0,.3);
     }
     .visio-modal-overlay.active .visio-modal {
         transform:scale(1);
@@ -223,6 +223,7 @@
         font-size:24px;
         font-weight:700;
         color:white;
+        text-shadow:0 2px 10px rgba(0,0,0,.3);
         display:flex;
         align-items:center;
         gap:10px;
@@ -242,16 +243,17 @@
         transition:all .3s;
     }
     .visio-close-btn:hover {
-        background:rgba(255,107,157,.3);
-        border-color:rgba(255,107,157,.6);
+        background:linear-gradient(135deg,#ff6b9d,#c06fff);
+        border-color:rgba(255,255,255,.5);
         transform:rotate(90deg) scale(1.1);
+        box-shadow:0 4px 15px rgba(192,111,255,.4);
     }
 
     .visio-video-area {
         position:relative;
         width:100%;
         padding-bottom:56.25%;
-        background:rgba(0,0,0,.6);
+        background:rgba(0,0,0,.3);
         border-radius:16px;
         margin-bottom:20px;
         overflow:hidden;
@@ -265,14 +267,15 @@
         align-items:center;
         justify-content:center;
         gap:12px;
-        color:rgba(255,255,255,.6);
+        color:rgba(255,255,255,.7);
     }
     .visio-video-icon {
         font-size:64px;
-        opacity:.5;
+        opacity:.6;
     }
     .visio-video-text {
         font-size:16px;
+        font-weight:600;
     }
 
     .visio-controls {
@@ -299,6 +302,7 @@
         background:rgba(255,255,255,.2);
         border-color:rgba(255,255,255,.4);
         transform:translateY(-2px);
+        box-shadow:0 4px 15px rgba(0,0,0,.2);
     }
     .visio-control-btn.active {
         background:linear-gradient(135deg,#ff6b9d,#c06fff);
@@ -308,11 +312,11 @@
     .visio-control-btn.danger {
         background:rgba(239,68,68,.2);
         border-color:rgba(239,68,68,.4);
-        color:#ff6b6b;
     }
     .visio-control-btn.danger:hover {
         background:rgba(239,68,68,.3);
-        border-color:#ff6b6b;
+        border-color:rgba(239,68,68,.6);
+        box-shadow:0 4px 15px rgba(239,68,68,.3);
     }
 
     .users-panel::-webkit-scrollbar, .messages-area::-webkit-scrollbar { width:7px; }
