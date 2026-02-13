@@ -38,7 +38,7 @@
     .theme-btn-custom:hover { transform:scale(1.15); border-color:white; }
     .theme-btn-custom input[type=file] { position:absolute; opacity:0; width:100%; height:100%; cursor:pointer; }
 
-    .user-profile-photo { width:45px; height:45px; border-radius:50%; border:3px solid rgba(255,255,255,.6); overflow:hidden; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#ff6b9d,#c06fff); font-size:20px; color:white; cursor:pointer; transition:all .3s; flex-shrink:0; }
+    .user-profile-photo { width:45px; height:45px; border-radius:50%; border:3px solid rgba(255,255,255,.6); overflow:hidden; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#ff6b9d,#c06fff); font-size:20px; color:white; cursor:pointer; transition:all .3s; flex-shrink:0; vertical-align:middle; position:relative; top:0; }
     .user-profile-photo:hover { transform:scale(1.15); }
     .user-profile-photo img { width:100%; height:100%; object-fit:cover; }
 
@@ -77,7 +77,7 @@
     .notif-badge { position:absolute; top:10px; right:10px; background:linear-gradient(135deg,#ff6b9d,#ff3060); color:white; font-size:12px; font-weight:900; border-radius:14px; min-width:24px; height:24px; display:flex; align-items:center; justify-content:center; padding:0 8px; animation:badgePop .5s cubic-bezier(.34,1.56,.64,1); }
     @keyframes badgePop { from{transform:scale(0) rotate(-15deg)} to{transform:scale(1)} }
 
-    .right-panel { flex:1; display:flex; flex-direction:column; min-width:0; background:rgba(255,255,255,.05); backdrop-filter:blur(10px); border-radius:20px; border:1px solid rgba(255,255,255,.15); overflow:hidden; }
+    .right-panel { flex:1; display:flex; flex-direction:column; min-width:0; background:rgba(255,255,255,.05); backdrop-filter:blur(10px); border-radius:20px; border:1px solid rgba(255,255,255,.15); overflow:hidden; transition:flex .4s; }
 
     .wizz-btn { padding:10px 20px; background:linear-gradient(135deg,#ffd700,#ff8c00); border:none; border-radius:12px; color:white; font-weight:700; cursor:pointer; transition:all .3s; font-size:14px; }
     .wizz-btn:hover { transform:translateY(-2px); }
@@ -162,7 +162,7 @@
         .message-input { min-width:0; padding:12px 16px; font-size:14px; }
         .send-btn { padding:12px 20px; font-size:14px; }
         .pm-msg-wrap { max-width:90%; }
-        .users-panel { position:fixed; top:0; left:0; height:100%; z-index:200; max-height:100vh; border-radius:0 20px 20px 0; width:280px; }
+        .users-panel { position:fixed; top:0; left:0; height:100%; z-index:200; max-height:100vh; border-radius:0 20px 20px 0; width:280px; transform:translateX(0); transition:transform .4s cubic-bezier(.4,0,.2,1), opacity .4s; }
         .users-panel.hidden { transform:translateX(-100%); width:280px; opacity:0; pointer-events:none; }
     }
 </style>
@@ -243,9 +243,15 @@
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
+// ── FIX Safari/iPhone : console.log au lieu de console.error pour éviter DataCloneError ──
 function logErr(label, err) {
-    const msg = err?.message || err?.details || err?.hint || JSON.stringify(err) || String(err);
-    console.error(`❌ ${label}: ${msg}`);
+    try {
+        const msg = (err && (err.message || err.details || err.hint)) ? (err.message || err.details || err.hint) : String(err);
+        const code = (err && err.code) ? err.code : '';
+        console.log('ERR ' + label + ' [' + code + '] ' + msg);
+    } catch(e) {
+        console.log('ERR ' + label + ' (détail non disponible)');
+    }
 }
 
 const supabase = createClient(
@@ -253,38 +259,49 @@ const supabase = createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWtyaXdyd3V5bndwem9kYmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzQ3NjYsImV4cCI6MjA4NjE1MDc2Nn0.MJ6CSmrttEWcrdfy5C7nP4sE_pe19sGNE-WasASPDNc'
 );
 
+/* ══ FIX : générer un fingerprint si absent ══ */
+function getOrCreateFingerprint() {
+    let fp = localStorage.getItem('browserFingerprint');
+    if (!fp) {
+        // Générer un ID aléatoire unique
+        fp = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        localStorage.setItem('browserFingerprint', fp);
+    }
+    return fp;
+}
+
 /* ══ UTILISATEUR COURANT ══ */
 let currentUserPhoto    = null;
 const currentUserPrenom = localStorage.getItem('prenom') || 'Invité';
-const fingerprint       = localStorage.getItem('browserFingerprint') || '';
-const currentUniqueId   = fingerprint ? `${currentUserPrenom}_${fingerprint}` : null;
+const fingerprint       = getOrCreateFingerprint();
+const currentUniqueId   = currentUserPrenom + '_' + fingerprint;
 const savedPhotoUrl     = localStorage.getItem('userPhotoUrl') || localStorage.getItem('tempPhotoPreview');
 
-console.log('🚀 BubbleChat –', currentUserPrenom, '| ID:', currentUniqueId);
+console.log('BubbleChat – ' + currentUserPrenom + ' | ID: ' + currentUniqueId);
 
 (function initPhoto() {
     const el = document.getElementById('userProfilePhoto');
-    if (savedPhotoUrl) { el.innerHTML = `<img src="${savedPhotoUrl}" alt="Profil">`; currentUserPhoto = savedPhotoUrl; }
+    if (savedPhotoUrl) { el.innerHTML = '<img src="' + savedPhotoUrl + '" alt="Profil">'; currentUserPhoto = savedPhotoUrl; }
     else el.textContent = '💬';
 })();
 
 /* ══ TOGGLE SIDEBAR ══ */
 let sidebarVisible = true;
-const isMobile = () => window.innerWidth <= 600;
+const isMobile = function() { return window.innerWidth <= 600; };
 
-document.getElementById('toggleSidebar').addEventListener('click', () => {
+document.getElementById('toggleSidebar').addEventListener('click', function() {
     sidebarVisible = !sidebarVisible;
     document.getElementById('usersPanel').classList.toggle('hidden', !sidebarVisible);
     document.getElementById('toggleIcon').textContent = sidebarVisible ? '👥' : '💬';
     document.getElementById('toggleText').textContent  = sidebarVisible ? 'Profils' : 'Chat';
 });
 
-document.addEventListener('click', e => {
+document.addEventListener('click', function(e) {
     if (isMobile() && sidebarVisible) {
-        const panel  = document.getElementById('usersPanel');
-        const toggle = document.getElementById('toggleSidebar');
-        const right  = document.getElementById('rightPanel');
-        if (!panel.contains(e.target) && !toggle.contains(e.target) && !right.contains(e.target)) {
+        var panel     = document.getElementById('usersPanel');
+        var toggle    = document.getElementById('toggleSidebar');
+        var rightPane = document.getElementById('rightPanel');
+        if (!panel.contains(e.target) && !toggle.contains(e.target) && !rightPane.contains(e.target)) {
             sidebarVisible = false;
             panel.classList.add('hidden');
             document.getElementById('toggleIcon').textContent = '💬';
@@ -294,22 +311,17 @@ document.addEventListener('click', e => {
 });
 
 /* ══ ÉTAT GLOBAL ══ */
-let currentChatType = 'public';
-let currentChatUser = null;
-let profiles        = [];
-const pmBadges      = {};
-
-// public_messages : id est int8 → polling fiable par id
-let lastPublicId    = 0;
-let publicLoaded    = false;
-
-// private_messages
-let lastPMId        = 0;
-let pmPollInterval  = null;
-let lastInboxId     = 0;
+var currentChatType   = 'public';
+var currentChatUser   = null;
+var profiles          = [];
+var pmBadges          = {};
+var lastPublicMsgTime = null; // FIX UUID : on utilise created_at
+var lastPMId          = 0;
+var pmPollInterval    = null;
+var lastInboxId       = 0;
 
 /* ══ COULEUR BULLES ══ */
-const PRESETS = [
+var PRESETS = [
     { l:'Rose/Violet', v:'linear-gradient(135deg,#ff6b9d,#c06fff)' },
     { l:'Bleu',        v:'linear-gradient(135deg,#2196f3,#03a9f4)' },
     { l:'Vert',        v:'linear-gradient(135deg,#43e97b,#38f9d7)' },
@@ -319,107 +331,106 @@ const PRESETS = [
     { l:'Cyan',        v:'linear-gradient(135deg,#00bcd4,#26c6da)'  },
     { l:'Noir',        v:'linear-gradient(135deg,#2d2d2d,#555)'     },
 ];
-let myBubbleStyle = localStorage.getItem('myBubbleStyle') || PRESETS[0].v;
+var myBubbleStyle = localStorage.getItem('myBubbleStyle') || PRESETS[0].v;
 
 function buildColorSwatches() {
-    const c = document.getElementById('colorSwatches');
+    var c = document.getElementById('colorSwatches');
     c.innerHTML = '';
-    PRESETS.forEach(p => {
-        const sw = document.createElement('div');
+    PRESETS.forEach(function(p) {
+        var sw = document.createElement('div');
         sw.className = 'color-swatch' + (myBubbleStyle === p.v ? ' active' : '');
         sw.style.background = p.v;
         sw.title = p.l;
-        sw.addEventListener('click', () => {
-            c.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        sw.addEventListener('click', function() {
+            c.querySelectorAll('.color-swatch').forEach(function(s) { s.classList.remove('active'); });
             sw.classList.add('active');
             myBubbleStyle = p.v;
             localStorage.setItem('myBubbleStyle', p.v);
-            document.querySelectorAll('.pm-msg.sent').forEach(b => b.style.background = p.v);
+            document.querySelectorAll('.pm-msg.sent').forEach(function(b) { b.style.background = p.v; });
         });
         c.appendChild(sw);
     });
 }
 buildColorSwatches();
 
-document.getElementById('customColorInput').addEventListener('input', e => {
-    const hex = e.target.value;
-    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+document.getElementById('customColorInput').addEventListener('input', function(e) {
+    var hex = e.target.value;
+    document.querySelectorAll('.color-swatch').forEach(function(s) { s.classList.remove('active'); });
     myBubbleStyle = hex;
     localStorage.setItem('myBubbleStyle', hex);
-    document.querySelectorAll('.pm-msg.sent').forEach(b => b.style.background = hex);
+    document.querySelectorAll('.pm-msg.sent').forEach(function(b) { b.style.background = hex; });
 });
 
 /* ══ STATUT EN LIGNE ══ */
 async function setOnlineStatus(online) {
-    if (!currentUniqueId) return;
-    const { error } = await supabase
-        .from('profiles')
-        .update({ is_online: online, last_seen: new Date().toISOString() })
-        .eq('unique_id', currentUniqueId);
-    if (error) logErr('setOnlineStatus', error);
+    try {
+        await supabase.from('profiles').update({ is_online: online, last_seen: new Date().toISOString() }).eq('unique_id', currentUniqueId);
+    } catch(e) { console.log('setOnlineStatus err'); }
 }
 setOnlineStatus(true);
-setInterval(() => setOnlineStatus(true), 30000);
-window.addEventListener('beforeunload', () => setOnlineStatus(false));
-document.addEventListener('visibilitychange', () => setOnlineStatus(!document.hidden));
+setInterval(function() { setOnlineStatus(true); }, 30000);
+window.addEventListener('beforeunload', function() { setOnlineStatus(false); });
+document.addEventListener('visibilitychange', function() { setOnlineStatus(!document.hidden); });
 
 /* ══ PROFILS ══ */
 async function loadProfiles() {
-    const { data, error } = await supabase
-        .from('profiles')
-        .select('unique_id, prenom, photo_url, is_online')
-        .order('is_online', { ascending: false })
-        .order('prenom',    { ascending: true });
+    try {
+        var res = await supabase
+            .from('profiles')
+            .select('unique_id, prenom, photo_url, is_online, last_seen')
+            .order('is_online', { ascending: false })
+            .order('prenom',    { ascending: true });
 
-    if (error) { logErr('Profils', error); return; }
+        if (res.error) { console.log('ERR Profils: ' + res.error.message); return; }
 
-    profiles = (data || [])
-        .filter(p => p.unique_id !== currentUniqueId)
-        .map(p => ({
-            unique_id: p.unique_id || '',
-            prenom:    p.prenom    || 'Anonyme',
-            photo_url: p.photo_url || null,
-            is_online: !!p.is_online
-        }));
-    renderProfiles();
+        profiles = (res.data || [])
+            .filter(function(p) { return p.unique_id !== currentUniqueId; })
+            .map(function(p) { return {
+                unique_id: p.unique_id || '',
+                prenom:    p.prenom    || 'Anonyme',
+                photo_url: p.photo_url || null,
+                is_online: !!p.is_online
+            }; });
+        renderProfiles();
+    } catch(e) { console.log('ERR loadProfiles exception'); }
 }
 
 function renderProfiles() {
-    const container = document.getElementById('profileList');
-    const countEl   = document.getElementById('profileCount');
+    var container = document.getElementById('profileList');
+    var countEl   = document.getElementById('profileCount');
     container.innerHTML = '';
-    const onlineCount = profiles.filter(p => p.is_online).length;
-    countEl.textContent = `${profiles.length} utilisateur${profiles.length > 1 ? 's' : ''} · ${onlineCount} en ligne`;
 
-    profiles.forEach(profile => {
-        const item = document.createElement('div');
-        item.className = 'user-item' + (currentChatType === 'private' && currentChatUser?.unique_id === profile.unique_id ? ' active' : '');
+    var onlineCount = profiles.filter(function(p) { return p.is_online; }).length;
+    countEl.textContent = profiles.length + ' utilisateur' + (profiles.length > 1 ? 's' : '') + ' · ' + onlineCount + ' en ligne';
+
+    profiles.forEach(function(profile) {
+        var item = document.createElement('div');
+        item.className = 'user-item' + (currentChatType === 'private' && currentChatUser && currentChatUser.unique_id === profile.unique_id ? ' active' : '');
         item.dataset.uid = profile.unique_id;
 
-        const av = document.createElement('div');
+        var av = document.createElement('div');
         av.className = 'user-avatar';
-        av.innerHTML = profile.photo_url ? `<img src="${profile.photo_url}" alt="${esc(profile.prenom)}">` : profile.prenom[0].toUpperCase();
-        const dot = document.createElement('div');
+        av.innerHTML = profile.photo_url ? '<img src="' + profile.photo_url + '" alt="' + esc(profile.prenom) + '">' : profile.prenom[0].toUpperCase();
+        var dot = document.createElement('div');
         dot.className = 'status-dot ' + (profile.is_online ? 'online' : 'offline');
         av.appendChild(dot);
 
-        const info = document.createElement('div');
+        var info = document.createElement('div');
         info.className = 'user-info';
-        info.innerHTML = `<div class="user-name">${esc(profile.prenom)}</div>
-            <div class="user-status-txt ${profile.is_online ? 'online' : 'offline'}">${profile.is_online ? '● En ligne' : '● Hors ligne'}</div>`;
+        info.innerHTML = '<div class="user-name">' + esc(profile.prenom) + '</div><div class="user-status-txt ' + (profile.is_online ? 'online' : 'offline') + '">' + (profile.is_online ? '● En ligne' : '● Hors ligne') + '</div>';
 
         item.appendChild(av);
         item.appendChild(info);
 
-        const unread = pmBadges[profile.unique_id] || 0;
+        var unread = pmBadges[profile.unique_id] || 0;
         if (unread > 0) {
-            const badge = document.createElement('div');
+            var badge = document.createElement('div');
             badge.className = 'notif-badge';
             badge.textContent = unread > 99 ? '99+' : unread;
             item.appendChild(badge);
         }
 
-        item.addEventListener('click', () => {
+        item.addEventListener('click', function() {
             switchToPrivateChat(profile);
             if (isMobile()) {
                 sidebarVisible = false;
@@ -437,137 +448,102 @@ loadProfiles();
 
 /* ══ INBOX POLLING ══ */
 async function pollInbox() {
-    if (!currentUniqueId) return;
-    const { data, error } = await supabase
-        .from('private_messages')
-        .select('id, sender_unique_id, message')
-        .eq('receiver_unique_id', currentUniqueId)
-        .eq('is_read', false)
-        .gt('id', lastInboxId)
-        .order('id', { ascending: true });
+    try {
+        var res = await supabase
+            .from('private_messages')
+            .select('id, sender_unique_id, message')
+            .eq('receiver_unique_id', currentUniqueId)
+            .eq('is_read', false)
+            .gt('id', lastInboxId)
+            .order('id', { ascending: true });
 
-    if (error) { logErr('Inbox', error); return; }
-    if (!data?.length) return;
+        if (res.error) { console.log('ERR Inbox: ' + res.error.message); return; }
+        if (!res.data || !res.data.length) return;
 
-    data.forEach(msg => {
-        if (msg.id > lastInboxId) lastInboxId = msg.id;
-        const sid = msg.sender_unique_id;
-        if (!(currentChatType === 'private' && currentChatUser?.unique_id === sid)) {
-            pmBadges[sid] = (pmBadges[sid] || 0) + 1;
-            renderProfiles();
-            showToast(msg, sid);
-        }
-    });
+        res.data.forEach(function(msg) {
+            if (msg.id > lastInboxId) lastInboxId = msg.id;
+            var sid = msg.sender_unique_id;
+            if (!(currentChatType === 'private' && currentChatUser && currentChatUser.unique_id === sid)) {
+                pmBadges[sid] = (pmBadges[sid] || 0) + 1;
+                renderProfiles();
+                showToast(msg, sid);
+            }
+        });
+    } catch(e) { console.log('ERR pollInbox exception'); }
 }
 setInterval(pollInbox, 3000);
 
 function showToast(msg, senderId) {
-    const sender = profiles.find(p => p.unique_id === senderId);
-    const name   = sender ? sender.prenom : 'Quelqu\'un';
-    const toast  = document.createElement('div');
+    var sender = profiles.find(function(p) { return p.unique_id === senderId; });
+    var name   = sender ? sender.prenom : 'Quelqu\'un';
+    var toast  = document.createElement('div');
     toast.className = 'pm-toast';
-    toast.innerHTML = `<div class="pm-toast-name">💌 ${esc(name)}</div><div class="pm-toast-text">${esc(msg.message)}</div>`;
-    toast.addEventListener('click', () => {
-        const prof = profiles.find(p => p.unique_id === senderId);
+    toast.innerHTML = '<div class="pm-toast-name">💌 ' + esc(name) + '</div><div class="pm-toast-text">' + esc(msg.message) + '</div>';
+    toast.addEventListener('click', function() {
+        var prof = profiles.find(function(p) { return p.unique_id === senderId; });
         if (prof) switchToPrivateChat(prof);
         toast.remove();
     });
     document.body.appendChild(toast);
-    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 5000);
+    setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 400); }, 5000);
 }
 
 /* ══ WIZZ ══ */
-document.getElementById('wizzBtn').addEventListener('click', async () => {
-    if (!currentChatUser || !currentUniqueId) return;
+document.getElementById('wizzBtn').addEventListener('click', async function() {
+    if (!currentChatUser) return;
     document.getElementById('rightPanel').classList.add('wizzing');
-    setTimeout(() => document.getElementById('rightPanel').classList.remove('wizzing'), 600);
-    const { error } = await supabase.from('private_messages').insert({
-        sender_unique_id:   currentUniqueId,
-        receiver_unique_id: currentChatUser.unique_id,
-        message: '⚡ WIZZ !',
-        is_read: false,
-        is_wizz: true
-    });
-    if (error) logErr('Wizz', error);
+    setTimeout(function() { document.getElementById('rightPanel').classList.remove('wizzing'); }, 600);
+    try {
+        await supabase.from('private_messages').insert({ sender_unique_id: currentUniqueId, receiver_unique_id: currentChatUser.unique_id, message: '⚡ WIZZ !', is_read: false });
+    } catch(e) { console.log('ERR Wizz'); }
 });
 
 /* ══ CHAT PUBLIC ══
-   TABLE : public_messages
-   Colonnes : id (int8), author (text), message (text), photo_url (text), created_at
-*/
+   FIX : on compare par created_at (string ISO) et non par id (UUID) */
 async function loadPublicMessages() {
-    if (currentChatType !== 'public') return;
-
-    if (!publicLoaded) {
-        // Premier chargement : 60 derniers messages
-        const { data, error } = await supabase
-            .from('public_messages')
-            .select('id, author, message, photo_url, created_at')
-            .order('created_at', { ascending: false })
+    try {
+        var query = supabase
+            .from('messages')
+            .select('id, prenom, message, created_at, photo_url')
+            .is('to_user', null)
+            .order('created_at', { ascending: true })
             .limit(60);
 
-        if (error) { logErr('public_messages init', error); return; }
+        if (lastPublicMsgTime) {
+            query = query.gt('created_at', lastPublicMsgTime);
+        }
 
-        const msgs = (data || []).reverse();
-        document.getElementById('messagesArea').innerHTML = '';
+        var res = await query;
+        if (res.error) { console.log('ERR Messages publics: ' + res.error.message); return; }
+        if (!res.data || !res.data.length) return;
 
-        msgs.forEach(msg => {
-            if (msg.id > lastPublicId) lastPublicId = msg.id;
-            renderPublicMessage({
-                author: msg.author   || 'Anonyme',
-                text:   msg.message,
-                photo:  msg.photo_url,
-                time:   fmtTime(msg.created_at)
-            });
+        if (!lastPublicMsgTime) {
+            document.getElementById('messagesArea').innerHTML = '';
+        }
+
+        res.data.forEach(function(msg) {
+            if (!lastPublicMsgTime || msg.created_at > lastPublicMsgTime) {
+                lastPublicMsgTime = msg.created_at;
+            }
+            if (currentChatType === 'public') {
+                renderPublicMessage({ author: msg.prenom || 'Anonyme', text: msg.message, photo: msg.photo_url, time: fmtTime(msg.created_at) });
+            }
         });
-
-        publicLoaded = true;
-        const area = document.getElementById('messagesArea');
-        area.scrollTop = area.scrollHeight;
-        return;
-    }
-
-    // Polling : nouveaux messages seulement
-    const { data, error } = await supabase
-        .from('public_messages')
-        .select('id, author, message, photo_url, created_at')
-        .gt('id', lastPublicId)
-        .order('id', { ascending: true });
-
-    if (error) { logErr('public_messages poll', error); return; }
-    if (!data?.length) return;
-
-    data.forEach(msg => {
-        if (msg.id > lastPublicId) lastPublicId = msg.id;
-        renderPublicMessage({
-            author: msg.author   || 'Anonyme',
-            text:   msg.message,
-            photo:  msg.photo_url,
-            time:   fmtTime(msg.created_at)
-        });
-    });
+    } catch(e) { console.log('ERR loadPublicMessages exception'); }
 }
 
-function renderPublicMessage({ author, text, photo, time }) {
-    const area = document.getElementById('messagesArea');
-    const el   = document.createElement('div');
+function renderPublicMessage(opts) {
+    var area = document.getElementById('messagesArea');
+    var el   = document.createElement('div');
     el.className = 'message';
 
-    const av = document.createElement('div');
+    var av = document.createElement('div');
     av.className = 'message-avatar';
+    av.innerHTML = opts.photo ? '<img src="' + opts.photo + '" alt="' + esc(opts.author) + '">' : (opts.author ? opts.author[0] : '?').toUpperCase();
 
-    // Chercher la photo dans les profils si pas fournie directement
-    if (!photo) {
-        const profile = profiles.find(p => p.prenom === author);
-        photo = profile?.photo_url || null;
-    }
-    av.innerHTML = photo ? `<img src="${photo}" alt="${esc(author)}">` : (author?.[0] || '?').toUpperCase();
-
-    const content = document.createElement('div');
+    var content = document.createElement('div');
     content.className = 'message-content';
-    content.innerHTML = `<div class="message-author">${esc(author)}</div>
-        <div class="message-text">${esc(text)}</div>
-        <div class="message-time">${time}</div>`;
+    content.innerHTML = '<div class="message-author">' + esc(opts.author) + '</div><div class="message-text">' + esc(opts.text) + '</div><div class="message-time">' + opts.time + '</div>';
 
     el.appendChild(av);
     el.appendChild(content);
@@ -576,21 +552,14 @@ function renderPublicMessage({ author, text, photo, time }) {
 }
 
 async function sendPublicMessage(text) {
-    // Affichage local immédiat
-    renderPublicMessage({ author: currentUserPrenom, text, photo: currentUserPhoto, time: fmtTime(new Date().toISOString()) });
-
-    const { data, error } = await supabase
-        .from('public_messages')
-        .insert({
-            author:    currentUserPrenom,
-            message:   text,
-            photo_url: currentUserPhoto || null
-        })
-        .select('id')
-        .single();
-
-    if (error) { logErr('Envoi public', error); return; }
-    if (data?.id && data.id > lastPublicId) lastPublicId = data.id;
+    renderPublicMessage({ author: currentUserPrenom, text: text, photo: currentUserPhoto, time: fmtTime(new Date().toISOString()) });
+    try {
+        var res = await supabase.from('messages').insert({ prenom: currentUserPrenom, message: text, photo_url: currentUserPhoto || null, to_user: null }).select('created_at').single();
+        if (res.error) { console.log('ERR Envoi public: ' + res.error.message); return; }
+        if (res.data && res.data.created_at && (!lastPublicMsgTime || res.data.created_at > lastPublicMsgTime)) {
+            lastPublicMsgTime = res.data.created_at;
+        }
+    } catch(e) { console.log('ERR sendPublicMessage exception'); }
 }
 
 setInterval(loadPublicMessages, 2500);
@@ -599,22 +568,21 @@ setInterval(loadPublicMessages, 2500);
 function setHeader(avatarHtml, name, statusTxt, isOnline, showWizz) {
     document.getElementById('chatHeaderAvatar').innerHTML = avatarHtml;
     document.getElementById('chatHeaderName').textContent = name;
-    const st = document.getElementById('chatHeaderStatus');
-    st.className   = 'chat-panel-header-status ' + (isOnline ? 'online' : 'offline');
+    var st = document.getElementById('chatHeaderStatus');
+    st.className  = 'chat-panel-header-status ' + (isOnline ? 'online' : 'offline');
     st.textContent = statusTxt;
     document.getElementById('wizzBtn').style.display = showWizz ? 'block' : 'none';
 }
 
 function switchToPublicChat() {
     if (pmPollInterval) { clearInterval(pmPollInterval); pmPollInterval = null; }
-    currentChatType = 'public';
-    currentChatUser = null;
-    lastPublicId    = 0;
-    publicLoaded    = false;
+    currentChatType   = 'public';
+    currentChatUser   = null;
+    lastPublicMsgTime = null;
 
     setHeader('🌐', 'Chat général', '● Public', true, false);
     document.getElementById('bubbleColorPicker').style.display = 'none';
-    document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
+    document.querySelectorAll('.user-item').forEach(function(i) { i.classList.remove('active'); });
     document.getElementById('publicChatBtn').classList.add('active');
     document.getElementById('messagesArea').innerHTML = '';
     loadPublicMessages();
@@ -627,26 +595,26 @@ function switchToPrivateChat(profile) {
     lastPMId        = 0;
     pmBadges[profile.unique_id] = 0;
 
-    const avHtml = profile.photo_url
-        ? `<img src="${profile.photo_url}" alt="${esc(profile.prenom)}">`
+    var avHtml = profile.photo_url
+        ? '<img src="' + profile.photo_url + '" alt="' + esc(profile.prenom) + '">'
         : profile.prenom[0].toUpperCase();
     setHeader(avHtml, profile.prenom, profile.is_online ? '🟢 En ligne' : '🔴 Hors ligne', profile.is_online, true);
 
     document.getElementById('bubbleColorPicker').style.display = 'flex';
-    document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
-    document.querySelectorAll(`.user-item[data-uid="${profile.unique_id}"]`).forEach(i => i.classList.add('active'));
+    document.querySelectorAll('.user-item').forEach(function(i) { i.classList.remove('active'); });
+    document.querySelectorAll('.user-item[data-uid="' + profile.unique_id + '"]').forEach(function(i) { i.classList.add('active'); });
     document.getElementById('publicChatBtn').classList.remove('active');
 
     loadPMHistory(profile.unique_id);
     markAllRead(profile.unique_id);
-    document.querySelectorAll('.notif-badge').forEach(b => {
-        const item = b.closest('.user-item');
-        if (item?.dataset.uid === profile.unique_id) b.remove();
+    document.querySelectorAll('.notif-badge').forEach(function(b) {
+        var item = b.closest('.user-item');
+        if (item && item.dataset.uid === profile.unique_id) b.remove();
     });
-    pmPollInterval = setInterval(() => pollNewPMs(profile.unique_id), 2500);
+    pmPollInterval = setInterval(function() { pollNewPMs(profile.unique_id); }, 2500);
 }
 
-document.getElementById('publicChatBtn').addEventListener('click', () => {
+document.getElementById('publicChatBtn').addEventListener('click', function() {
     switchToPublicChat();
     if (isMobile()) {
         sidebarVisible = false;
@@ -658,170 +626,145 @@ document.getElementById('publicChatBtn').addEventListener('click', () => {
 
 /* ══ MESSAGES PRIVÉS ══ */
 async function loadPMHistory(otherId) {
-    const area = document.getElementById('messagesArea');
+    var area = document.getElementById('messagesArea');
     area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">💬</span>Chargement...</div>';
 
-    if (!currentUniqueId) {
-        area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">⚠️</span>Identifiant introuvable<br><small>Rechargez la page</small></div>';
-        return;
-    }
+    try {
+        var res = await supabase
+            .from('private_messages')
+            .select('id, sender_unique_id, message, created_at, is_read')
+            .or('and(sender_unique_id.eq.' + currentUniqueId + ',receiver_unique_id.eq.' + otherId + '),and(sender_unique_id.eq.' + otherId + ',receiver_unique_id.eq.' + currentUniqueId + ')')
+            .order('created_at', { ascending: true })
+            .limit(150);
 
-    const { data, error } = await supabase
-        .from('private_messages')
-        .select('id, sender_unique_id, message, created_at, is_read')
-        .or(
-            `and(sender_unique_id.eq.${currentUniqueId},receiver_unique_id.eq.${otherId}),` +
-            `and(sender_unique_id.eq.${otherId},receiver_unique_id.eq.${currentUniqueId})`
-        )
-        .order('created_at', { ascending: true })
-        .limit(150);
+        if (res.error) { console.log('ERR Historique MP: ' + res.error.message); area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">⚠️</span>Erreur chargement</div>'; return; }
 
-    if (error) { logErr('Historique MP', error); area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">⚠️</span>Erreur chargement</div>'; return; }
+        area.innerHTML = '';
+        if (!res.data || !res.data.length) {
+            area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">💌</span>Aucun message</div>';
+            return;
+        }
 
-    area.innerHTML = '';
-    if (!data?.length) {
-        area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">💌</span>Aucun message<br><span style="font-size:13px;opacity:.6">Soyez le premier à écrire !</span></div>';
-        return;
-    }
-
-    data.forEach(msg => {
-        if (msg.id > lastPMId) lastPMId = msg.id;
-        appendPMBubble({ id: msg.id, text: msg.message, fromMe: msg.sender_unique_id === currentUniqueId, time: fmtTime(msg.created_at), is_read: msg.is_read });
-    });
-    area.scrollTop = area.scrollHeight;
+        res.data.forEach(function(msg) {
+            if (msg.id > lastPMId) lastPMId = msg.id;
+            appendPMBubble({ id: msg.id, text: msg.message, fromMe: msg.sender_unique_id === currentUniqueId, time: fmtTime(msg.created_at), is_read: msg.is_read });
+        });
+        area.scrollTop = area.scrollHeight;
+    } catch(e) { console.log('ERR loadPMHistory exception'); }
 }
 
-function buildBubble({ id, text, fromMe, time, is_read }) {
-    const wrap = document.createElement('div');
-    wrap.className = 'pm-msg-wrap ' + (fromMe ? 'sent' : 'received');
-    wrap.dataset.msgId = id;
+function buildBubble(opts) {
+    var wrap = document.createElement('div');
+    wrap.className  = 'pm-msg-wrap ' + (opts.fromMe ? 'sent' : 'received');
+    wrap.dataset.msgId = opts.id;
 
-    const bubble = document.createElement('div');
-    bubble.className = 'pm-msg ' + (fromMe ? 'sent' : 'received');
-    if (fromMe) bubble.style.background = myBubbleStyle;
+    var bubble = document.createElement('div');
+    bubble.className = 'pm-msg ' + (opts.fromMe ? 'sent' : 'received');
+    if (opts.fromMe) bubble.style.background = myBubbleStyle;
 
-    const tick = fromMe ? `<span class="pm-tick ${is_read ? 'read' : ''}">${is_read ? '✓✓' : '✓'}</span>` : '';
-    bubble.innerHTML = `${esc(text)}<div class="pm-msg-meta">${time} ${tick}</div>`;
+    var tick = opts.fromMe ? '<span class="pm-tick ' + (opts.is_read ? 'read' : '') + '">' + (opts.is_read ? '✓✓' : '✓') + '</span>' : '';
+    bubble.innerHTML = esc(opts.text) + '<div class="pm-msg-meta">' + opts.time + ' ' + tick + '</div>';
     wrap.appendChild(bubble);
     return wrap;
 }
 
 function appendPMBubble(msg) {
-    const area = document.getElementById('messagesArea');
-    area.querySelector('.pm-empty')?.remove();
+    var area = document.getElementById('messagesArea');
+    var empty = area.querySelector('.pm-empty');
+    if (empty) empty.remove();
     area.appendChild(buildBubble(msg));
     area.scrollTop = area.scrollHeight;
 }
 
 async function sendPM() {
-    if (!currentChatUser || !currentUniqueId) return;
-    const input = document.getElementById('messageInput');
-    const text  = input.value.trim();
+    if (!currentChatUser) return;
+    var input = document.getElementById('messageInput');
+    var text  = input.value.trim();
     if (!text) return;
     input.value = '';
 
-    const tempId = 'tmp-' + Date.now();
-    appendPMBubble({ id: tempId, text, fromMe: true, time: fmtTime(new Date().toISOString()), is_read: false });
+    var tempId = 'tmp-' + Date.now();
+    appendPMBubble({ id: tempId, text: text, fromMe: true, time: fmtTime(new Date().toISOString()), is_read: false });
 
-    const { data, error } = await supabase.from('private_messages').insert({
-        sender_unique_id:   currentUniqueId,
-        receiver_unique_id: currentChatUser.unique_id,
-        message: text,
-        is_read: false,
-        is_wizz: false
-    }).select('id').single();
-
-    if (error) {
-        logErr('Envoi MP', error);
-        document.querySelector(`[data-msg-id="${tempId}"]`)?.remove();
-        input.value = text;
-        return;
-    }
-    const el = document.querySelector(`[data-msg-id="${tempId}"]`);
-    if (el && data) { el.dataset.msgId = data.id; if (data.id > lastPMId) lastPMId = data.id; }
+    try {
+        var res = await supabase.from('private_messages').insert({ sender_unique_id: currentUniqueId, receiver_unique_id: currentChatUser.unique_id, message: text, is_read: false }).select('id').single();
+        if (res.error) { console.log('ERR Envoi MP: ' + res.error.message); var el2 = document.querySelector('[data-msg-id="' + tempId + '"]'); if (el2) el2.remove(); input.value = text; return; }
+        var el = document.querySelector('[data-msg-id="' + tempId + '"]');
+        if (el && res.data) { el.dataset.msgId = res.data.id; if (res.data.id > lastPMId) lastPMId = res.data.id; }
+    } catch(e) { console.log('ERR sendPM exception'); }
 }
 
 async function pollNewPMs(otherId) {
-    if (!currentUniqueId || currentChatType !== 'private' || currentChatUser?.unique_id !== otherId) return;
+    if (currentChatType !== 'private' || !currentChatUser || currentChatUser.unique_id !== otherId) return;
+    try {
+        var res = await supabase
+            .from('private_messages')
+            .select('id, message, created_at, is_read')
+            .eq('sender_unique_id',   otherId)
+            .eq('receiver_unique_id', currentUniqueId)
+            .gt('id', lastPMId)
+            .order('id', { ascending: true });
 
-    const { data, error } = await supabase
-        .from('private_messages')
-        .select('id, message, created_at, is_read')
-        .eq('sender_unique_id',   otherId)
-        .eq('receiver_unique_id', currentUniqueId)
-        .gt('id', lastPMId)
-        .order('id', { ascending: true });
+        if (res.error || !res.data || !res.data.length) return;
 
-    if (error) { logErr('Poll MP', error); return; }
-    if (!data?.length) return;
-
-    data.forEach(msg => {
-        if (msg.id > lastPMId) lastPMId = msg.id;
-        appendPMBubble({ id: msg.id, text: msg.message, fromMe: false, time: fmtTime(msg.created_at), is_read: false });
-        markRead(msg.id);
-    });
-
-    if (data.some(m => m.message === '⚡ WIZZ !')) {
-        document.getElementById('rightPanel').classList.add('wizzing');
-        setTimeout(() => document.getElementById('rightPanel').classList.remove('wizzing'), 600);
-    }
+        res.data.forEach(function(msg) {
+            if (msg.id > lastPMId) lastPMId = msg.id;
+            appendPMBubble({ id: msg.id, text: msg.message, fromMe: false, time: fmtTime(msg.created_at), is_read: false });
+            markRead(msg.id);
+        });
+        if (res.data.some(function(m) { return m.message === '⚡ WIZZ !'; })) {
+            document.getElementById('rightPanel').classList.add('wizzing');
+            setTimeout(function() { document.getElementById('rightPanel').classList.remove('wizzing'); }, 600);
+        }
+    } catch(e) { console.log('ERR pollNewPMs exception'); }
 }
 
 async function markRead(id) {
-    const { error } = await supabase.from('private_messages').update({ is_read: true }).eq('id', id);
-    if (error) logErr('markRead', error);
+    try { await supabase.from('private_messages').update({ is_read: true }).eq('id', id); } catch(e) {}
 }
-
 async function markAllRead(senderId) {
-    if (!currentUniqueId) return;
-    const { error } = await supabase.from('private_messages')
-        .update({ is_read: true })
-        .eq('receiver_unique_id', currentUniqueId)
-        .eq('sender_unique_id',   senderId)
-        .eq('is_read', false);
-    if (error) logErr('markAllRead', error);
+    try { await supabase.from('private_messages').update({ is_read: true }).eq('receiver_unique_id', currentUniqueId).eq('sender_unique_id', senderId).eq('is_read', false); } catch(e) {}
 }
 
 /* ══ ENVOI UNIFIÉ ══ */
 function sendMessage() {
-    const input = document.getElementById('messageInput');
-    const text  = input.value.trim();
+    var input = document.getElementById('messageInput');
+    var text  = input.value.trim();
     if (!text) return;
     if (currentChatType === 'public') { sendPublicMessage(text); input.value = ''; }
     else sendPM();
 }
 document.getElementById('sendBtn').addEventListener('click', sendMessage);
-document.getElementById('messageInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+document.getElementById('messageInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') sendMessage(); });
 
 /* ══ THÈMES ══ */
-document.querySelectorAll('.theme-btn').forEach(btn =>
-    btn.addEventListener('click', () => {
-        document.body.className = '';
-        document.body.style.backgroundImage = '';
-        document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+document.querySelectorAll('.theme-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.body.className = ''; document.body.style.backgroundImage = '';
+        document.querySelectorAll('.theme-btn').forEach(function(b) { b.classList.remove('active'); });
         btn.classList.add('active');
         document.body.classList.add('theme-' + btn.dataset.theme);
-    })
-);
-document.getElementById('customBgInput').addEventListener('change', e => {
-    const file = e.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
+    });
+});
+document.getElementById('customBgInput').addEventListener('change', function(e) {
+    var file = e.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
         document.body.className = 'custom-bg';
-        document.body.style.backgroundImage = `url(${ev.target.result})`;
-        document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+        document.body.style.backgroundImage = 'url(' + ev.target.result + ')';
+        document.querySelectorAll('.theme-btn').forEach(function(b) { b.classList.remove('active'); });
     };
     reader.readAsDataURL(file);
 });
 
 /* ══ PARTICULES ══ */
 (function() {
-    const c = document.getElementById('particles');
-    for (let i = 0; i < 40; i++) {
-        const p = document.createElement('div');
+    var c = document.getElementById('particles');
+    for (var i = 0; i < 40; i++) {
+        var p = document.createElement('div');
         p.className = 'particle';
-        p.style.left = Math.random() * 100 + '%';
-        p.style.animationDelay    = Math.random() * 20 + 's';
+        p.style.left = (Math.random() * 100) + '%';
+        p.style.animationDelay    = (Math.random() * 20) + 's';
         p.style.animationDuration = (Math.random() * 15 + 15) + 's';
         c.appendChild(p);
     }
@@ -833,8 +776,8 @@ function esc(s) {
 }
 function fmtTime(iso) {
     if (!iso) return '';
-    const d = new Date(iso), now = new Date();
-    const hm = d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+    var d = new Date(iso), now = new Date();
+    var hm = d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
     return d.toDateString() === now.toDateString() ? hm : d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' }) + ' ' + hm;
 }
 
