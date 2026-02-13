@@ -705,35 +705,25 @@ var elCopyBtn   = document.getElementById('visioCopyBtn');
 
 /* Génère un nom de salle stable à partir de la conversation */
 function buildRoomName(chatType, otherPrenom) {
-    var prefix = 'bubblechat';
-    if (chatType === 'public') {
-        return prefix + '-general';
-    }
-    // Pour une conv privée : tri alphabétique pour que les 2 côtés aient la même salle
+    var prefix = 'BubbleChat';
+    if (chatType === 'public') return prefix + 'General';
     var names = [currentUserPrenom.toLowerCase(), (otherPrenom || 'user').toLowerCase()].sort();
-    return prefix + '-' + names[0] + '-' + names[1];
+    return prefix + names[0].replace(/[^a-z0-9]/g,'') + names[1].replace(/[^a-z0-9]/g,'');
 }
 
-/* Construit l'URL Jitsi avec paramètres d'UI */
-function buildJitsiUrl(roomName) {
-    var displayName = encodeURIComponent(currentUserPrenom);
-    var params = [
-        'config.prejoinPageEnabled=false',
-        'config.startWithAudioMuted=false',
-        'config.startWithVideoMuted=false',
-        'config.disableDeepLinking=true',
-        'config.toolbarButtons=["microphone","camera","closedcaptions","desktop","fullscreen","fodeviceselection","hangup","profile","chat","settings","raisehand","videoquality","filmstrip","tileview","help","mute-everyone"]',
-        'interfaceConfig.SHOW_JITSI_WATERMARK=false',
-        'interfaceConfig.SHOW_WATERMARK_FOR_GUESTS=false',
-        'interfaceConfig.SHOW_BRAND_WATERMARK=false',
-        'interfaceConfig.SHOW_CHROME_EXTENSION_BANNER=false',
-        'interfaceConfig.DEFAULT_REMOTE_DISPLAY_NAME=' + displayName,
-        'userInfo.displayName=' + displayName
-    ];
-    return 'https://meet.jit.si/' + encodeURIComponent(roomName) + '#' + params.join('&');
+var jitsiApi = null; // instance Jitsi External API
+
+/* Charge le script Jitsi External API si pas encore chargé */
+function loadJitsiScript(cb) {
+    if (window.JitsiMeetExternalAPI) { cb(); return; }
+    var s = document.createElement('script');
+    s.src = 'https://meet.jit.si/external_api.js';
+    s.onload  = cb;
+    s.onerror = function() { console.error('Impossible de charger Jitsi'); };
+    document.head.appendChild(s);
 }
 
-/* Ouvre la visio */
+/* Ouvre la visio — entrée directe, zéro écran intermédiaire */
 function openVisio(chatType, otherPrenom) {
     var roomName = buildRoomName(chatType, otherPrenom);
     visioState.roomName = roomName;
@@ -741,12 +731,12 @@ function openVisio(chatType, otherPrenom) {
     visioState.pip  = false;
     visioState.fullscreen = false;
 
-    // Affiche
+    // Affiche le container
     elOverlay.classList.add('open');
     elContainer.classList.add('open');
     elContainer.classList.remove('pip', 'fullscreen');
 
-    // Reset position (centré via CSS transform)
+    // Reset position centrée
     elContainer.style.bottom = '';
     elContainer.style.right  = '';
     elContainer.style.top    = '50%';
@@ -756,39 +746,84 @@ function openVisio(chatType, otherPrenom) {
     elContainer.style.height = '';
 
     // Titre
-    var titleLabel = chatType === 'public'
-        ? 'Visio — Chat général'
-        : 'Visio avec ' + (otherPrenom || 'utilisateur');
+    var titleLabel = chatType === 'public' ? 'Visio — Chat général' : 'Visio avec ' + (otherPrenom || 'utilisateur');
     elTitleText.textContent = titleLabel;
     elRoomInfo.textContent  = 'Salle : ' + roomName;
     elLoadRoom.textContent  = roomName;
 
-    // Lien d'invitation (lien direct Jitsi partageable)
-    var inviteUrl = 'https://meet.jit.si/' + encodeURIComponent(roomName);
+    // Lien d'invitation
+    var inviteUrl = 'https://meet.jit.si/' + roomName;
     elInvite.value = inviteUrl;
 
-    // Loader
+    // Loader visible
     elLoading.classList.remove('hide');
 
-    // Injecte l'iframe Jitsi
-    var existing = elIframeWrap.querySelector('iframe');
-    if (existing) existing.remove();
+    // Nettoie l'ancienne instance
+    if (jitsiApi) { try { jitsiApi.dispose(); } catch(e){} jitsiApi = null; }
+    elIframeWrap.querySelectorAll('iframe, div[id^="jitsiConference"]').forEach(function(el){ el.remove(); });
 
-    var iframe = document.createElement('iframe');
-    iframe.id = 'visioIframe';
-    iframe.allow = 'camera; microphone; display-capture; fullscreen; autoplay; clipboard-write';
-    iframe.allowFullscreen = true;
-    iframe.src = buildJitsiUrl(roomName);
-    iframe.onload = function() {
-        setTimeout(function() { elLoading.classList.add('hide'); }, 1500);
-    };
-    elIframeWrap.appendChild(iframe);
+    // Lance Jitsi via External API (entrée instantanée)
+    loadJitsiScript(function() {
+        try {
+            jitsiApi = new window.JitsiMeetExternalAPI('meet.jit.si', {
+                roomName: roomName,
+                parentNode: elIframeWrap,
+                width: '100%',
+                height: '100%',
+                userInfo: {
+                    displayName: currentUserPrenom || 'Invité'
+                },
+                configOverwrite: {
+                    prejoinPageEnabled:        false,   // ← PAS d'écran de prénom
+                    prejoinConfig:             { enabled: false },
+                    startWithAudioMuted:       false,
+                    startWithVideoMuted:       false,
+                    disableDeepLinking:        true,
+                    disableInviteFunctions:    false,
+                    enableWelcomePage:         false,
+                    disableThirdPartyRequests: false,
+                    defaultLanguage:           'fr',
+                    toolbarButtons: [
+                        'microphone','camera','desktop',
+                        'fullscreen','hangup','chat',
+                        'raisehand','tileview','videoquality'
+                    ]
+                },
+                interfaceConfigOverwrite: {
+                    SHOW_JITSI_WATERMARK:          false,
+                    SHOW_WATERMARK_FOR_GUESTS:     false,
+                    SHOW_BRAND_WATERMARK:          false,
+                    SHOW_CHROME_EXTENSION_BANNER:  false,
+                    MOBILE_APP_PROMO:              false,
+                    HIDE_INVITE_MORE_HEADER:       false,
+                    TOOLBAR_BUTTONS: [
+                        'microphone','camera','desktop',
+                        'fullscreen','hangup','chat',
+                        'raisehand','tileview','videoquality'
+                    ]
+                }
+            });
 
-    // Bloque le scroll de la page
+            // Masque le loader dès que la conférence est prête
+            jitsiApi.addEventListener('videoConferenceJoined', function() {
+                elLoading.classList.add('hide');
+            });
+            // Fallback : masque après 4s quoi qu'il arrive
+            setTimeout(function() { elLoading.classList.add('hide'); }, 4000);
+
+            // Si l'utilisateur raccroche depuis Jitsi → ferme le modal
+            jitsiApi.addEventListener('readyToClose', function() { closeVisio(); });
+
+        } catch(err) {
+            console.error('Jitsi API error:', err);
+            elLoading.classList.add('hide');
+        }
+    });
+
     document.body.style.overflow = 'hidden';
 }
 
-/* Ferme la visio */
+/* Ferme la visio et coupe caméra/micro */
 function closeVisio() {
     visioState.open = false;
     visioState.pip  = false;
@@ -797,9 +832,16 @@ function closeVisio() {
     elOverlay.classList.remove('open', 'pip-mode');
     elContainer.classList.remove('open', 'pip', 'fullscreen');
 
-    // Détruit l'iframe pour couper caméra/micro
-    var iframe = elIframeWrap.querySelector('iframe');
-    if (iframe) iframe.remove();
+    // Dispose l'API Jitsi → coupe proprement caméra et micro
+    if (jitsiApi) {
+        try { jitsiApi.dispose(); } catch(e) {}
+        jitsiApi = null;
+    }
+    // Nettoie tout résidu DOM
+    elIframeWrap.querySelectorAll('iframe, div').forEach(function(el) {
+        if (el.id !== 'visioLoading') el.remove();
+    });
+    elLoading.classList.remove('hide');
 
     document.body.style.overflow = '';
     resetContainerPos();
