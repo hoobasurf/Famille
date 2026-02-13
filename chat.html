@@ -5,6 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BubbleChat</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#764ba2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BubbleChat">
+    <link rel="apple-touch-icon" href="/icon-192.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; min-height: 100vh; position: relative; overflow-x: hidden; transition: background 0.8s ease; }
@@ -41,6 +47,12 @@
     .user-profile-photo { width:45px; height:45px; border-radius:50%; border:3px solid rgba(255,255,255,.6); overflow:hidden; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#ff6b9d,#c06fff); font-size:20px; color:white; cursor:pointer; transition:all .3s; flex-shrink:0; vertical-align:middle; position:relative; top:0; }
     .user-profile-photo:hover { transform:scale(1.15); }
     .user-profile-photo img { width:100%; height:100%; object-fit:cover; }
+
+    /* Bouton notifications */
+    .notif-toggle-btn { width:45px; height:45px; border-radius:50%; border:3px solid rgba(255,255,255,.5); background:rgba(255,255,255,.1); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; transition:all .3s; flex-shrink:0; }
+    .notif-toggle-btn:hover { transform:scale(1.15); border-color:white; }
+    .notif-toggle-btn.active { border-color:#4caf50; box-shadow:0 0 0 4px rgba(76,175,80,.3); background:rgba(76,175,80,.2); }
+    .notif-toggle-btn.denied { border-color:#f44336; background:rgba(244,67,54,.2); }
 
     .toggle-sidebar-btn { position:fixed; top:50%; left:20px; transform:translateY(-50%); z-index:300; background:linear-gradient(135deg,#ff6b9d,#c06fff); border:none; border-radius:16px; padding:16px 20px; color:white; font-weight:700; cursor:pointer; transition:all .4s cubic-bezier(.34,1.56,.64,1); display:flex; flex-direction:column; align-items:center; gap:8px; animation:neonPulse 2s ease-in-out infinite; }
     @keyframes neonPulse { 0%,100%{ box-shadow:0 0 20px rgba(255,107,157,.6),0 0 40px rgba(192,111,255,.4),0 8px 25px rgba(0,0,0,.3); } 50%{ box-shadow:0 0 35px rgba(255,107,157,.9),0 0 65px rgba(192,111,255,.6),0 8px 25px rgba(0,0,0,.3); } }
@@ -153,7 +165,7 @@
         .app-wrapper { padding:10px; gap:10px; }
         .chat-header { padding:10px 14px; }
         .theme-label { display:none; }
-        .theme-btn, .theme-btn-custom, .user-profile-photo { width:36px; height:36px; font-size:16px; }
+        .theme-btn, .theme-btn-custom, .user-profile-photo, .notif-toggle-btn { width:36px; height:36px; font-size:16px; }
         .toggle-sidebar-btn { left:6px; padding:10px 12px; border-radius:12px; }
         .toggle-icon { font-size:20px; }
         .chat-panel-header { padding:14px 16px; }
@@ -186,6 +198,8 @@
                 <div class="theme-btn" data-theme="chasse"    style="background:linear-gradient(135deg,#3e2723,#795548)"  title="Chasse"></div>
                 <div class="theme-btn" data-theme="aquarium"  style="background:linear-gradient(135deg,#00416a,#ffe000)"  title="Aquarium"></div>
                 <div class="theme-btn-custom" title="Photo personnalisée">📷<input type="file" id="customBgInput" accept="image/*"></div>
+                <!-- Bouton notifications -->
+                <div class="notif-toggle-btn" id="notifBtn" title="Activer les notifications">🔔</div>
                 <div class="user-profile-photo" id="userProfilePhoto" title="Mon profil">💬</div>
             </div>
         </div>
@@ -240,18 +254,20 @@
 
 </div>
 
+<!-- Son de notification (inline base64 bip) -->
+
+<audio id="notifSound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2ozHTh/rt3fwpFkOTyLs+Psu5hqS0ybtO3yvKF1V1mhue7yuqJzV1qiue/yuqJ0WVmiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuqJ0WVqiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu/zuaF0WFuiuu8=" type="audio/wav">
+</audio>
+
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-// ── FIX Safari/iPhone : console.log au lieu de console.error pour éviter DataCloneError ──
 function logErr(label, err) {
     try {
-        const msg = (err && (err.message || err.details || err.hint)) ? (err.message || err.details || err.hint) : String(err);
-        const code = (err && err.code) ? err.code : '';
-        console.log('ERR ' + label + ' [' + code + '] ' + msg);
-    } catch(e) {
-        console.log('ERR ' + label + ' (détail non disponible)');
-    }
+        var msg = (err && (err.message || err.details || err.hint)) ? (err.message || err.details || err.hint) : String(err);
+        console.log('ERR ' + label + ': ' + msg);
+    } catch(e) { console.log('ERR ' + label); }
 }
 
 const supabase = createClient(
@@ -259,11 +275,10 @@ const supabase = createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWtyaXdyd3V5bndwem9kYmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzQ3NjYsImV4cCI6MjA4NjE1MDc2Nn0.MJ6CSmrttEWcrdfy5C7nP4sE_pe19sGNE-WasASPDNc'
 );
 
-/* ══ FIX : générer un fingerprint si absent ══ */
+/* ══ FINGERPRINT ══ */
 function getOrCreateFingerprint() {
-    let fp = localStorage.getItem('browserFingerprint');
+    var fp = localStorage.getItem('browserFingerprint');
     if (!fp) {
-        // Générer un ID aléatoire unique
         fp = Math.random().toString(36).slice(2) + Date.now().toString(36);
         localStorage.setItem('browserFingerprint', fp);
     }
@@ -271,23 +286,132 @@ function getOrCreateFingerprint() {
 }
 
 /* ══ UTILISATEUR COURANT ══ */
-let currentUserPhoto    = null;
-const currentUserPrenom = localStorage.getItem('prenom') || 'Invité';
-const fingerprint       = getOrCreateFingerprint();
-const currentUniqueId   = currentUserPrenom + '_' + fingerprint;
-const savedPhotoUrl     = localStorage.getItem('userPhotoUrl') || localStorage.getItem('tempPhotoPreview');
+var currentUserPhoto    = null;
+var currentUserPrenom   = localStorage.getItem('prenom') || 'Invité';
+var fingerprint         = getOrCreateFingerprint();
+var currentUniqueId     = currentUserPrenom + '_' + fingerprint;
+var savedPhotoUrl       = localStorage.getItem('userPhotoUrl') || localStorage.getItem('tempPhotoPreview');
 
 console.log('BubbleChat – ' + currentUserPrenom + ' | ID: ' + currentUniqueId);
 
 (function initPhoto() {
-    const el = document.getElementById('userProfilePhoto');
+    var el = document.getElementById('userProfilePhoto');
     if (savedPhotoUrl) { el.innerHTML = '<img src="' + savedPhotoUrl + '" alt="Profil">'; currentUserPhoto = savedPhotoUrl; }
     else el.textContent = '💬';
 })();
 
+/* ══════════════════════════════════════════
+   SYSTÈME DE NOTIFICATIONS PUSH
+══════════════════════════════════════════ */
+var swRegistration = null;
+var notifGranted   = false;
+
+/* 1. Enregistrer le Service Worker */
+async function registerSW() {
+    if (!('serviceWorker' in navigator)) { console.log('SW non supporté'); return; }
+    try {
+        swRegistration = await navigator.serviceWorker.register('/sw.js');
+        console.log('SW enregistré');
+        updateNotifBtn();
+    } catch(e) { console.log('SW erreur: ' + e); }
+}
+
+/* 2. Demander la permission */
+async function requestNotifPermission() {
+    if (!('Notification' in window)) {
+        alert('Votre navigateur ne supporte pas les notifications.\nSur iPhone : installez l\'app via "Ajouter à l\'écran d\'accueil" dans Safari.');
+        return;
+    }
+    if (Notification.permission === 'granted') {
+        notifGranted = true;
+        updateNotifBtn();
+        return;
+    }
+    if (Notification.permission === 'denied') {
+        alert('Notifications bloquées.\nVeuillez les autoriser dans les réglages de votre navigateur.');
+        return;
+    }
+    try {
+        var result = await Notification.requestPermission();
+        notifGranted = (result === 'granted');
+        updateNotifBtn();
+        if (notifGranted) {
+            /* Test notification */
+            sendPushNotif('BubbleChat 💬', 'Notifications activées ! 🎉', '🌐');
+        }
+    } catch(e) { console.log('Notif permission err: ' + e); }
+}
+
+/* 3. Mettre à jour l'icône du bouton */
+function updateNotifBtn() {
+    var btn = document.getElementById('notifBtn');
+    if (!btn) return;
+    var perm = ('Notification' in window) ? Notification.permission : 'unsupported';
+    if (perm === 'granted') {
+        btn.textContent = '🔔';
+        btn.classList.add('active');
+        btn.classList.remove('denied');
+        btn.title = 'Notifications activées';
+        notifGranted = true;
+    } else if (perm === 'denied') {
+        btn.textContent = '🔕';
+        btn.classList.add('denied');
+        btn.classList.remove('active');
+        btn.title = 'Notifications bloquées';
+    } else {
+        btn.textContent = '🔔';
+        btn.classList.remove('active', 'denied');
+        btn.title = 'Activer les notifications';
+    }
+}
+
+/* 4. Envoyer une notification via le SW */
+function sendPushNotif(title, body, senderPhoto) {
+    /* Son */
+    try {
+        var audio = document.getElementById('notifSound');
+        if (audio) { audio.currentTime = 0; audio.play().catch(function(){}); }
+    } catch(e) {}
+
+    /* Si l'app est au premier plan → juste le son, pas de popup */
+    if (!document.hidden) return;
+
+    /* Si pas de permission → rien */
+    if (!notifGranted) return;
+
+    /* Via Service Worker (fonctionne en arrière-plan) */
+    if (swRegistration && swRegistration.active) {
+        swRegistration.active.postMessage({
+            type:  'NEW_MESSAGE',
+            title: title,
+            body:  body,
+            icon:  senderPhoto || '/icon-192.png',
+            tag:   'bubblechat-' + Date.now(),
+            url:   '/chat.html'
+        });
+    } else {
+        /* Fallback : Notification directe */
+        try {
+            new Notification(title, {
+                body:    body,
+                icon:    '/icon-192.png',
+                badge:   '/icon-192.png',
+                vibrate: [200, 100, 200]
+            });
+        } catch(e) {}
+    }
+}
+
+/* Bouton notifications */
+document.getElementById('notifBtn').addEventListener('click', requestNotifPermission);
+
+/* Init SW */
+registerSW();
+updateNotifBtn();
+
 /* ══ TOGGLE SIDEBAR ══ */
-let sidebarVisible = true;
-const isMobile = function() { return window.innerWidth <= 600; };
+var sidebarVisible = true;
+var isMobile = function() { return window.innerWidth <= 600; };
 
 document.getElementById('toggleSidebar').addEventListener('click', function() {
     sidebarVisible = !sidebarVisible;
@@ -315,7 +439,7 @@ var currentChatType   = 'public';
 var currentChatUser   = null;
 var profiles          = [];
 var pmBadges          = {};
-var lastPublicMsgTime = null; // FIX UUID : on utilise created_at
+var lastPublicMsgTime = null;
 var lastPMId          = 0;
 var pmPollInterval    = null;
 var lastInboxId       = 0;
@@ -365,7 +489,7 @@ document.getElementById('customColorInput').addEventListener('input', function(e
 async function setOnlineStatus(online) {
     try {
         await supabase.from('profiles').update({ is_online: online, last_seen: new Date().toISOString() }).eq('unique_id', currentUniqueId);
-    } catch(e) { console.log('setOnlineStatus err'); }
+    } catch(e) {}
 }
 setOnlineStatus(true);
 setInterval(function() { setOnlineStatus(true); }, 30000);
@@ -392,7 +516,7 @@ async function loadProfiles() {
                 is_online: !!p.is_online
             }; });
         renderProfiles();
-    } catch(e) { console.log('ERR loadProfiles exception'); }
+    } catch(e) { console.log('ERR loadProfiles'); }
 }
 
 function renderProfiles() {
@@ -457,8 +581,7 @@ async function pollInbox() {
             .gt('id', lastInboxId)
             .order('id', { ascending: true });
 
-        if (res.error) { console.log('ERR Inbox: ' + res.error.message); return; }
-        if (!res.data || !res.data.length) return;
+        if (res.error || !res.data || !res.data.length) return;
 
         res.data.forEach(function(msg) {
             if (msg.id > lastInboxId) lastInboxId = msg.id;
@@ -467,9 +590,19 @@ async function pollInbox() {
                 pmBadges[sid] = (pmBadges[sid] || 0) + 1;
                 renderProfiles();
                 showToast(msg, sid);
+
+                /* 🔔 NOTIFICATION PUSH message privé */
+                var sender = profiles.find(function(p) { return p.unique_id === sid; });
+                var senderName = sender ? sender.prenom : 'Quelqu\'un';
+                var senderPhoto = sender ? sender.photo_url : null;
+                sendPushNotif(
+                    '💌 ' + senderName,
+                    msg.message === '⚡ WIZZ !' ? '⚡ WIZZ !' : msg.message,
+                    senderPhoto || '/icon-192.png'
+                );
             }
         });
-    } catch(e) { console.log('ERR pollInbox exception'); }
+    } catch(e) { console.log('ERR pollInbox'); }
 }
 setInterval(pollInbox, 3000);
 
@@ -495,11 +628,10 @@ document.getElementById('wizzBtn').addEventListener('click', async function() {
     setTimeout(function() { document.getElementById('rightPanel').classList.remove('wizzing'); }, 600);
     try {
         await supabase.from('private_messages').insert({ sender_unique_id: currentUniqueId, receiver_unique_id: currentChatUser.unique_id, message: '⚡ WIZZ !', is_read: false });
-    } catch(e) { console.log('ERR Wizz'); }
+    } catch(e) {}
 });
 
-/* ══ CHAT PUBLIC ══
-   FIX : on compare par created_at (string ISO) et non par id (UUID) */
+/* ══ CHAT PUBLIC ══ */
 async function loadPublicMessages() {
     try {
         var query = supabase
@@ -514,22 +646,30 @@ async function loadPublicMessages() {
         }
 
         var res = await query;
-        if (res.error) { console.log('ERR Messages publics: ' + res.error.message); return; }
-        if (!res.data || !res.data.length) return;
+        if (res.error || !res.data || !res.data.length) return;
 
-        if (!lastPublicMsgTime) {
-            document.getElementById('messagesArea').innerHTML = '';
-        }
+        var isFirst = !lastPublicMsgTime;
+        if (isFirst) document.getElementById('messagesArea').innerHTML = '';
 
         res.data.forEach(function(msg) {
             if (!lastPublicMsgTime || msg.created_at > lastPublicMsgTime) {
                 lastPublicMsgTime = msg.created_at;
             }
             if (currentChatType === 'public') {
+                var isNew = !isFirst && msg.prenom !== currentUserPrenom;
                 renderPublicMessage({ author: msg.prenom || 'Anonyme', text: msg.message, photo: msg.photo_url, time: fmtTime(msg.created_at) });
+
+                /* 🔔 NOTIFICATION PUSH message public (seulement nouveaux messages des autres) */
+                if (isNew) {
+                    sendPushNotif(
+                        '🌐 ' + (msg.prenom || 'Anonyme'),
+                        msg.message,
+                        msg.photo_url || '/icon-192.png'
+                    );
+                }
             }
         });
-    } catch(e) { console.log('ERR loadPublicMessages exception'); }
+    } catch(e) { console.log('ERR loadPublicMessages'); }
 }
 
 function renderPublicMessage(opts) {
@@ -555,11 +695,10 @@ async function sendPublicMessage(text) {
     renderPublicMessage({ author: currentUserPrenom, text: text, photo: currentUserPhoto, time: fmtTime(new Date().toISOString()) });
     try {
         var res = await supabase.from('messages').insert({ prenom: currentUserPrenom, message: text, photo_url: currentUserPhoto || null, to_user: null }).select('created_at').single();
-        if (res.error) { console.log('ERR Envoi public: ' + res.error.message); return; }
-        if (res.data && res.data.created_at && (!lastPublicMsgTime || res.data.created_at > lastPublicMsgTime)) {
+        if (!res.error && res.data && res.data.created_at && (!lastPublicMsgTime || res.data.created_at > lastPublicMsgTime)) {
             lastPublicMsgTime = res.data.created_at;
         }
-    } catch(e) { console.log('ERR sendPublicMessage exception'); }
+    } catch(e) {}
 }
 
 setInterval(loadPublicMessages, 2500);
@@ -637,7 +776,7 @@ async function loadPMHistory(otherId) {
             .order('created_at', { ascending: true })
             .limit(150);
 
-        if (res.error) { console.log('ERR Historique MP: ' + res.error.message); area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">⚠️</span>Erreur chargement</div>'; return; }
+        if (res.error) { area.innerHTML = '<div class="pm-empty"><span class="pm-empty-icon">⚠️</span>Erreur chargement</div>'; return; }
 
         area.innerHTML = '';
         if (!res.data || !res.data.length) {
@@ -650,7 +789,7 @@ async function loadPMHistory(otherId) {
             appendPMBubble({ id: msg.id, text: msg.message, fromMe: msg.sender_unique_id === currentUniqueId, time: fmtTime(msg.created_at), is_read: msg.is_read });
         });
         area.scrollTop = area.scrollHeight;
-    } catch(e) { console.log('ERR loadPMHistory exception'); }
+    } catch(e) { console.log('ERR loadPMHistory'); }
 }
 
 function buildBubble(opts) {
@@ -669,7 +808,7 @@ function buildBubble(opts) {
 }
 
 function appendPMBubble(msg) {
-    var area = document.getElementById('messagesArea');
+    var area  = document.getElementById('messagesArea');
     var empty = area.querySelector('.pm-empty');
     if (empty) empty.remove();
     area.appendChild(buildBubble(msg));
@@ -688,10 +827,10 @@ async function sendPM() {
 
     try {
         var res = await supabase.from('private_messages').insert({ sender_unique_id: currentUniqueId, receiver_unique_id: currentChatUser.unique_id, message: text, is_read: false }).select('id').single();
-        if (res.error) { console.log('ERR Envoi MP: ' + res.error.message); var el2 = document.querySelector('[data-msg-id="' + tempId + '"]'); if (el2) el2.remove(); input.value = text; return; }
+        if (res.error) { var el2 = document.querySelector('[data-msg-id="' + tempId + '"]'); if (el2) el2.remove(); input.value = text; return; }
         var el = document.querySelector('[data-msg-id="' + tempId + '"]');
         if (el && res.data) { el.dataset.msgId = res.data.id; if (res.data.id > lastPMId) lastPMId = res.data.id; }
-    } catch(e) { console.log('ERR sendPM exception'); }
+    } catch(e) {}
 }
 
 async function pollNewPMs(otherId) {
@@ -716,7 +855,7 @@ async function pollNewPMs(otherId) {
             document.getElementById('rightPanel').classList.add('wizzing');
             setTimeout(function() { document.getElementById('rightPanel').classList.remove('wizzing'); }, 600);
         }
-    } catch(e) { console.log('ERR pollNewPMs exception'); }
+    } catch(e) {}
 }
 
 async function markRead(id) {
