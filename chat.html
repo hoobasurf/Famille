@@ -38,7 +38,7 @@
     .theme-btn-custom:hover { transform:scale(1.15); border-color:white; }
     .theme-btn-custom input[type=file] { position:absolute; opacity:0; width:100%; height:100%; cursor:pointer; }
 
-    .user-profile-photo { width:45px; height:45px; border-radius:50%; border:3px solid rgba(255,255,255,.6); overflow:hidden; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#ff6b9d,#c06fff); font-size:20px; color:white; cursor:pointer; transition:all .3s; flex-shrink:0; vertical-align:middle; position:relative; top:0; }
+    .user-profile-photo { width:45px; height:45px; border-radius:50%; border:3px solid rgba(255,255,255,.6); overflow:hidden; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#ff6b9d,#c06fff); font-size:20px; color:white; cursor:pointer; transition:all .3s; flex-shrink:0; }
     .user-profile-photo:hover { transform:scale(1.15); }
     .user-profile-photo img { width:100%; height:100%; object-fit:cover; }
 
@@ -77,7 +77,7 @@
     .notif-badge { position:absolute; top:10px; right:10px; background:linear-gradient(135deg,#ff6b9d,#ff3060); color:white; font-size:12px; font-weight:900; border-radius:14px; min-width:24px; height:24px; display:flex; align-items:center; justify-content:center; padding:0 8px; animation:badgePop .5s cubic-bezier(.34,1.56,.64,1); }
     @keyframes badgePop { from{transform:scale(0) rotate(-15deg)} to{transform:scale(1)} }
 
-    .right-panel { flex:1; display:flex; flex-direction:column; min-width:0; background:rgba(255,255,255,.05); backdrop-filter:blur(10px); border-radius:20px; border:1px solid rgba(255,255,255,.15); overflow:hidden; transition:flex .4s; }
+    .right-panel { flex:1; display:flex; flex-direction:column; min-width:0; background:rgba(255,255,255,.05); backdrop-filter:blur(10px); border-radius:20px; border:1px solid rgba(255,255,255,.15); overflow:hidden; }
 
     .wizz-btn { padding:10px 20px; background:linear-gradient(135deg,#ffd700,#ff8c00); border:none; border-radius:12px; color:white; font-weight:700; cursor:pointer; transition:all .3s; font-size:14px; }
     .wizz-btn:hover { transform:translateY(-2px); }
@@ -162,7 +162,7 @@
         .message-input { min-width:0; padding:12px 16px; font-size:14px; }
         .send-btn { padding:12px 20px; font-size:14px; }
         .pm-msg-wrap { max-width:90%; }
-        .users-panel { position:fixed; top:0; left:0; height:100%; z-index:200; max-height:100vh; border-radius:0 20px 20px 0; width:280px; transform:translateX(0); transition:transform .4s cubic-bezier(.4,0,.2,1), opacity .4s; }
+        .users-panel { position:fixed; top:0; left:0; height:100%; z-index:200; max-height:100vh; border-radius:0 20px 20px 0; width:280px; }
         .users-panel.hidden { transform:translateX(-100%); width:280px; opacity:0; pointer-events:none; }
     }
 </style>
@@ -281,10 +281,10 @@ document.getElementById('toggleSidebar').addEventListener('click', () => {
 
 document.addEventListener('click', e => {
     if (isMobile() && sidebarVisible) {
-        const panel     = document.getElementById('usersPanel');
-        const toggle    = document.getElementById('toggleSidebar');
-        const rightPane = document.getElementById('rightPanel');
-        if (!panel.contains(e.target) && !toggle.contains(e.target) && !rightPane.contains(e.target)) {
+        const panel  = document.getElementById('usersPanel');
+        const toggle = document.getElementById('toggleSidebar');
+        const right  = document.getElementById('rightPanel');
+        if (!panel.contains(e.target) && !toggle.contains(e.target) && !right.contains(e.target)) {
             sidebarVisible = false;
             panel.classList.add('hidden');
             document.getElementById('toggleIcon').textContent = '💬';
@@ -294,19 +294,19 @@ document.addEventListener('click', e => {
 });
 
 /* ══ ÉTAT GLOBAL ══ */
-let currentChatType   = 'public';
-let currentChatUser   = null;
-let profiles          = [];
-const pmBadges        = {};
+let currentChatType = 'public';
+let currentChatUser = null;
+let profiles        = [];
+const pmBadges      = {};
 
-// ── Polling public : on utilise l'id (bigint) pour éviter les problèmes de timezone ──
-let lastPublicId   = 0;
-let publicLoaded   = false;
+// public_messages : id est int8 → polling fiable par id
+let lastPublicId    = 0;
+let publicLoaded    = false;
 
-// ── Polling privé ──
-let lastPMId       = 0;
-let pmPollInterval = null;
-let lastInboxId    = 0;
+// private_messages
+let lastPMId        = 0;
+let pmPollInterval  = null;
+let lastInboxId     = 0;
 
 /* ══ COULEUR BULLES ══ */
 const PRESETS = [
@@ -367,7 +367,7 @@ document.addEventListener('visibilitychange', () => setOnlineStatus(!document.hi
 async function loadProfiles() {
     const { data, error } = await supabase
         .from('profiles')
-        .select('unique_id, prenom, photo_url, is_online, last_seen')
+        .select('unique_id, prenom, photo_url, is_online')
         .order('is_online', { ascending: false })
         .order('prenom',    { ascending: true });
 
@@ -388,7 +388,6 @@ function renderProfiles() {
     const container = document.getElementById('profileList');
     const countEl   = document.getElementById('profileCount');
     container.innerHTML = '';
-
     const onlineCount = profiles.filter(p => p.is_online).length;
     countEl.textContent = `${profiles.length} utilisateur${profiles.length > 1 ? 's' : ''} · ${onlineCount} en ligne`;
 
@@ -485,35 +484,37 @@ document.getElementById('wizzBtn').addEventListener('click', async () => {
     const { error } = await supabase.from('private_messages').insert({
         sender_unique_id:   currentUniqueId,
         receiver_unique_id: currentChatUser.unique_id,
-        message:  '⚡ WIZZ !',
-        is_read:  false
+        message: '⚡ WIZZ !',
+        is_read: false,
+        is_wizz: true
     });
     if (error) logErr('Wizz', error);
 });
 
 /* ══ CHAT PUBLIC ══
-   FIX PRINCIPAL : suppression du filtre .is('to_user', null) qui bloquait tous les messages.
-   On utilise désormais l'id (bigint auto-incrémenté) pour le polling, fiable et sans problème de timezone. */
+   TABLE : public_messages
+   Colonnes : id (int8), author (text), message (text), photo_url (text), created_at
+*/
 async function loadPublicMessages() {
     if (currentChatType !== 'public') return;
 
-    // Premier chargement : récupérer les 60 derniers messages
     if (!publicLoaded) {
+        // Premier chargement : 60 derniers messages
         const { data, error } = await supabase
-            .from('messages')
-            .select('id, prenom, message, created_at, photo_url')
+            .from('public_messages')
+            .select('id, author, message, photo_url, created_at')
             .order('created_at', { ascending: false })
             .limit(60);
 
-        if (error) { logErr('Messages publics init', error); return; }
+        if (error) { logErr('public_messages init', error); return; }
 
-        const msgs = (data || []).reverse(); // remettre dans l'ordre chronologique
+        const msgs = (data || []).reverse();
         document.getElementById('messagesArea').innerHTML = '';
 
         msgs.forEach(msg => {
             if (msg.id > lastPublicId) lastPublicId = msg.id;
             renderPublicMessage({
-                author: msg.prenom   || 'Anonyme',
+                author: msg.author   || 'Anonyme',
                 text:   msg.message,
                 photo:  msg.photo_url,
                 time:   fmtTime(msg.created_at)
@@ -526,22 +527,20 @@ async function loadPublicMessages() {
         return;
     }
 
-    // Polling : seulement les nouveaux messages (id > lastPublicId)
-    if (lastPublicId === 0) return;
-
+    // Polling : nouveaux messages seulement
     const { data, error } = await supabase
-        .from('messages')
-        .select('id, prenom, message, created_at, photo_url')
+        .from('public_messages')
+        .select('id, author, message, photo_url, created_at')
         .gt('id', lastPublicId)
         .order('id', { ascending: true });
 
-    if (error) { logErr('Messages publics poll', error); return; }
+    if (error) { logErr('public_messages poll', error); return; }
     if (!data?.length) return;
 
     data.forEach(msg => {
         if (msg.id > lastPublicId) lastPublicId = msg.id;
         renderPublicMessage({
-            author: msg.prenom   || 'Anonyme',
+            author: msg.author   || 'Anonyme',
             text:   msg.message,
             photo:  msg.photo_url,
             time:   fmtTime(msg.created_at)
@@ -556,6 +555,12 @@ function renderPublicMessage({ author, text, photo, time }) {
 
     const av = document.createElement('div');
     av.className = 'message-avatar';
+
+    // Chercher la photo dans les profils si pas fournie directement
+    if (!photo) {
+        const profile = profiles.find(p => p.prenom === author);
+        photo = profile?.photo_url || null;
+    }
     av.innerHTML = photo ? `<img src="${photo}" alt="${esc(author)}">` : (author?.[0] || '?').toUpperCase();
 
     const content = document.createElement('div');
@@ -574,15 +579,17 @@ async function sendPublicMessage(text) {
     // Affichage local immédiat
     renderPublicMessage({ author: currentUserPrenom, text, photo: currentUserPhoto, time: fmtTime(new Date().toISOString()) });
 
-    const { data, error } = await supabase.from('messages').insert({
-        prenom:    currentUserPrenom,
-        message:   text,
-        photo_url: currentUserPhoto || null
-        // NE PAS inclure to_user — pas de filtre dessus
-    }).select('id').single();
+    const { data, error } = await supabase
+        .from('public_messages')
+        .insert({
+            author:    currentUserPrenom,
+            message:   text,
+            photo_url: currentUserPhoto || null
+        })
+        .select('id')
+        .single();
 
     if (error) { logErr('Envoi public', error); return; }
-    // Mettre à jour lastPublicId pour ne pas recharger ce message
     if (data?.id && data.id > lastPublicId) lastPublicId = data.id;
 }
 
@@ -593,7 +600,7 @@ function setHeader(avatarHtml, name, statusTxt, isOnline, showWizz) {
     document.getElementById('chatHeaderAvatar').innerHTML = avatarHtml;
     document.getElementById('chatHeaderName').textContent = name;
     const st = document.getElementById('chatHeaderStatus');
-    st.className  = 'chat-panel-header-status ' + (isOnline ? 'online' : 'offline');
+    st.className   = 'chat-panel-header-status ' + (isOnline ? 'online' : 'offline');
     st.textContent = statusTxt;
     document.getElementById('wizzBtn').style.display = showWizz ? 'block' : 'none';
 }
@@ -603,7 +610,7 @@ function switchToPublicChat() {
     currentChatType = 'public';
     currentChatUser = null;
     lastPublicId    = 0;
-    publicLoaded    = false; // ← reset pour recharger l'historique
+    publicLoaded    = false;
 
     setHeader('🌐', 'Chat général', '● Public', true, false);
     document.getElementById('bubbleColorPicker').style.display = 'none';
@@ -686,7 +693,7 @@ async function loadPMHistory(otherId) {
 
 function buildBubble({ id, text, fromMe, time, is_read }) {
     const wrap = document.createElement('div');
-    wrap.className  = 'pm-msg-wrap ' + (fromMe ? 'sent' : 'received');
+    wrap.className = 'pm-msg-wrap ' + (fromMe ? 'sent' : 'received');
     wrap.dataset.msgId = id;
 
     const bubble = document.createElement('div');
@@ -720,7 +727,8 @@ async function sendPM() {
         sender_unique_id:   currentUniqueId,
         receiver_unique_id: currentChatUser.unique_id,
         message: text,
-        is_read: false
+        is_read: false,
+        is_wizz: false
     }).select('id').single();
 
     if (error) {
@@ -752,6 +760,7 @@ async function pollNewPMs(otherId) {
         appendPMBubble({ id: msg.id, text: msg.message, fromMe: false, time: fmtTime(msg.created_at), is_read: false });
         markRead(msg.id);
     });
+
     if (data.some(m => m.message === '⚡ WIZZ !')) {
         document.getElementById('rightPanel').classList.add('wizzing');
         setTimeout(() => document.getElementById('rightPanel').classList.remove('wizzing'), 600);
@@ -762,6 +771,7 @@ async function markRead(id) {
     const { error } = await supabase.from('private_messages').update({ is_read: true }).eq('id', id);
     if (error) logErr('markRead', error);
 }
+
 async function markAllRead(senderId) {
     if (!currentUniqueId) return;
     const { error } = await supabase.from('private_messages')
@@ -786,7 +796,8 @@ document.getElementById('messageInput').addEventListener('keypress', e => { if (
 /* ══ THÈMES ══ */
 document.querySelectorAll('.theme-btn').forEach(btn =>
     btn.addEventListener('click', () => {
-        document.body.className = ''; document.body.style.backgroundImage = '';
+        document.body.className = '';
+        document.body.style.backgroundImage = '';
         document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         document.body.classList.add('theme-' + btn.dataset.theme);
