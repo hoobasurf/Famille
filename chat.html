@@ -47,6 +47,9 @@
         /* ══ BOUTON ARCADE ══ */
         .arcade-btn { width:45px; height:45px; border-radius:50%; border:3px solid rgba(255,215,0,.7); background:linear-gradient(135deg,rgba(255,107,157,.25),rgba(192,111,255,.25)); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:22px; transition:all .3s; flex-shrink:0; text-decoration:none; box-shadow:0 0 14px rgba(255,215,0,.35); }
         .arcade-btn:hover { transform:scale(1.18); border-color:#ffd700; box-shadow:0 0 28px rgba(255,215,0,.7),0 0 10px rgba(255,107,157,.5); background:linear-gradient(135deg,rgba(255,107,157,.4),rgba(192,111,255,.4)); }
+        /* ══ BOUTON WALL ══ */
+        .wall-btn { width:45px; height:45px; border-radius:50%; border:3px solid rgba(30,144,255,.7); background:linear-gradient(135deg,rgba(30,144,255,.25),rgba(70,130,180,.25)); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:22px; transition:all .3s; flex-shrink:0; text-decoration:none; box-shadow:0 0 14px rgba(30,144,255,.35); }
+        .wall-btn:hover { transform:scale(1.18); border-color:#1e90ff; box-shadow:0 0 28px rgba(30,144,255,.7); }
         .toggle-sidebar-btn { position:fixed; top:50%; left:20px; transform:translateY(-50%); z-index:300; background:linear-gradient(135deg,#ff6b9d,#c06fff); border:none; border-radius:16px; padding:16px 20px; color:white; font-weight:700; cursor:pointer; transition:all .4s cubic-bezier(.34,1.56,.64,1); display:flex; flex-direction:column; align-items:center; gap:8px; animation:neonPulse 2s ease-in-out infinite; }
         @keyframes neonPulse { 0%,100%{ box-shadow:0 0 20px rgba(255,107,157,.6),0 0 40px rgba(192,111,255,.4),0 8px 25px rgba(0,0,0,.3); } 50%{ box-shadow:0 0 35px rgba(255,107,157,.9),0 0 65px rgba(192,111,255,.6),0 8px 25px rgba(0,0,0,.3); } }
         .toggle-sidebar-btn:hover { transform:translateY(-50%) scale(1.1); }
@@ -209,6 +212,7 @@
                 <div class="theme-btn" data-theme="aquarium"  style="background:linear-gradient(135deg,#00416a,#ffe000)"  title="Aquarium"></div>
                 <div class="theme-btn-custom" title="Photo personnalisée">📷<input type="file" id="customBgInput" accept="image/*"></div>
                 <a href="arcade.html" class="arcade-btn" title="🕹️ Arcade — Jeux">🕹️</a>
+                <a href="wall.html" class="wall-btn" title="Mur">📰</a>
                 <div class="notif-toggle-btn" id="notifBtn" title="Activer les notifications">🔔</div>
                 <div class="user-profile-photo" id="userProfilePhoto" title="Mon profil">💬</div>
             </div>
@@ -336,7 +340,7 @@ registerSW();updateNotifBtn();
 var sidebarVisible=true;
 var isMobile=function(){return window.innerWidth<=600;};
 document.getElementById('toggleSidebar').addEventListener('click',function(){sidebarVisible=!sidebarVisible;document.getElementById('usersPanel').classList.toggle('hidden',!sidebarVisible);document.getElementById('toggleIcon').textContent=sidebarVisible?'👥':'💬';document.getElementById('toggleText').textContent=sidebarVisible?'Profils':'Chat';});
-document.addEventListener('click',function(e){if(isMobile()&&sidebarVisible){var panel=document.getElementById('usersPanel');var toggle=document.getElementById('toggleSidebar');var rightPane=document.getElementById('rightPanel');if(!panel.contains(e.target)&&!toggle.contains(e.target)&&!rightPane.contains(e.target)){sidebarVisible=false;panel.classList.add('hidden');document.getElementById('toggleIcon').textContent='💬';document.getElementById('toggleText').textContent='Chat';}}});
+document.addEventListener('click',function(e){if(isMobile()&&sidebarVisible){var panel=document.getElementById('usersPanel');var toggle=document.getElementById('toggleSidebar');var rightPane=document.getElementById('rightPanel');var header=document.querySelector('.chat-header');if(!panel.contains(e.target)&&!toggle.contains(e.target)&&!rightPane.contains(e.target)&&!(header&&header.contains(e.target))){sidebarVisible=false;panel.classList.add('hidden');document.getElementById('toggleIcon').textContent='💬';document.getElementById('toggleText').textContent='Chat';}}});
 var currentChatType='public',currentChatUser=null,profiles=[],pmBadges={},lastPublicMsgTime=null,lastPMId=0,pmPollInterval=null,lastInboxId=0;
 var PRESETS=[{l:'Rose/Violet',v:'linear-gradient(135deg,#ff6b9d,#c06fff)'},{l:'Bleu',v:'linear-gradient(135deg,#2196f3,#03a9f4)'},{l:'Vert',v:'linear-gradient(135deg,#43e97b,#38f9d7)'},{l:'Orange',v:'linear-gradient(135deg,#f7971e,#ffd200)'},{l:'Rouge',v:'linear-gradient(135deg,#f44336,#e91e63)'},{l:'Indigo',v:'linear-gradient(135deg,#5c6bc0,#7c4dff)'},{l:'Cyan',v:'linear-gradient(135deg,#00bcd4,#26c6da)'},{l:'Noir',v:'linear-gradient(135deg,#2d2d2d,#555)'}];
 var myBubbleStyle=localStorage.getItem('myBubbleStyle')||PRESETS[0].v;
