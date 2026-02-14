@@ -52,24 +52,53 @@ body{background:#1a1a2e;font-family:'Nunito',sans-serif;overflow:hidden;user-sel
 .lvl-icon{font-size:20px;display:block;margin-bottom:2px;}
 .lvl-sub{font-size:10px;color:#a8d8ea;margin-top:1px;}
 
-/* Room UI */
-.room-input-row{display:flex;gap:8px;margin-bottom:12px;}
-.room-input{flex:1;padding:12px 16px;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:12px;color:white;font-size:18px;font-weight:700;font-family:‘Press Start 2P’,monospace;letter-spacing:4px;text-align:center;outline:none;}
-.room-input::placeholder{color:rgba(255,255,255,.35);font-size:14px;letter-spacing:2px;}
-.room-input:focus{border-color:rgba(255,215,0,.6);}
-.room-btn{padding:12px 20px;background:linear-gradient(135deg,#ff6b9d,#c06fff);border:none;border-radius:12px;color:white;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;white-space:nowrap;}
-.room-btn:hover{transform:translateY(-1px);}
-.room-btn.green{background:linear-gradient(135deg,#43e97b,#38f9d7);}
+/* ══ DÉCOUVERTE JOUEURS ══ */
+.players-online-box{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px;margin-bottom:14px;}
+.players-online-title{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.players-online-title span{font-family:‘Press Start 2P’,monospace;font-size:9px;color:#FFD700;letter-spacing:1px;}
+.online-pulse{width:8px;height:8px;border-radius:50%;background:#43e97b;animation:opulse 1.5s infinite;}
+@keyframes opulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.players-grid{display:flex;flex-direction:column;gap:6px;min-height:60px;}
+.player-card{display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.1);border-radius:12px;cursor:pointer;transition:all .25s;position:relative;}
+.player-card:hover{border-color:rgba(255,215,0,.5);background:rgba(255,215,0,.06);transform:translateX(4px);}
+.player-card.selected-player{border-color:#43e97b;background:rgba(67,233,123,.12);transform:translateX(4px);}
+.player-card.invited{border-color:#FFD700;background:rgba(255,215,0,.1);animation:inviteGlow .8s ease-in-out infinite alternate;}
+@keyframes inviteGlow{from{box-shadow:0 0 8px rgba(255,215,0,.2)}to{box-shadow:0 0 18px rgba(255,215,0,.5)}}
+.player-card.accepted{border-color:#43e97b;background:rgba(67,233,123,.15);}
+.player-card.declined{border-color:#e74c3c;background:rgba(231,76,60,.1);opacity:.6;}
+.player-card-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ff6b9d,#c06fff);border:2px solid rgba(255,255,255,.3);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;color:white;font-weight:700;position:relative;}
+.player-card-avatar img{width:100%;height:100%;object-fit:cover;}
+.player-card-info{flex:1;min-width:0;}
+.player-card-name{font-size:14px;font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.player-card-sub{font-size:11px;color:#a8d8ea;margin-top:2px;}
+.player-card-status{font-size:13px;margin-left:auto;}
+.player-card-check{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:#43e97b;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;}
 
-.room-status{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;margin-bottom:14px;min-height:60px;}
-.room-code-display{font-family:‘Press Start 2P’,monospace;font-size:28px;color:#FFD700;text-align:center;letter-spacing:8px;text-shadow:0 0 20px rgba(255,215,0,.5);}
-.room-code-label{font-size:12px;color:#a8d8ea;text-align:center;margin-bottom:8px;}
-.room-players-list{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
-.room-player-row{display:flex;align-items:center;gap:10px;padding:6px 10px;background:rgba(255,255,255,.06);border-radius:8px;}
-.room-player-emoji{font-size:22px;}
-.room-player-name{font-size:13px;font-weight:700;color:white;}
-.room-player-host{font-size:10px;color:#FFD700;margin-left:auto;}
-.room-player-ready{font-size:10px;margin-left:auto;}
+.no-players-msg{text-align:center;color:rgba(255,255,255,.4);font-size:12px;padding:18px 0;line-height:2;}
+.no-players-icon{font-size:30px;display:block;margin-bottom:8px;}
+
+/* Invitation reçue overlay */
+.invite-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;}
+.invite-overlay.show{display:flex;}
+.invite-card{background:linear-gradient(135deg,#1a1a2e,#302b63);border:2px solid rgba(255,215,0,.5);border-radius:22px;padding:28px;text-align:center;max-width:340px;width:90%;box-shadow:0 0 40px rgba(255,215,0,.3);animation:inviteIn .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes inviteIn{from{opacity:0;transform:scale(.8) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.invite-icon{font-size:52px;margin-bottom:12px;}
+.invite-title{font-family:‘Press Start 2P’,monospace;font-size:13px;color:#FFD700;margin-bottom:8px;}
+.invite-from{font-size:15px;color:white;margin-bottom:18px;}
+.invite-btns{display:flex;gap:10px;justify-content:center;}
+.invite-btn{padding:12px 24px;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;}
+.invite-btn-yes{background:linear-gradient(135deg,#43e97b,#38f9d7);color:#0a1a10;}
+.invite-btn-no{background:rgba(231,76,60,.8);color:white;}
+
+/* Session room status */
+.session-status{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;margin-bottom:14px;}
+.session-row{display:flex;align-items:center;gap:10px;padding:6px 0;}
+.session-av{font-size:20px;}
+.session-name{font-size:13px;font-weight:700;color:white;flex:1;}
+.session-badge{font-size:11px;padding:3px 8px;border-radius:8px;font-weight:700;}
+.session-badge.host{background:rgba(255,215,0,.2);color:#FFD700;border:1px solid rgba(255,215,0,.3);}
+.session-badge.ready{background:rgba(67,233,123,.2);color:#43e97b;}
+.session-badge.waiting{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);}
 
 .tuto-panel{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;margin-bottom:14px;}
 .tuto-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;font-size:11px;color:white;line-height:1.5;}
@@ -84,6 +113,7 @@ body{background:#1a1a2e;font-family:'Nunito',sans-serif;overflow:hidden;user-sel
 .msg-info{text-align:center;font-size:12px;color:#a8d8ea;padding:8px;border-radius:8px;background:rgba(255,255,255,.05);}
 .msg-info.error{color:#ff6b6b;background:rgba(255,0,0,.1);}
 .msg-info.success{color:#43e97b;background:rgba(67,233,123,.1);}
+.msg-info.warning{color:#FFD700;background:rgba(255,215,0,.1);}
 
 /* ── GAME ── */
 #gameScreen{position:relative;}
@@ -160,7 +190,6 @@ canvas{display:block;width:100%;height:100%;}
 
 ```
 <div class="lobby-panel">
-
   <!-- Tabs -->
   <div class="mode-tabs">
     <div class="mode-tab active" id="tabSolo" onclick="switchTab('solo')">
@@ -196,39 +225,69 @@ canvas{display:block;width:100%;height:100%;}
 
   <!-- ── TAB MULTI ── -->
   <div class="tab-content" id="contentMulti">
+    <!-- Non connecté -->
     <div id="multiNotAuth" style="display:none">
       <div class="msg-info error">⚠️ Tu dois être connecté à BubbleChat pour jouer en ligne.</div>
       <a href="chat.html" style="display:block;margin-top:10px;text-align:center;color:#a8d8ea;font-size:13px;">← Retour au chat</a>
     </div>
+
+    <!-- Connecté -->
     <div id="multiAuth">
       <div class="section-lbl">🎭 TON AVATAR</div>
       <div class="avatar-grid" id="avGridMulti"></div>
 
-      <div class="room-input-row">
-        <input class="room-input" id="roomCodeInput" maxlength="4" placeholder="CODE" type="text" oninput="this.value=this.value.toUpperCase().replace(/[^0-9]/g,'')">
-        <button class="room-btn" onclick="joinRoom()">REJOINDRE</button>
-        <button class="room-btn green" onclick="createRoom()">CRÉER</button>
+      <!-- Joueurs en ligne -->
+      <div class="players-online-box">
+        <div class="players-online-title">
+          <div class="online-pulse"></div>
+          <span>JOUEURS EN LIGNE</span>
+          <span id="onlineCountBadge" style="margin-left:auto;background:rgba(255,255,255,.1);border-radius:8px;padding:2px 8px;font-size:9px;color:#a8d8ea;font-family:'Nunito',sans-serif;">0</span>
+        </div>
+        <div class="players-grid" id="playersGrid">
+          <div class="no-players-msg">
+            <span class="no-players-icon">👀</span>
+            Recherche des joueurs...
+          </div>
+        </div>
       </div>
 
-      <div class="room-status" id="roomStatus">
-        <div class="msg-info">Crée une salle ou entre un code pour rejoindre</div>
+      <!-- Joueurs sélectionnés pour jouer -->
+      <div id="sessionBox" style="display:none">
+        <div class="section-lbl">👥 MA PARTIE</div>
+        <div class="session-status" id="sessionStatus"></div>
       </div>
 
-      <div class="section-lbl" id="lvlLblMulti" style="display:none">🗺️ NIVEAU (hôte)</div>
-      <div class="level-grid" id="lvlGridMulti" style="display:none">
-        <button class="lvl-btn selected" onclick="pickLevelMulti('short',this)"><span class="lvl-icon">⚡</span>Court</button>
-        <button class="lvl-btn"          onclick="pickLevelMulti('medium',this)"><span class="lvl-icon">🌟</span>Moyen</button>
-        <button class="lvl-btn"          onclick="pickLevelMulti('long',this)"><span class="lvl-icon">🏆</span>Long</button>
+      <!-- Niveau (hôte uniquement) -->
+      <div id="lvlLblMulti" style="display:none">
+        <div class="section-lbl">🗺️ NIVEAU</div>
+        <div class="level-grid" id="lvlGridMulti">
+          <button class="lvl-btn selected" onclick="pickLevelMulti('short',this)"><span class="lvl-icon">⚡</span>Court</button>
+          <button class="lvl-btn"          onclick="pickLevelMulti('medium',this)"><span class="lvl-icon">🌟</span>Moyen</button>
+          <button class="lvl-btn"          onclick="pickLevelMulti('long',this)"><span class="lvl-icon">🏆</span>Long</button>
+        </div>
       </div>
 
-      <div class="player-info" id="pInfoMulti">Choisis un avatar puis crée ou rejoins une salle</div>
+      <div class="player-info" id="pInfoMulti">Choisis ton avatar puis clique sur un joueur pour jouer</div>
       <button class="start-btn" id="startMultiBtn" disabled onclick="startMulti()">▶ LANCER LA PARTIE</button>
     </div>
   </div>
-
 </div>
 ```
 
+  </div>
+</div>
+
+<!-- Overlay invitation reçue -->
+
+<div class="invite-overlay" id="inviteOverlay">
+  <div class="invite-card">
+    <div class="invite-icon">🎮</div>
+    <div class="invite-title">INVITATION !</div>
+    <div class="invite-from" id="inviteFromText">Quelqu'un veut jouer avec toi !</div>
+    <div class="invite-btns">
+      <button class="invite-btn invite-btn-yes" onclick="acceptInvite()">✅ Rejoindre !</button>
+      <button class="invite-btn invite-btn-no"  onclick="declineInvite()">❌ Refuser</button>
+    </div>
   </div>
 </div>
 
@@ -309,11 +368,16 @@ const sb = createClient(SUPA_URL, SUPA_KEY);
 // ═══════════════════════════════════════════
 //  IDENTITÉ JOUEUR (depuis BubbleChat)
 // ═══════════════════════════════════════════
-function getFingerprint(){ let f=localStorage.getItem('browserFingerprint'); if(!f){f=Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem('browserFingerprint',f);} return f; }
+function getFingerprint(){
+  let f = localStorage.getItem('browserFingerprint');
+  if(!f){ f = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('browserFingerprint', f); }
+  return f;
+}
 const myPrenom   = localStorage.getItem('prenom') || null;
 const myFP       = getFingerprint();
-const myUID      = myPrenom ? (myPrenom+'_'+myFP) : null;
+const myUID      = myPrenom ? (myPrenom + '_' + myFP) : null;
 const isLoggedIn = !!myPrenom;
+const myPhoto    = localStorage.getItem('userPhotoUrl') || localStorage.getItem('tempPhotoPreview') || null;
 
 // ═══════════════════════════════════════════
 //  CONSTANTES JEU
@@ -341,30 +405,55 @@ const CTRL=[
 // ═══════════════════════════════════════════
 //  ÉTAT LOBBY
 // ═══════════════════════════════════════════
-let chosenSolo   = null;   // avatar index solo
-let chosenMulti  = null;   // avatar index multi
+let chosenSolo   = null;
+let chosenMulti  = null;
 let chosenLen    = 'short';
 let chosenLenMulti = 'short';
 let currentTab   = 'solo';
-let currentRoom  = null;   // { id, isHost }
-let roomChannel  = null;   // Supabase Realtime channel
-let roomPollInt  = null;
+
+// ── Nouveaux états pour la découverte joueurs ──
+let onlinePlayers   = [];      // joueurs en ligne (depuis profiles)
+let selectedPlayers = [];      // UIDs des joueurs invités
+let mySessionId     = null;    // ID de ma session en cours
+let isHost          = false;
+let sessionChannel  = null;
+let onlineChannel   = null;
+let playersPollInt  = null;
+let sessionPollInt  = null;
+let pendingInvite   = null;    // {sessionId, fromName, fromUID, avatarIndex, level}
 
 // ── STARS ──
-(()=>{ const el=document.getElementById('starsEl'); for(let i=0;i<70;i++){ const s=document.createElement('div'); s.className='star'; const z=Math.random()*3+1; s.style.cssText=`width:${z}px;height:${z}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*2}s;animation-duration:${1+Math.random()*2}s`; el.appendChild(s); } })();
+(()=>{
+  const el = document.getElementById('starsEl');
+  for(let i=0;i<70;i++){
+    const s = document.createElement('div'); s.className='star';
+    const z = Math.random()*3+1;
+    s.style.cssText=`width:${z}px;height:${z}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*2}s;animation-duration:${1+Math.random()*2}s`;
+    el.appendChild(s);
+  }
+})();
 
 // ── AVATAR GRIDS ──
 function makeAvGrid(gridId, onSelect){
-  const g=document.getElementById(gridId); g.innerHTML='';
+  const g = document.getElementById(gridId); g.innerHTML='';
   AVATARS.forEach((av,i)=>{
-    const d=document.createElement('div'); d.className='av-slot'; d.id=gridId+'_av'+i;
+    const d = document.createElement('div'); d.className='av-slot'; d.id=gridId+'_av'+i;
     d.innerHTML=`<span class="av-emoji">${av.e}</span><div class="av-name">${av.n}</div><div class="av-dot" style="background:${av.c}"></div>`;
     d.onclick=()=>onSelect(i,gridId);
     g.appendChild(d);
   });
 }
-makeAvGrid('avGridSolo', (i,gid)=>{ chosenSolo=i; selectAvatar(gid,i); document.getElementById('startSoloBtn').disabled=false; document.getElementById('pInfoSolo').textContent=`${AVATARS[i].e} ${AVATARS[i].n} sélectionné !`; });
-makeAvGrid('avGridMulti',(i,gid)=>{ chosenMulti=i; selectAvatar(gid,i); updateMultiUI(); });
+makeAvGrid('avGridSolo', (i,gid)=>{
+  chosenSolo=i; selectAvatar(gid,i);
+  document.getElementById('startSoloBtn').disabled=false;
+  document.getElementById('pInfoSolo').textContent=`${AVATARS[i].e} ${AVATARS[i].n} sélectionné !`;
+});
+makeAvGrid('avGridMulti',(i,gid)=>{
+  chosenMulti=i; selectAvatar(gid,i);
+  document.getElementById('pInfoMulti').textContent=`${AVATARS[i].e} ${AVATARS[i].n} — clique sur un joueur pour l'inviter !`;
+  // Mettre à jour mon avatar dans la session si j'en ai une
+  if(mySessionId) updateMyAvatarInSession(i);
+});
 
 function selectAvatar(gridId,sel){
   document.querySelectorAll(`#${gridId} .av-slot`).forEach((el,j)=>{ el.classList.toggle('selected',j===sel); });
@@ -378,118 +467,358 @@ window.switchTab = function(tab){
   document.getElementById('contentSolo').classList.toggle('active',tab==='solo');
   document.getElementById('contentMulti').classList.toggle('active',tab==='multi');
   if(tab==='multi'){
-    if(!isLoggedIn){ document.getElementById('multiNotAuth').style.display='block'; document.getElementById('multiAuth').style.display='none'; }
-    else           { document.getElementById('multiNotAuth').style.display='none';  document.getElementById('multiAuth').style.display='block'; }
+    if(!isLoggedIn){
+      document.getElementById('multiNotAuth').style.display='block';
+      document.getElementById('multiAuth').style.display='none';
+    } else {
+      document.getElementById('multiNotAuth').style.display='none';
+      document.getElementById('multiAuth').style.display='block';
+      // Enregistrer présence et démarrer la découverte
+      registerPresence();
+      startPlayerDiscovery();
+    }
+  } else {
+    stopPlayerDiscovery();
   }
 };
 
 // ── LEVEL ──
 window.pickLevel = function(k,el){ chosenLen=k; document.querySelectorAll('#lvlGridSolo .lvl-btn').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); };
-window.pickLevelMulti = function(k,el){ chosenLenMulti=k; document.querySelectorAll('#lvlGridMulti .lvl-btn').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); };
-
-// ═══════════════════════════════════════════
-//  GESTION SALLE MULTI
-// ═══════════════════════════════════════════
-function genCode(){ return String(Math.floor(1000+Math.random()*9000)); }
-
-window.createRoom = async function(){
-  if(chosenMulti===null){ setMultiMsg('Choisis un avatar d\'abord !','error'); return; }
-  const code=genCode();
-  try{
-    await sb.from('game_rooms').insert({ id:code, host_id:myUID, level:chosenLenMulti, status:'waiting', seed:Date.now() });
-    await sb.from('game_players').insert({ room_id:code, player_id:myUID, player_name:myPrenom, avatar_index:chosenMulti, slot:0, is_ready:true });
-    currentRoom={id:code, isHost:true};
-    subscribeRoom(code);
-    showRoomStatus(code,true);
-  }catch(e){ setMultiMsg('Erreur création salle : '+e.message,'error'); }
+window.pickLevelMulti = function(k,el){
+  chosenLenMulti=k;
+  document.querySelectorAll('#lvlGridMulti .lvl-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  if(mySessionId) updateSessionLevel(k);
 };
 
-window.joinRoom = async function(){
-  const code=document.getElementById('roomCodeInput').value.trim();
-  if(code.length!==4){ setMultiMsg('Entre un code à 4 chiffres','error'); return; }
-  if(chosenMulti===null){ setMultiMsg('Choisis un avatar d\'abord !','error'); return; }
-  try{
-    const {data:room}=await sb.from('game_rooms').select('*').eq('id',code).single();
-    if(!room){ setMultiMsg('Salle introuvable !','error'); return; }
-    if(room.status==='playing'){ setMultiMsg('Partie déjà en cours !','error'); return; }
-    const {data:existing}=await sb.from('game_players').select('id').eq('room_id',code).eq('player_id',myUID).single();
-    const {data:allPlayers}=await sb.from('game_players').select('slot').eq('room_id',code);
-    const usedSlots=allPlayers?allPlayers.map(p=>p.slot):[];
-    const slot=[0,1,2,3].find(s=>!usedSlots.includes(s))??usedSlots.length;
-    if(!existing){
-      await sb.from('game_players').insert({ room_id:code, player_id:myUID, player_name:myPrenom, avatar_index:chosenMulti, slot, is_ready:true });
-    }
-    currentRoom={id:code, isHost:room.host_id===myUID};
-    subscribeRoom(code);
-    showRoomStatus(code,currentRoom.isHost);
-  }catch(e){ setMultiMsg('Erreur : '+e.message,'error'); }
-};
-
-function subscribeRoom(code){
-  if(roomChannel) sb.removeChannel(roomChannel);
-  // Écoute les changements dans game_players pour cette salle
-  roomChannel=sb.channel('room_'+code)
-    .on('postgres_changes',{event:'*',schema:'public',table:'game_players',filter:`room_id=eq.${code}`}, ()=>refreshRoomStatus(code))
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'game_rooms',filter:`id=eq.${code}`}, (payload)=>{ if(payload.new.status==='playing') launchMultiGame(payload.new); })
-    .subscribe();
-  if(roomPollInt) clearInterval(roomPollInt);
-  roomPollInt=setInterval(()=>refreshRoomStatus(code),3000);
+// ═══════════════════════════════════════════
+//  PRÉSENCE EN LIGNE
+// ═══════════════════════════════════════════
+async function registerPresence(){
+  if(!myUID) return;
+  try {
+    // Marquer comme en ligne dans profiles (même table que BubbleChat)
+    await sb.from('profiles').upsert({
+      unique_id: myUID,
+      prenom: myPrenom,
+      photo_url: myPhoto,
+      is_online: true,
+      last_seen: new Date().toISOString()
+    }, { onConflict:'unique_id' });
+  } catch(e){}
 }
 
-async function refreshRoomStatus(code){
-  try{
-    const {data:players}=await sb.from('game_players').select('*').eq('room_id',code).order('slot');
-    if(!players) return;
-    renderRoomPlayers(players,code);
-    const isHost=players.find(p=>p.player_id===myUID)?.slot===0;
-    document.getElementById('startMultiBtn').disabled=!isHost||players.length<1;
-  }catch(e){}
+// ═══════════════════════════════════════════
+//  DÉCOUVERTE DES JOUEURS EN LIGNE
+// ═══════════════════════════════════════════
+function startPlayerDiscovery(){
+  loadOnlinePlayers();
+  if(playersPollInt) clearInterval(playersPollInt);
+  playersPollInt = setInterval(loadOnlinePlayers, 4000);
+
+  // Écouter les invitations qui me sont destinées
+  listenForInvites();
 }
 
-function showRoomStatus(code,isHost){
-  const st=document.getElementById('roomStatus');
-  st.innerHTML=`<div class="room-code-label">Code de ta salle :</div><div class="room-code-display">${code}</div><div class="room-players-list" id="roomPlayersList"></div>`;
-  if(isHost){ document.getElementById('lvlLblMulti').style.display='block'; document.getElementById('lvlGridMulti').style.display='grid'; }
-  document.getElementById('startMultiBtn').disabled=!isHost;
-  refreshRoomStatus(code);
+function stopPlayerDiscovery(){
+  if(playersPollInt){ clearInterval(playersPollInt); playersPollInt=null; }
+  if(sessionPollInt){ clearInterval(sessionPollInt); sessionPollInt=null; }
+  if(onlineChannel){ sb.removeChannel(onlineChannel); onlineChannel=null; }
 }
 
-function renderRoomPlayers(players,code){
-  const list=document.getElementById('roomPlayersList');
-  if(!list)return;
-  list.innerHTML='';
-  players.forEach(p=>{
-    const av=AVATARS[p.avatar_index]||AVATARS[0];
-    const isMe=p.player_id===myUID;
-    const isHost=p.slot===0;
-    const row=document.createElement('div');
-    row.className='room-player-row';
-    row.innerHTML=`<span class="room-player-emoji">${av.e}</span><span class="room-player-name">${esc(p.player_name)}${isMe?' (toi)':''}</span>${isHost?'<span class="room-player-host">👑 Hôte</span>':'<span class="room-player-ready" style="color:#43e97b">✅</span>'}`;
-    list.appendChild(row);
+async function loadOnlinePlayers(){
+  if(!myUID) return;
+  try {
+    const {data} = await sb.from('profiles')
+      .select('unique_id, prenom, photo_url, is_online, last_seen')
+      .neq('unique_id', myUID)
+      .eq('is_online', true)
+      .order('prenom', {ascending:true});
+
+    onlinePlayers = (data||[]).filter(p=>{
+      // Filtrer les "disparus" depuis plus de 2 minutes
+      if(!p.last_seen) return false;
+      return (Date.now() - new Date(p.last_seen).getTime()) < 120000;
+    });
+
+    renderOnlinePlayers();
+  } catch(e){}
+}
+
+function renderOnlinePlayers(){
+  const grid = document.getElementById('playersGrid');
+  const badge = document.getElementById('onlineCountBadge');
+  badge.textContent = onlinePlayers.length;
+
+  if(!onlinePlayers.length){
+    grid.innerHTML=`<div class="no-players-msg"><span class="no-players-icon">👻</span>Aucun joueur en ligne pour l'instant<br><span style="font-size:10px;opacity:.6">Invite tes amis sur BubbleChat !</span></div>`;
+    return;
+  }
+
+  grid.innerHTML='';
+  onlinePlayers.forEach(p=>{
+    const isSelected = selectedPlayers.includes(p.unique_id);
+    const card = document.createElement('div');
+    card.className = 'player-card' + (isSelected?' selected-player':'');
+    card.dataset.uid = p.unique_id;
+
+    const avLetter = (p.prenom||'?')[0].toUpperCase();
+    const avHtml = p.photo_url
+      ? `<img src="${esc(p.photo_url)}" alt="${esc(p.prenom)}">`
+      : avLetter;
+
+    card.innerHTML=`
+      <div class="player-card-avatar">${avHtml}</div>
+      <div class="player-card-info">
+        <div class="player-card-name">${esc(p.prenom)}</div>
+        <div class="player-card-sub">🟢 En ligne · Prêt à jouer</div>
+      </div>
+      <div class="player-card-status">${isSelected?'✅':'🎮'}</div>
+      ${isSelected?'<div class="player-card-check">✓</div>':''}
+    `;
+    card.onclick=()=>togglePlayerSelection(p);
+    grid.appendChild(card);
   });
-  setMultiMsg(`${players.length} joueur${players.length>1?'s':''} dans la salle`,'success');
 }
 
-function setMultiMsg(txt,type=''){
-  document.getElementById('pInfoMulti').textContent=txt;
-  document.getElementById('pInfoMulti').className='player-info'+(type?' msg-info '+type:'');
-}
-function updateMultiUI(){ if(chosenMulti!==null) setMultiMsg('Avatar prêt ! Crée ou rejoins une salle.'); }
+function togglePlayerSelection(player){
+  if(chosenMulti===null){
+    setMultiMsg('Choisis d\'abord ton avatar !','warning');
+    return;
+  }
 
+  const idx = selectedPlayers.indexOf(player.unique_id);
+  if(idx===-1){
+    selectedPlayers.push(player.unique_id);
+  } else {
+    selectedPlayers.splice(idx,1);
+  }
+
+  renderOnlinePlayers();
+  updateSessionBox();
+}
+
+function updateSessionBox(){
+  const box = document.getElementById('sessionBox');
+  const startBtn = document.getElementById('startMultiBtn');
+
+  if(!selectedPlayers.length){
+    box.style.display='none';
+    document.getElementById('lvlLblMulti').style.display='none';
+    startBtn.disabled=true;
+    document.getElementById('pInfoMulti').textContent='Clique sur un joueur pour l\'inviter à jouer !';
+    return;
+  }
+
+  box.style.display='block';
+  document.getElementById('lvlLblMulti').style.display='block';
+
+  // Afficher les joueurs dans la session
+  const sessionEl = document.getElementById('sessionStatus');
+  const myAv = AVATARS[chosenMulti]||AVATARS[0];
+  let html = `
+    <div class="session-row">
+      <div class="session-av">${myAv.e}</div>
+      <div class="session-name">${esc(myPrenom)} (toi)</div>
+      <div class="session-badge host">👑 Hôte</div>
+    </div>`;
+
+  selectedPlayers.forEach(uid=>{
+    const p = onlinePlayers.find(op=>op.unique_id===uid);
+    if(!p) return;
+    const status = getInviteStatus(uid);
+    const badgeClass = status==='accepted'?'ready':status==='declined'?'host':'waiting';
+    const badgeText = status==='accepted'?'✅ Prêt':status==='declined'?'❌ Refusé':'⏳ Invité...';
+    html+=`
+      <div class="session-row">
+        <div class="session-av">${p.photo_url?`<span style="font-size:16px">${(p.prenom||'?')[0]}</span>`:p.prenom[0]}</div>
+        <div class="session-name">${esc(p.prenom)}</div>
+        <div class="session-badge ${badgeClass}">${badgeText}</div>
+      </div>`;
+  });
+  sessionEl.innerHTML=html;
+
+  // Activer le bouton si au moins 1 joueur sélectionné
+  startBtn.disabled = selectedPlayers.length===0;
+  setMultiMsg(`${selectedPlayers.length} joueur${selectedPlayers.length>1?'s':''} sélectionné${selectedPlayers.length>1?'s':''} · Clique sur LANCER !`,'success');
+}
+
+// Statut des invitations envoyées
+const inviteStatuses = {}; // uid => 'pending'|'accepted'|'declined'
+function getInviteStatus(uid){ return inviteStatuses[uid]||'pending'; }
+
+// ═══════════════════════════════════════════
+//  SYSTÈME D'INVITATION (via Supabase)
+// ═══════════════════════════════════════════
+// On réutilise la table game_rooms et game_players,
+// mais on ENVOIE des invitations via private_messages ou une table dédiée.
+// Ici on utilise un broadcast Realtime channel par UID.
+
+function listenForInvites(){
+  if(onlineChannel) sb.removeChannel(onlineChannel);
+  // Canal unique par utilisateur pour recevoir les invitations
+  onlineChannel = sb.channel('player_invite_'+myUID)
+    .on('broadcast',{event:'game_invite'},(msg)=>{
+      if(msg.payload && msg.payload.toUID===myUID){
+        handleIncomingInvite(msg.payload);
+      }
+    })
+    .subscribe();
+}
+
+function handleIncomingInvite(payload){
+  pendingInvite = payload;
+  document.getElementById('inviteFromText').innerHTML=`<b>${esc(payload.fromName)}</b> veut jouer avec toi !<br><span style="font-size:12px;color:#a8d8ea">Niveau : ${payload.level==='short'?'⚡ Court':payload.level==='medium'?'🌟 Moyen':'🏆 Long'}</span>`;
+  document.getElementById('inviteOverlay').classList.add('show');
+  // Auto-fermeture après 30s
+  setTimeout(()=>{
+    if(pendingInvite===payload) declineInvite();
+  }, 30000);
+}
+
+window.acceptInvite = async function(){
+  if(!pendingInvite) return;
+  document.getElementById('inviteOverlay').classList.remove('show');
+  const inv = pendingInvite;
+  pendingInvite = null;
+  // Répondre à l'hôte
+  await sendInviteResponse(inv.sessionId, inv.fromUID, 'accepted', chosenMulti||0);
+  // Rejoindre la salle
+  mySessionId = inv.sessionId;
+  isHost = false;
+  waitForGameStart(inv.sessionId);
+  setMultiMsg(`Tu rejoins la partie de ${esc(inv.fromName)} !`, 'success');
+  // Basculer sur l'onglet multi
+  switchTab('multi');
+};
+
+window.declineInvite = async function(){
+  if(!pendingInvite) return;
+  const inv = pendingInvite;
+  pendingInvite = null;
+  document.getElementById('inviteOverlay').classList.remove('show');
+  await sendInviteResponse(inv.sessionId, inv.fromUID, 'declined', 0);
+};
+
+async function sendInviteResponse(sessionId, hostUID, response, avatarIdx){
+  try {
+    const channel = sb.channel('player_invite_'+hostUID);
+    await channel.send({
+      type:'broadcast', event:'invite_response',
+      payload:{ sessionId, fromUID:myUID, fromName:myPrenom, response, avatarIdx }
+    });
+    sb.removeChannel(channel);
+  } catch(e){}
+}
+
+// ═══════════════════════════════════════════
+//  LANCEMENT MULTI
+// ═══════════════════════════════════════════
 window.startMulti = async function(){
-  if(!currentRoom?.isHost) return;
-  try{
-    const {data:players}=await sb.from('game_players').select('*').eq('room_id',currentRoom.id).order('slot');
-    const seed=Date.now();
-    await sb.from('game_rooms').update({ status:'playing', level:chosenLenMulti, seed }).eq('id',currentRoom.id);
-    // Lancer immédiatement pour l'hôte aussi
-    launchMultiGame({ level:chosenLenMulti, seed, id:currentRoom.id });
-  }catch(e){ setMultiMsg('Erreur lancement : '+e.message,'error'); }
+  if(chosenMulti===null){ setMultiMsg('Choisis un avatar d\'abord !','warning'); return; }
+  if(!selectedPlayers.length){ setMultiMsg('Sélectionne au moins un joueur !','warning'); return; }
+
+  // Créer une session dans Supabase
+  const code = String(Math.floor(1000+Math.random()*9000));
+  const seed = Date.now();
+  mySessionId = code;
+  isHost = true;
+
+  try {
+    await sb.from('game_rooms').insert({ id:code, host_id:myUID, level:chosenLenMulti, status:'inviting', seed });
+    await sb.from('game_players').insert({ room_id:code, player_id:myUID, player_name:myPrenom, avatar_index:chosenMulti, slot:0, is_ready:true });
+  } catch(e){ setMultiMsg('Erreur création : '+e.message,'error'); return; }
+
+  // Envoyer invitations à chaque joueur sélectionné via Realtime broadcast
+  setMultiMsg(`Invitations envoyées à ${selectedPlayers.length} joueur${selectedPlayers.length>1?'s':''} ...`,'success');
+  Object.keys(inviteStatuses).forEach(k=>delete inviteStatuses[k]);
+
+  // Écouter les réponses
+  listenForInviteResponses(code, seed);
+
+  for(const uid of selectedPlayers){
+    try {
+      const ch = sb.channel('player_invite_'+uid);
+      await ch.send({
+        type:'broadcast', event:'game_invite',
+        payload:{
+          toUID: uid,
+          fromUID: myUID,
+          fromName: myPrenom,
+          sessionId: code,
+          level: chosenLenMulti,
+          seed
+        }
+      });
+      sb.removeChannel(ch);
+    } catch(e){}
+  }
+
+  updateSessionBox();
+};
+
+function listenForInviteResponses(sessionId, seed){
+  // Écouter les réponses sur mon propre canal
+  const myChannel = sb.channel('player_invite_'+myUID);
+  myChannel.on('broadcast',{event:'invite_response'},(msg)=>{
+    const p = msg.payload;
+    if(!p || p.sessionId!==sessionId) return;
+    inviteStatuses[p.fromUID] = p.response;
+
+    if(p.response==='accepted'){
+      // Ajouter à la salle Supabase
+      const usedSlots=[...selectedPlayers.filter(u=>inviteStatuses[u]==='accepted').map((_,i)=>i+1)];
+      const slot = usedSlots.length+1;
+      sb.from('game_players').insert({
+        room_id:sessionId, player_id:p.fromUID, player_name:p.fromName,
+        avatar_index:p.avatarIdx, slot, is_ready:true
+      }).then(()=>{});
+    }
+
+    updateSessionBox();
+
+    // Tous ont répondu ? Activer le lancement
+    const allResponded = selectedPlayers.every(u=>inviteStatuses[u]==='accepted'||inviteStatuses[u]==='declined');
+    const anyAccepted  = selectedPlayers.some(u=>inviteStatuses[u]==='accepted');
+    if(allResponded && anyAccepted){
+      setMultiMsg('Tous prêts ! Lance la partie 🎮','success');
+    }
+  }).subscribe();
+}
+
+function waitForGameStart(sessionId){
+  // Écouter le signal de démarrage depuis l'hôte
+  const ch = sb.channel('game_start_'+sessionId)
+    .on('broadcast',{event:'game_start'},(msg)=>{
+      if(msg.payload) launchMultiGame(msg.payload);
+    }).subscribe();
+}
+
+async function updateMyAvatarInSession(avatarIdx){
+  if(!mySessionId) return;
+  try { await sb.from('game_players').update({avatar_index:avatarIdx}).eq('room_id',mySessionId).eq('player_id',myUID); } catch(e){}
+}
+
+async function updateSessionLevel(level){
+  if(!mySessionId) return;
+  try { await sb.from('game_rooms').update({level}).eq('id',mySessionId); } catch(e){}
+}
+
+window.startMultiFinal = async function(){
+  if(!mySessionId||!isHost) return;
+  const {data:players} = await sb.from('game_players').select('*').eq('room_id',mySessionId).order('slot');
+  const seed = Date.now();
+  await sb.from('game_rooms').update({status:'playing', seed}).eq('id',mySessionId);
+
+  // Broadcaster le démarrage
+  const ch = sb.channel('game_start_'+mySessionId);
+  await ch.send({type:'broadcast',event:'game_start',payload:{id:mySessionId, level:chosenLenMulti, seed}});
+
+  launchMultiGame({id:mySessionId, level:chosenLenMulti, seed});
 };
 
 async function launchMultiGame(room){
-  // Récupérer tous les joueurs
-  const {data:players}=await sb.from('game_players').select('*').eq('room_id',room.id).order('slot');
+  const {data:players} = await sb.from('game_players').select('*').eq('room_id',room.id).order('slot');
   if(!players) return;
   startOnlineGame(room, players);
 }
@@ -499,23 +828,35 @@ async function launchMultiGame(room){
 // ═══════════════════════════════════════════
 window.startSolo = function(){
   if(chosenSolo===null) return;
-  const chosen=[{idx:chosenSolo,slot:0}];
-  launchGame(chosenLen, chosen, null);
+  launchGame(chosenLen, [{idx:chosenSolo,slot:0}], null);
 };
 
 // ═══════════════════════════════════════════
 //  DÉMARRAGE MULTI
 // ═══════════════════════════════════════════
 function startOnlineGame(room, playersData){
-  // Trouver mon slot
-  const me=playersData.find(p=>p.player_id===myUID);
+  const me = playersData.find(p=>p.player_id===myUID);
   if(!me){ alert('Tu n\'es plus dans cette salle !'); return; }
-  const chosen=playersData.map(p=>({idx:p.avatar_index, slot:p.slot, playerId:p.player_id, isMe:p.player_id===myUID}));
+  const chosen = playersData.map(p=>({idx:p.avatar_index, slot:p.slot, playerId:p.player_id, isMe:p.player_id===myUID}));
   launchGame(room.level, chosen, room);
 }
 
+// Override du bouton lancer selon host/all ready
+document.getElementById('startMultiBtn').addEventListener('click', function(){
+  if(!isHost) return; // non-hôtes attendent
+  startMultiFinal();
+});
+// On retire l'onclick inline
+document.getElementById('startMultiBtn').removeAttribute('onclick');
+
+function setMultiMsg(txt,type=''){
+  const el = document.getElementById('pInfoMulti');
+  el.textContent=txt;
+  el.className='player-info'+(type?' msg-info '+type:'');
+}
+
 // ═══════════════════════════════════════════
-//  MOTEUR DE JEU
+//  MOTEUR DE JEU (identique à l'original)
 // ═══════════════════════════════════════════
 let canvas,ctx,gs,raf,touchPid=0;
 const keys={};
@@ -538,7 +879,6 @@ function resolvePlat(p,pl){
 }
 function pop(x,y,txt,col){pops.push({x,y,txt,col,life:60});}
 
-// ── GENERATEUR NIVEAU (seed pour reproductibilité) ──
 function seededRand(seed){let s=seed%2147483647;if(s<=0)s+=2147483646;return ()=>{s=s*16807%2147483647;return(s-1)/2147483646;};}
 
 function generateLevel(key,seed=12345){
@@ -588,11 +928,9 @@ function mkPlayer(avIdx,slot,startX,isRemote=false,pid='local'){
   return{id:slot,av:AVATARS[avIdx],playerId:pid,x:startX,y:(GROUND_Y-2)*T,w:34,h:40,vx:0,vy:0,onGround:false,alive:true,finished:false,riding:null,score:0,facing:1,wf:0,wt:0,jp:false,isRemote};
 }
 
-// ── LAUNCH ──
 function launchGame(levelKey, chosenPlayers, room){
-  // Cleanup
   if(raf) cancelAnimationFrame(raf);
-  if(roomPollInt){ clearInterval(roomPollInt); roomPollInt=null; }
+  stopPlayerDiscovery();
 
   document.getElementById('lobbyScreen').classList.remove('active');
   document.getElementById('gameScreen').classList.add('active');
@@ -602,14 +940,12 @@ function launchGame(levelKey, chosenPlayers, room){
   const seed=room?.seed||12345;
   const lv=generateLevel(levelKey,seed);
 
-  // Créer les joueurs locaux et distants
   const players=chosenPlayers.map((c,i)=>{
     const isRemote=room?!c.isMe:false;
     const pid=room?c.playerId:('local_'+i);
     return mkPlayer(c.idx,c.slot??i,60+i*55,isRemote,pid);
   });
 
-  // Mon joueur local (pour les contrôles)
   const mySlot=room?chosenPlayers.findIndex(c=>c.isMe):0;
   touchPid=Math.max(0,mySlot);
 
@@ -632,134 +968,70 @@ function launchGame(levelKey, chosenPlayers, room){
 
 function fitCanvas(){if(!canvas)return;canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;}
 
-// ─────────────────────────────────────────
-//  RÉSEAU — SUPABASE REALTIME
-// ─────────────────────────────────────────
-let gameChannel=null;
-let lastStateSent=0;
-let lastEventId=0;
-
+// ─── RÉSEAU ───
+let gameChannel=null,lastStateSent=0;
 function startNetworking(roomId){
   if(gameChannel) sb.removeChannel(gameChannel);
   gameChannel=sb.channel('game_'+roomId,{config:{broadcast:{self:false}}})
-    // États des joueurs distants (positions)
     .on('broadcast',{event:'state'},(msg)=>onRemoteState(msg.payload))
-    // Événements (boutons pont/ballon/mort)
     .on('broadcast',{event:'game_event'},(msg)=>onRemoteEvent(msg.payload))
     .subscribe((status)=>{
-      const dot=document.getElementById('netDot');
-      const txt=document.getElementById('netTxt');
+      const dot=document.getElementById('netDot'),txt=document.getElementById('netTxt');
       if(status==='SUBSCRIBED'){dot.classList.remove('offline');txt.textContent='En ligne';}
       else{dot.classList.add('offline');txt.textContent='Reconnexion...';}
     });
 }
-
 function onRemoteState(payload){
-  if(!gs||!payload) return;
+  if(!gs||!payload)return;
   const p=gs.players.find(pl=>pl.playerId===payload.playerId);
-  if(!p||!p.isRemote) return;
-  // Interpolation douce
-  p.x=payload.x; p.y=payload.y;
-  p.facing=payload.facing; p.alive=payload.alive;
-  p.finished=payload.finished; p.score=payload.score;
-  p.riding=payload.riding??null;
+  if(!p||!p.isRemote)return;
+  p.x=payload.x;p.y=payload.y;p.facing=payload.facing;p.alive=payload.alive;p.finished=payload.finished;p.score=payload.score;p.riding=payload.riding??null;
 }
-
 function onRemoteEvent(ev){
-  if(!gs||!ev) return;
-  const {lv}=gs;
-  if(ev.type==='bridge_press'){
-    const br=lv.bridges[ev.bridgeId];
-    if(br){ br.pressed1=ev.side===1?ev.val:br.pressed1; br.pressed2=ev.side===2?ev.val:br.pressed2; br.open=br.pressed1||br.pressed2; }
-  } else if(ev.type==='pump'){
-    const bal=lv.balloons[ev.balId];
-    if(bal) bal.pumper=ev.val?ev.slot:-1;
-  } else if(ev.type==='player_dead'){
-    const p=gs.players.find(pl=>pl.playerId===ev.playerId);
-    if(p){p.alive=false;}
-  } else if(ev.type==='player_finished'){
-    const p=gs.players.find(pl=>pl.playerId===ev.playerId);
-    if(p){p.finished=true;p.score=ev.score;}
-  }
+  if(!gs||!ev)return;
+  const{lv}=gs;
+  if(ev.type==='bridge_press'){const br=lv.bridges[ev.bridgeId];if(br){br.pressed1=ev.side===1?ev.val:br.pressed1;br.pressed2=ev.side===2?ev.val:br.pressed2;br.open=br.pressed1||br.pressed2;}}
+  else if(ev.type==='pump'){const bal=lv.balloons[ev.balId];if(bal)bal.pumper=ev.val?ev.slot:-1;}
+  else if(ev.type==='player_dead'){const p=gs.players.find(pl=>pl.playerId===ev.playerId);if(p)p.alive=false;}
+  else if(ev.type==='player_finished'){const p=gs.players.find(pl=>pl.playerId===ev.playerId);if(p){p.finished=true;p.score=ev.score;}}
 }
-
 function sendState(){
-  if(!gs?.room||!gameChannel) return;
-  const now=Date.now();
-  if(now-lastStateSent<50) return; // 20 fps réseau max
-  lastStateSent=now;
-  const me=gs.players[touchPid];
-  if(!me)return;
-  gameChannel.send({type:'broadcast',event:'state',payload:{
-    playerId:myUID, x:me.x, y:me.y, facing:me.facing,
-    alive:me.alive, finished:me.finished, score:me.score,
-    riding:me.riding
-  }});
-}
-
-function sendEvent(type,data){
   if(!gs?.room||!gameChannel)return;
-  gameChannel.send({type:'broadcast',event:'game_event',payload:{type,...data}});
+  const now=Date.now();if(now-lastStateSent<50)return;lastStateSent=now;
+  const me=gs.players[touchPid];if(!me)return;
+  gameChannel.send({type:'broadcast',event:'state',payload:{playerId:myUID,x:me.x,y:me.y,facing:me.facing,alive:me.alive,finished:me.finished,score:me.score,riding:me.riding}});
 }
+function sendEvent(type,data){if(!gs?.room||!gameChannel)return;gameChannel.send({type:'broadcast',event:'game_event',payload:{type,...data}});}
 
-// ─────────────────────────────────────────
-//  BOUCLE DE JEU
-// ─────────────────────────────────────────
-function gameLoop(){
-  if(!gs||gs.over)return;
-  gs.tick++;
-  update();
-  draw();
-  updateHUD();
-  sendState();
-  raf=requestAnimationFrame(gameLoop);
-}
+// ─── BOUCLE JEU ───
+function gameLoop(){if(!gs||gs.over)return;gs.tick++;update();draw();updateHUD();sendState();raf=requestAnimationFrame(gameLoop);}
 
 function update(){
   const{lv,players}=gs;
   lv.bridges.forEach(br=>{br.open=br.pressed1||br.pressed2;});
-  lv.balloons.forEach(bal=>{
-    if(bal.pumper>=0){bal.floatY-=2.0;if(bal.floatY<80)bal.floatY=80;}
-    else{bal.floatY+=1.3;if(bal.floatY>bal.initY)bal.floatY=bal.initY;}
-  });
-  players.forEach((p,pid)=>{
-    if(p.isRemote) return; // les distants sont mis à jour via réseau
-    updatePlayer(p,pid);
-  });
+  lv.balloons.forEach(bal=>{if(bal.pumper>=0){bal.floatY-=2.0;if(bal.floatY<80)bal.floatY=80;}else{bal.floatY+=1.3;if(bal.floatY>bal.initY)bal.floatY=bal.initY;}});
+  players.forEach((p,pid)=>{if(p.isRemote)return;updatePlayer(p,pid);});
   checkEnd();
 }
 
 function updatePlayer(p,pid){
   if(!p.alive||p.finished)return;
   const{lv}=gs;
-  const isMyCtrl=(pid===touchPid)||(gs.room===null); // en solo, pid direct
-
+  const isMyCtrl=(pid===touchPid)||(gs.room===null);
   if(p.riding!==null){
     const bal=lv.balloons[p.riding];
-    p.x=bal.bx+bal.bw/2-p.w/2; p.y=bal.floatY-p.h-4;
-    p.vx=0;p.vy=0;p.onGround=false;
+    p.x=bal.bx+bal.bw/2-p.w/2;p.y=bal.floatY-p.h-4;p.vx=0;p.vy=0;p.onGround=false;
     const jp=isMyCtrl?held(pid,'jump'):false;
     if(jp&&!p.jp){p.vy=JFORCE*0.7;p.riding=null;bal.rider=-1;}
-    p.jp=jp;
-    if(p.y>lv.worldH)killP(p,pid);
-    checkFlag(p,pid); return;
+    p.jp=jp;if(p.y>lv.worldH)killP(p,pid);checkFlag(p,pid);return;
   }
-
   p.vx=0;
-  if(isMyCtrl){
-    if(held(pid,'left')){p.vx=-SPD;p.facing=-1;}
-    if(held(pid,'right')){p.vx=SPD;p.facing=1;}
-  }
+  if(isMyCtrl){if(held(pid,'left')){p.vx=-SPD;p.facing=-1;}if(held(pid,'right')){p.vx=SPD;p.facing=1;}}
   const jp=isMyCtrl?held(pid,'jump'):false;
   if(jp&&!p.jp&&p.onGround){p.vy=JFORCE;p.onGround=false;}
-  p.jp=jp;
-  p.vy+=GRAV;
-  p.x+=p.vx;if(p.x<0)p.x=0;
-  p.y+=p.vy;
-  p.onGround=false;
+  p.jp=jp;p.vy+=GRAV;p.x+=p.vx;if(p.x<0)p.x=0;p.y+=p.vy;p.onGround=false;
   lv.plats.forEach(pl=>resolvePlat(p,pl));
   lv.bridges.forEach(br=>{if(br.open)resolvePlat(p,{x:br.bx,y:br.by,w:br.bw,h:br.bh+4});});
-
   if(isMyCtrl){
     const act=held(pid,'act');
     lv.bridges.forEach(br=>{
@@ -780,10 +1052,7 @@ function updatePlayer(p,pid){
       if(bal.rider<0&&overlap(p.x,p.y,p.w,p.h,bal.bx,bal.floatY,bal.bw,bal.bh)&&p.vy>=0){p.riding=bal.id;bal.rider=pid;p.vy=0;}
     });
   }
-
-  lv.coins.forEach(c=>{
-    if(!c.col&&overlap(p.x,p.y,p.w,p.h,c.x,c.y,28,28)){c.col=true;p.score+=c.bonus?3:1;pop(c.x,c.y,c.bonus?'+3⭐':'+1🪙','#FFD700');}
-  });
+  lv.coins.forEach(c=>{if(!c.col&&overlap(p.x,p.y,p.w,p.h,c.x,c.y,28,28)){c.col=true;p.score+=c.bonus?3:1;pop(c.x,c.y,c.bonus?'+3⭐':'+1🪙','#FFD700');}});
   if(Math.abs(p.vx)>.1){p.wt++;if(p.wt>7){p.wt=0;p.wf=(p.wf+1)%4;}}else p.wf=0;
   if(p.y>lv.worldH+100)killP(p,pid);
   checkFlag(p,pid);
@@ -797,14 +1066,11 @@ function killP(p,pid){
   gs.lv.bridges.forEach(br=>{if(br.presser1===pid){br.pressed1=false;br.presser1=-1;}if(br.presser2===pid){br.pressed2=false;br.presser2=-1;}});
   gs.lv.balloons.forEach(b=>{if(b.pumper===pid)b.pumper=-1;});
   pop(p.x,p.y,'💀 MORT!','#ff4444');
-  if(gs.room) sendEvent('player_dead',{playerId:p.playerId});
+  if(gs.room)sendEvent('player_dead',{playerId:p.playerId});
 }
 
 function checkFlag(p,pid){
-  if(!p.finished&&p.x+p.w>gs.lv.flagX){
-    p.finished=true;p.score+=10;pop(p.x,p.y-40,'+10 🏁','#FFD700');
-    if(gs.room) sendEvent('player_finished',{playerId:p.playerId,score:p.score});
-  }
+  if(!p.finished&&p.x+p.w>gs.lv.flagX){p.finished=true;p.score+=10;pop(p.x,p.y-40,'+10 🏁','#FFD700');if(gs.room)sendEvent('player_finished',{playerId:p.playerId,score:p.score});}
 }
 
 function checkEnd(){
@@ -818,33 +1084,20 @@ function checkEnd(){
   }
 }
 
-// ─────────────────────────────────────────
-//  CAMERA
-// ─────────────────────────────────────────
 function updateCam(){
-  const alive=gs.players.filter(p=>p.alive);
-  if(!alive.length)return;
-  // En multi, caméra centrée sur TON joueur
+  const alive=gs.players.filter(p=>p.alive);if(!alive.length)return;
   let target;
-  if(gs.room){
-    const me=gs.players[touchPid];
-    target=me?me.x-canvas.width*.35:0;
-  } else {
-    target=Math.max(...alive.map(p=>p.x))-canvas.width*.35;
-  }
+  if(gs.room){const me=gs.players[touchPid];target=me?me.x-canvas.width*.35:0;}
+  else{target=Math.max(...alive.map(p=>p.x))-canvas.width*.35;}
   gs.cam.x+=(target-gs.cam.x)*.1;
   gs.cam.x=Math.max(0,Math.min(gs.cam.x,gs.lv.worldW-canvas.width));
 }
 const sc=wx=>wx-gs.cam.x;
 
-// ─────────────────────────────────────────
-//  RENDU
-// ─────────────────────────────────────────
 function draw(){
   updateCam();
   const CW=canvas.width,CH=canvas.height,t=gs.tick,lv=gs.lv;
-  const sky=ctx.createLinearGradient(0,0,0,CH);
-  sky.addColorStop(0,'#1e6ea8');sky.addColorStop(.6,'#87CEEB');sky.addColorStop(1,'#b8e4f9');
+  const sky=ctx.createLinearGradient(0,0,0,CH);sky.addColorStop(0,'#1e6ea8');sky.addColorStop(.6,'#87CEEB');sky.addColorStop(1,'#b8e4f9');
   ctx.fillStyle=sky;ctx.fillRect(0,0,CW,CH);
   [[140,50,30],[420,38,42],[800,62,26],[1350,44,36],[2000,58,30],[2700,42,44]].forEach(([x,y,r])=>{
     const dx=x-gs.cam.x*.35;if(dx<-80||dx>CW+80)return;
@@ -853,10 +1106,7 @@ function draw(){
   lv.plats.forEach(pl=>drawPlat(pl,CW));
   lv.bridges.forEach(br=>drawBridge(br,t,CW));
   lv.balloons.forEach(bal=>drawBalloon(bal,t,CW));
-  lv.coins.forEach(c=>{
-    if(c.col)return;const cx=sc(c.x);if(cx<-30||cx>CW+30)return;
-    const bob=Math.sin(t/20+c.x)*3;ctx.font='20px sans-serif';ctx.fillText(c.bonus?'⭐':'🪙',cx,c.y+bob+22);
-  });
+  lv.coins.forEach(c=>{if(c.col)return;const cx=sc(c.x);if(cx<-30||cx>CW+30)return;const bob=Math.sin(t/20+c.x)*3;ctx.font='20px sans-serif';ctx.fillText(c.bonus?'⭐':'🪙',cx,c.y+bob+22);});
   gs.players.forEach(p=>drawPlayer(p,t,CW));
   for(let i=pops.length-1;i>=0;i--){
     const p=pops[i],alpha=p.life/60,rise=(1-alpha)*50,ppx=sc(p.x);
@@ -864,13 +1114,8 @@ function draw(){
     ctx.strokeText(p.txt,ppx,p.y-rise);ctx.fillStyle=p.col;ctx.fillText(p.txt,ppx,p.y-rise);ctx.textAlign='left';ctx.restore();
     p.life--;if(p.life<=0)pops.splice(i,1);
   }
-  // Progress bar
   const bW=CW-40;ctx.fillStyle='rgba(0,0,0,.3)';rr(ctx,20,14,bW,5,3);ctx.fill();
-  gs.players.forEach(p=>{
-    if(!p.alive)return;const pct=Math.min(1,p.x/lv.flagX);
-    ctx.fillStyle=p.av.c;ctx.beginPath();ctx.arc(20+pct*bW,16,4,0,Math.PI*2);ctx.fill();
-    ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(p.av.e,20+pct*bW,28);ctx.textAlign='left';
-  });
+  gs.players.forEach(p=>{if(!p.alive)return;const pct=Math.min(1,p.x/lv.flagX);ctx.fillStyle=p.av.c;ctx.beginPath();ctx.arc(20+pct*bW,16,4,0,Math.PI*2);ctx.fill();ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(p.av.e,20+pct*bW,28);ctx.textAlign='left';});
   ctx.font='11px sans-serif';ctx.textAlign='center';ctx.fillText('🏁',20+bW,28);ctx.textAlign='left';
 }
 
@@ -930,7 +1175,6 @@ function drawPlayer(p,t,CW){
   const bob=p.onGround&&Math.abs(p.vx)>.1?Math.abs(Math.sin(t/5))*2:0;
   ctx.font=`${p.w-4}px sans-serif`;ctx.textAlign='center';ctx.fillText(p.av.e,x+p.w/2,y+p.h-1-bob);ctx.textAlign='left';
   ctx.restore();
-  // Nom + indicateur remote
   ctx.font='bold 8px Nunito,sans-serif';ctx.textAlign='center';
   ctx.strokeStyle='rgba(0,0,0,.7)';ctx.lineWidth=3;ctx.strokeText(p.av.n,x+p.w/2,y-4);ctx.fillStyle='white';ctx.fillText(p.av.n,x+p.w/2,y-4);
   if(p.isRemote){ctx.fillStyle=p.av.c;ctx.fillText('📱',x+p.w/2,y-14);}
@@ -942,9 +1186,7 @@ function rr(ctx,x,y,w,h,r){
   ctx.beginPath();ctx.moveTo(x+r[0],y);ctx.lineTo(x+w-r[1],y);ctx.quadraticCurveTo(x+w,y,x+w,y+r[1]);ctx.lineTo(x+w,y+h-r[2]);ctx.quadraticCurveTo(x+w,y+h,x+w-r[2],y+h);ctx.lineTo(x+r[3],y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r[3]);ctx.lineTo(x,y+r[0]);ctx.quadraticCurveTo(x,y,x+r[0],y);ctx.closePath();
 }
 
-// ─────────────────────────────────────────
-//  HUD
-// ─────────────────────────────────────────
+// ─── HUD ───
 function buildHUD(){
   const h=document.getElementById('hudPlayers');h.innerHTML='';
   gs.players.forEach((p,i)=>{
@@ -962,11 +1204,8 @@ function updateHUD(){
   });
 }
 
-// ─────────────────────────────────────────
-//  CONTRÔLES TACTILES
-// ─────────────────────────────────────────
+// ─── CONTRÔLES TACTILES ───
 function buildTouchControls(){
-  // Joystick
   const jw=document.getElementById('joyWrap'),js=document.getElementById('joyStick');
   const p=gs.players[touchPid];const c=p?.av.c||'rgba(255,255,255,.5)';
   jw.querySelector('.joystick-base').style.borderColor=c;
@@ -978,26 +1217,22 @@ function buildTouchControls(){
   jw.addEventListener('touchstart',joyStart,{passive:false});jw.addEventListener('touchmove',joyMove,{passive:false});jw.addEventListener('touchend',joyEnd,{passive:false});jw.addEventListener('touchcancel',joyEnd,{passive:false});
   jw.addEventListener('mousedown',joyStart);window.addEventListener('mousemove',e=>{if(joy.active)joyMove(e);});window.addEventListener('mouseup',e=>{if(joy.active)joyEnd();});
 
-  // Zones tap
   const tzL=document.getElementById('tzLeft'),tzR=document.getElementById('tzRight');
   function zone(dir,e){e.preventDefault();const on=e.type==='touchstart'||e.type==='mousedown';keys[CTRL[touchPid][dir]]=on;}
   function tapJump(el){let ts=0;el.addEventListener('touchstart',e=>{ts=Date.now();},{passive:false});el.addEventListener('touchend',e=>{if(Date.now()-ts<200){keys[CTRL[touchPid].jump]=true;setTimeout(()=>{keys[CTRL[touchPid].jump]=false;},120);}},{passive:false});}
   ['touchstart','touchend','mousedown','mouseup'].forEach(ev=>{tzL.addEventListener(ev,e=>zone('left',e),{passive:false});tzR.addEventListener(ev,e=>zone('right',e),{passive:false});});
   tapJump(tzL);tapJump(tzR);
 
-  // Bouton saut
   const bj=document.getElementById('btnJump');bj.style.borderColor=c;
   const jDn=e=>{e.preventDefault();keys[CTRL[touchPid].jump]=true;bj.classList.add('pressed');};
   const jUp=e=>{e.preventDefault();keys[CTRL[touchPid].jump]=false;bj.classList.remove('pressed');};
   bj.addEventListener('touchstart',jDn,{passive:false});bj.addEventListener('touchend',jUp,{passive:false});bj.addEventListener('mousedown',jDn);bj.addEventListener('mouseup',jUp);bj.addEventListener('mouseleave',jUp);
 
-  // Bouton action
   const ba=document.getElementById('btnAct');ba.style.borderColor=c;
   const aDn=e=>{e.preventDefault();keys[CTRL[touchPid].act]=true;ba.classList.add('pressed');};
   const aUp=e=>{e.preventDefault();keys[CTRL[touchPid].act]=false;ba.classList.remove('pressed');};
   ba.addEventListener('touchstart',aDn,{passive:false});ba.addEventListener('touchend',aUp,{passive:false});ba.addEventListener('mousedown',aDn);ba.addEventListener('mouseup',aUp);ba.addEventListener('mouseleave',aUp);
 
-  // Sélecteur joueur (solo uniquement)
   const sw=document.getElementById('playerSwitcher');sw.innerHTML='';
   if(!gs.room&&gs.players.length>1){
     gs.players.forEach((p2,i)=>{
@@ -1009,14 +1244,12 @@ function buildTouchControls(){
   }
 }
 
-// ─────────────────────────────────────────
-//  NAVIGATION
-// ─────────────────────────────────────────
+// ─── NAVIGATION ───
 window.restartGame = function(){
   document.getElementById('winOv').classList.remove('show');
   document.getElementById('deathOv').classList.remove('show');
   pops.length=0;Object.keys(keys).forEach(k=>keys[k]=false);
-  if(gs?.room) launchGame(gs.levelKey,[...gs.players.map((p,i)=>({idx:gs.players[i].av===AVATARS.find(a=>a===gs.players[i].av)?AVATARS.indexOf(gs.players[i].av):0,slot:p.id,playerId:p.playerId,isMe:!p.isRemote}))],gs.room);
+  if(gs?.room) launchGame(gs.levelKey,[...gs.players.map((p,i)=>({idx:AVATARS.indexOf(gs.players[i].av),slot:p.id,playerId:p.playerId,isMe:!p.isRemote}))],gs.room);
   else startSolo();
 };
 
@@ -1028,11 +1261,19 @@ window.goLobby = function(){
   document.getElementById('gameScreen').classList.remove('active');
   document.getElementById('lobbyScreen').classList.add('active');
   pops.length=0;Object.keys(keys).forEach(k=>keys[k]=false);
-  // Quitter la salle
-  if(currentRoom){ sb.from('game_players').delete().eq('room_id',currentRoom.id).eq('player_id',myUID).then(()=>{}); currentRoom=null; }
+  // Nettoyer la session
+  if(mySessionId){
+    sb.from('game_players').delete().eq('room_id',mySessionId).eq('player_id',myUID).then(()=>{});
+    mySessionId=null;
+  }
+  selectedPlayers.length=0;
+  isHost=false;
 };
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// Maintenir la présence
+setInterval(()=>{ if(myUID&&currentTab==='multi') registerPresence(); }, 25000);
 </script>
 
 </body>
