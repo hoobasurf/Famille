@@ -384,21 +384,7 @@ document.getElementById(‘toggleIcon’).textContent=sidebarVisible?‘👥’:
 document.getElementById(‘toggleText’).textContent=sidebarVisible?‘Profils’:‘Chat’;
 });
 /* ── FIX CRITIQUE : ferme sidebar mobile seulement si clic HORS panel ET HORS toggleBtn ── */
-document.addEventListener(‘click’,function(e){
-if(!isMobile()||!sidebarVisible)return;
-var panel=document.getElementById(‘usersPanel’);
-var toggle=document.getElementById(‘toggleSidebar’);
-/* Si le clic vient de l’intérieur du panel ou du bouton toggle → on ne ferme pas */
-if(panel.contains(e.target)||toggle.contains(e.target))return;
-/* Si le clic vient d’un élément interactif dans le rightPanel → on ne ferme pas */
-var rightPanel=document.getElementById(‘rightPanel’);
-if(rightPanel&&rightPanel.contains(e.target))return;
-/* Autrement → ferme */
-sidebarVisible=false;
-panel.classList.add(‘hidden’);
-document.getElementById(‘toggleIcon’).textContent=‘💬’;
-document.getElementById(‘toggleText’).textContent=‘Chat’;
-});
+/* sidebar se ferme via toggle uniquement */
 
 /* ── ÉTAT GLOBAL ── */
 var currentChatType=‘public’,currentChatUser=null,profiles=[],pmBadges={},lastPublicMsgTime=null,lastPMId=0,pmPollInterval=null,lastInboxId=0;
