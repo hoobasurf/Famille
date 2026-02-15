@@ -831,6 +831,18 @@ window.startMulti = async function(){
   if(!mySessionId){ setMultiMsg('Invite d\'abord des joueurs !','warning'); return; }
 
   try {
+    // S'assurer que l'hôte est bien dans game_players
+    const {data:hostExisting} = await sb.from('game_players').select('id').eq('room_id',mySessionId).eq('player_id',myUID).maybeSingle();
+    if(!hostExisting){
+      const {data:allP} = await sb.from('game_players').select('slot').eq('room_id',mySessionId);
+      const usedSlots=(allP||[]).map(p=>p.slot);
+      const slot=[0,1,2,3].find(s=>!usedSlots.includes(s))??0;
+      await sb.from('game_players').insert({
+        room_id:mySessionId, player_id:myUID, player_name:myPrenom,
+        avatar_index:chosenMulti||0, slot, is_ready:true
+      });
+    }
+
     const seed = Date.now();
     await sb.from('game_rooms').update({ status:'playing', seed, level:chosenLenMulti }).eq('id',mySessionId);
     // Lancer immédiatement pour l'hôte
@@ -858,7 +870,12 @@ window.startSolo = function(){
 // ═══════════════════════════════════════════
 function startOnlineGame(room, playersData){
   const me = playersData.find(p=>p.player_id===myUID);
-  if(!me){ setMultiMsg('Erreur : tu n\'es pas dans la salle !','error'); return; }
+  if(!me){
+    // Fallback : se rajouter soi-même si absent de la liste
+    const usedSlots = playersData.map(p=>p.slot);
+    const slot = [0,1,2,3].find(s=>!usedSlots.includes(s))??playersData.length;
+    playersData = [...playersData, {player_id:myUID, player_name:myPrenom, avatar_index:chosenMulti||0, slot, is_ready:true}];
+  }
   const chosen = playersData.map(p=>({idx:p.avatar_index, slot:p.slot, playerId:p.player_id, isMe:p.player_id===myUID}));
   launchGame(room.level, chosen, room);
 }
