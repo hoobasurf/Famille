@@ -762,15 +762,25 @@ window.declineInvite = async function(){
 };
 
 function waitForGameStart(roomId){
-  // Polling simple : vérifier si status='playing' dans game_rooms
+  let attempts = 0;
+  const maxAttempts = 60;
+  setMultiMsg('⏳ En attente du lancement...', 'warning');
   const poll = setInterval(async ()=>{
+    attempts++;
+    if(attempts > maxAttempts){
+      clearInterval(poll);
+      setMultiMsg('⏰ Délai dépassé, la partie na pas démarré.', 'error');
+      return;
+    }
     try {
-      const {data:room} = await sb.from('game_rooms').select('status,level,seed').eq('id',roomId).single();
-      if(room?.status==='playing'){
+      const {data:room, error} = await sb.from('game_rooms').select('status,level,seed').eq('id',roomId).maybeSingle();
+      if(error){ console.warn('waitForGameStart error:', error.message); return; }
+      if(!room){ console.warn('Salle introuvable:', roomId); return; }
+      if(room.status==='playing'){
         clearInterval(poll);
         launchMultiGame({id:roomId, level:room.level, seed:room.seed});
       }
-    } catch(e){}
+    } catch(e){ console.warn('waitForGameStart catch:', e); }
   }, 1500);
 }
 
