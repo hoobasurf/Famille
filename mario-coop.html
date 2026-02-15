@@ -420,7 +420,8 @@ let sessionChannel  = null;
 let onlineChannel   = null;
 let playersPollInt  = null;
 let sessionPollInt  = null;
-let pendingInvite   = null;    // {sessionId, fromName, fromUID, avatarIndex, level}
+let pendingInvite   = null;
+const inviteStatuses = {};  // uid => waiting|accepted|declined
 
 // ── STARS ──
 (()=>{
@@ -452,7 +453,7 @@ makeAvGrid('avGridMulti',(i,gid)=>{
   chosenMulti=i; selectAvatar(gid,i);
   document.getElementById('pInfoMulti').textContent=`${AVATARS[i].e} ${AVATARS[i].n} — clique sur un joueur pour l'inviter !`;
   // Mettre à jour mon avatar dans la session si j'en ai une
-  if(mySessionId) updateMyAvatarInSession(i);
+  
 });
 
 function selectAvatar(gridId,sel){
@@ -488,7 +489,7 @@ window.pickLevelMulti = function(k,el){
   chosenLenMulti=k;
   document.querySelectorAll('#lvlGridMulti .lvl-btn').forEach(b=>b.classList.remove('selected'));
   el.classList.add('selected');
-  if(mySessionId) updateSessionLevel(k);
+  
 };
 
 // ═══════════════════════════════════════════
@@ -497,12 +498,9 @@ window.pickLevelMulti = function(k,el){
 async function registerPresence(){
   if(!myUID) return;
   try {
-    // Marquer comme en ligne dans profiles (même table que BubbleChat)
     await sb.from('profiles').upsert({
-      unique_id: myUID,
-      prenom: myPrenom,
-      photo_url: myPhoto,
-      is_online: true,
+      unique_id: myUID, prenom: myPrenom,
+      photo_url: myPhoto, is_online: true,
       last_seen: new Date().toISOString()
     }, { onConflict:'unique_id' });
   } catch(e){}
@@ -515,32 +513,27 @@ function startPlayerDiscovery(){
   loadOnlinePlayers();
   if(playersPollInt) clearInterval(playersPollInt);
   playersPollInt = setInterval(loadOnlinePlayers, 4000);
-
-  // Écouter les invitations qui me sont destinées
-  listenForInvites();
+  // Polling invitations reçues toutes les 2s
+  if(sessionPollInt) clearInterval(sessionPollInt);
+  sessionPollInt = setInterval(pollIncomingInvites, 2000);
 }
 
 function stopPlayerDiscovery(){
   if(playersPollInt){ clearInterval(playersPollInt); playersPollInt=null; }
   if(sessionPollInt){ clearInterval(sessionPollInt); sessionPollInt=null; }
-  if(onlineChannel){ sb.removeChannel(onlineChannel); onlineChannel=null; }
 }
 
 async function loadOnlinePlayers(){
   if(!myUID) return;
   try {
+    const cutoff = new Date(Date.now()-90000).toISOString(); // actifs < 90s
     const {data} = await sb.from('profiles')
       .select('unique_id, prenom, photo_url, is_online, last_seen')
       .neq('unique_id', myUID)
       .eq('is_online', true)
+      .gte('last_seen', cutoff)
       .order('prenom', {ascending:true});
-
-    onlinePlayers = (data||[]).filter(p=>{
-      // Filtrer les "disparus" depuis plus de 2 minutes
-      if(!p.last_seen) return false;
-      return (Date.now() - new Date(p.last_seen).getTime()) < 120000;
-    });
-
+    onlinePlayers = data||[];
     renderOnlinePlayers();
   } catch(e){}
 }
@@ -551,51 +544,234 @@ function renderOnlinePlayers(){
   badge.textContent = onlinePlayers.length;
 
   if(!onlinePlayers.length){
-    grid.innerHTML=`<div class="no-players-msg"><span class="no-players-icon">👻</span>Aucun joueur en ligne pour l'instant<br><span style="font-size:10px;opacity:.6">Invite tes amis sur BubbleChat !</span></div>`;
+    grid.innerHTML=`<div class="no-players-msg"><span class="no-players-icon">👻</span>Aucun joueur en ligne<br><span style="font-size:10px;opacity:.6">Tes amis doivent être connectés à BubbleChat</span></div>`;
     return;
   }
-
   grid.innerHTML='';
   onlinePlayers.forEach(p=>{
     const isSelected = selectedPlayers.includes(p.unique_id);
+    const status = inviteStatuses[p.unique_id]||'none';
     const card = document.createElement('div');
-    card.className = 'player-card' + (isSelected?' selected-player':'');
+    card.className = 'player-card'+(isSelected?' selected-player':'')+(status==='accepted'?' accepted':status==='declined'?' declined':'');
     card.dataset.uid = p.unique_id;
-
-    const avLetter = (p.prenom||'?')[0].toUpperCase();
-    const avHtml = p.photo_url
-      ? `<img src="${esc(p.photo_url)}" alt="${esc(p.prenom)}">`
-      : avLetter;
-
+    const avHtml = p.photo_url ? `<img src="${esc(p.photo_url)}" alt="">` : (p.prenom||'?')[0].toUpperCase();
+    const statusIcon = isSelected
+      ? (status==='accepted'?'✅':status==='declined'?'❌':'⏳')
+      : '🎮';
     card.innerHTML=`
       <div class="player-card-avatar">${avHtml}</div>
       <div class="player-card-info">
         <div class="player-card-name">${esc(p.prenom)}</div>
-        <div class="player-card-sub">🟢 En ligne · Prêt à jouer</div>
+        <div class="player-card-sub">${isSelected?(status==='accepted'?'✅ A accepté !':status==='declined'?'❌ A refusé':'⏳ Invitation envoyée...'):'🟢 En ligne · Clique pour inviter'}</div>
       </div>
-      <div class="player-card-status">${isSelected?'✅':'🎮'}</div>
-      ${isSelected?'<div class="player-card-check">✓</div>':''}
+      <div class="player-card-status">${statusIcon}</div>
     `;
-    card.onclick=()=>togglePlayerSelection(p);
+    card.onclick=()=>{ if(!isSelected) sendInviteTo(p); };
     grid.appendChild(card);
   });
 }
 
-function togglePlayerSelection(player){
-  if(chosenMulti===null){
-    setMultiMsg('Choisis d\'abord ton avatar !','warning');
-    return;
+// ═══════════════════════════════════════════
+//  SYSTÈME D'INVITATION — 100% POLLING
+//  On utilise game_invites (ou private_messages comme canal)
+//  Ici on utilise une table game_invites simple via game_rooms
+// ═══════════════════════════════════════════
+
+// Envoyer une invitation : insérer une ligne dans game_invites
+async function sendInviteTo(player){
+  if(chosenMulti===null){ setMultiMsg('Choisis ton avatar d\'abord !','warning'); return; }
+
+  // Créer la salle si pas encore fait
+  if(!mySessionId){
+    const code = String(Math.floor(1000+Math.random()*9000));
+    mySessionId = code;
+    isHost = true;
+    try {
+      await sb.from('game_rooms').insert({ id:code, host_id:myUID, level:chosenLenMulti, status:'waiting', seed:Date.now() });
+      await sb.from('game_players').insert({ room_id:code, player_id:myUID, player_name:myPrenom, avatar_index:chosenMulti, slot:0, is_ready:true });
+    } catch(e){ setMultiMsg('Erreur : '+e.message,'error'); mySessionId=null; return; }
   }
 
-  const idx = selectedPlayers.indexOf(player.unique_id);
-  if(idx===-1){
+  // Ajouter le joueur à la liste sélectionnée
+  if(!selectedPlayers.includes(player.unique_id)){
     selectedPlayers.push(player.unique_id);
-  } else {
-    selectedPlayers.splice(idx,1);
+    inviteStatuses[player.unique_id] = 'waiting';
   }
+
+  // Écrire l'invitation dans private_messages (comme un message spécial)
+  const inviteMsg = JSON.stringify({
+    __type:'game_invite', roomId:mySessionId,
+    fromName:myPrenom, fromUID:myUID,
+    level:chosenLenMulti, avatarIdx:chosenMulti
+  });
+  try {
+    await sb.from('private_messages').insert({
+      sender_unique_id: myUID,
+      receiver_unique_id: player.unique_id,
+      message: inviteMsg,
+      is_read: false
+    });
+  } catch(e){}
 
   renderOnlinePlayers();
   updateSessionBox();
+  setMultiMsg(`Invitation envoyée à ${esc(player.prenom)} !`, 'success');
+
+  // Démarrer le polling des réponses
+  startResponsePolling();
+}
+
+let responsesPollInt = null;
+let lastResponseCheck = 0;
+
+function startResponsePolling(){
+  if(responsesPollInt) return;
+  responsesPollInt = setInterval(pollInviteResponses, 2500);
+}
+
+// L'hôte vérifie si les invités ont répondu (en regardant game_players)
+async function pollInviteResponses(){
+  if(!mySessionId||!isHost) return;
+  try {
+    const {data:players} = await sb.from('game_players').select('*').eq('room_id',mySessionId).order('slot');
+    if(!players) return;
+    // Voir qui a rejoint
+    players.forEach(p=>{
+      if(p.player_id!==myUID && selectedPlayers.includes(p.player_id)){
+        inviteStatuses[p.player_id]='accepted';
+      }
+    });
+
+    // Vérifier aussi les refus via private_messages
+    const now = Date.now();
+    if(now - lastResponseCheck > 3000){
+      lastResponseCheck = now;
+      const cutoff = new Date(now - 60000).toISOString();
+      const {data:msgs} = await sb.from('private_messages')
+        .select('*')
+        .eq('receiver_unique_id', myUID)
+        .gte('created_at', cutoff)
+        .order('created_at',{ascending:false})
+        .limit(20);
+      (msgs||[]).forEach(m=>{
+        try {
+          const p = JSON.parse(m.message);
+          if(p.__type==='game_response' && p.roomId===mySessionId){
+            inviteStatuses[p.fromUID] = p.response;
+          }
+        } catch(e){}
+      });
+    }
+
+    renderOnlinePlayers();
+    updateSessionBox();
+  } catch(e){}
+}
+
+// Les invités vérifient s'ils ont des invitations dans leurs messages
+let lastInviteId = 0;
+async function pollIncomingInvites(){
+  if(!myUID || mySessionId) return; // pas si déjà dans une session
+  try {
+    const cutoff = new Date(Date.now()-120000).toISOString();
+    const {data:msgs} = await sb.from('private_messages')
+      .select('*')
+      .eq('receiver_unique_id', myUID)
+      .eq('is_read', false)
+      .gte('created_at', cutoff)
+      .order('created_at',{ascending:false})
+      .limit(5);
+    (msgs||[]).forEach(m=>{
+      if(m.id <= lastInviteId) return;
+      try {
+        const p = JSON.parse(m.message);
+        if(p.__type==='game_invite' && !pendingInvite){
+          lastInviteId = m.id;
+          // Marquer comme lu
+          sb.from('private_messages').update({is_read:true}).eq('id',m.id).then(()=>{});
+          showInviteOverlay(p, m.id);
+        }
+      } catch(e){}
+    });
+  } catch(e){}
+}
+
+function showInviteOverlay(payload, msgId){
+  pendingInvite = {...payload, msgId};
+  const lvl = payload.level==='short'?'⚡ Court':payload.level==='medium'?'🌟 Moyen':'🏆 Long';
+  document.getElementById('inviteFromText').innerHTML=
+    `<b>${esc(payload.fromName)}</b> t'invite à jouer !<br><span style="font-size:12px;color:#a8d8ea;">Niveau : ${lvl}</span>`;
+  document.getElementById('inviteOverlay').classList.add('show');
+  setTimeout(()=>{ if(pendingInvite?.msgId===msgId) declineInvite(); }, 30000);
+}
+
+window.acceptInvite = async function(){
+  if(!pendingInvite) return;
+  document.getElementById('inviteOverlay').classList.remove('show');
+  const inv = pendingInvite; pendingInvite=null;
+
+  mySessionId = inv.roomId;
+  isHost = false;
+
+  // Choisir un avatar si pas encore fait
+  const avIdx = chosenMulti!==null ? chosenMulti : 0;
+
+  // S'inscrire dans game_players
+  try {
+    const {data:existing} = await sb.from('game_players').select('id').eq('room_id',inv.roomId).eq('player_id',myUID).single();
+    if(!existing){
+      const {data:allP} = await sb.from('game_players').select('slot').eq('room_id',inv.roomId);
+      const usedSlots=(allP||[]).map(p=>p.slot);
+      const slot=[1,2,3].find(s=>!usedSlots.includes(s))??usedSlots.length;
+      await sb.from('game_players').insert({
+        room_id:inv.roomId, player_id:myUID, player_name:myPrenom,
+        avatar_index:avIdx, slot, is_ready:true
+      });
+    }
+  } catch(e){}
+
+  // Envoyer la réponse à l'hôte via private_messages
+  try {
+    await sb.from('private_messages').insert({
+      sender_unique_id: myUID,
+      receiver_unique_id: inv.fromUID,
+      message: JSON.stringify({__type:'game_response', roomId:inv.roomId, fromUID:myUID, fromName:myPrenom, response:'accepted'}),
+      is_read: false
+    });
+  } catch(e){}
+
+  setMultiMsg(`✅ Tu rejoins la partie de ${esc(inv.fromName)} !`, 'success');
+  switchTab('multi');
+
+  // Attendre le lancement (polling game_rooms status)
+  waitForGameStart(inv.roomId);
+};
+
+window.declineInvite = async function(){
+  if(!pendingInvite) return;
+  const inv = pendingInvite; pendingInvite=null;
+  document.getElementById('inviteOverlay').classList.remove('show');
+  try {
+    await sb.from('private_messages').insert({
+      sender_unique_id: myUID,
+      receiver_unique_id: inv.fromUID,
+      message: JSON.stringify({__type:'game_response', roomId:inv.roomId, fromUID:myUID, fromName:myPrenom, response:'declined'}),
+      is_read: false
+    });
+  } catch(e){}
+};
+
+function waitForGameStart(roomId){
+  // Polling simple : vérifier si status='playing' dans game_rooms
+  const poll = setInterval(async ()=>{
+    try {
+      const {data:room} = await sb.from('game_rooms').select('status,level,seed').eq('id',roomId).single();
+      if(room?.status==='playing'){
+        clearInterval(poll);
+        launchMultiGame({id:roomId, level:room.level, seed:room.seed});
+      }
+    } catch(e){}
+  }, 1500);
 }
 
 function updateSessionBox(){
@@ -606,220 +782,66 @@ function updateSessionBox(){
     box.style.display='none';
     document.getElementById('lvlLblMulti').style.display='none';
     startBtn.disabled=true;
-    document.getElementById('pInfoMulti').textContent='Clique sur un joueur pour l\'inviter à jouer !';
     return;
   }
 
   box.style.display='block';
   document.getElementById('lvlLblMulti').style.display='block';
 
-  // Afficher les joueurs dans la session
   const sessionEl = document.getElementById('sessionStatus');
-  const myAv = AVATARS[chosenMulti]||AVATARS[0];
-  let html = `
-    <div class="session-row">
-      <div class="session-av">${myAv.e}</div>
-      <div class="session-name">${esc(myPrenom)} (toi)</div>
-      <div class="session-badge host">👑 Hôte</div>
-    </div>`;
+  const myAv = AVATARS[chosenMulti||0];
+  let html=`<div class="session-row">
+    <div class="session-av">${myAv.e}</div>
+    <div class="session-name">${esc(myPrenom)} (toi)</div>
+    <div class="session-badge host">👑 Hôte</div>
+  </div>`;
 
   selectedPlayers.forEach(uid=>{
     const p = onlinePlayers.find(op=>op.unique_id===uid);
-    if(!p) return;
-    const status = getInviteStatus(uid);
-    const badgeClass = status==='accepted'?'ready':status==='declined'?'host':'waiting';
-    const badgeText = status==='accepted'?'✅ Prêt':status==='declined'?'❌ Refusé':'⏳ Invité...';
-    html+=`
-      <div class="session-row">
-        <div class="session-av">${p.photo_url?`<span style="font-size:16px">${(p.prenom||'?')[0]}</span>`:p.prenom[0]}</div>
-        <div class="session-name">${esc(p.prenom)}</div>
-        <div class="session-badge ${badgeClass}">${badgeText}</div>
-      </div>`;
+    const name = p?p.prenom:uid;
+    const st = inviteStatuses[uid]||'waiting';
+    const bc = st==='accepted'?'ready':st==='declined'?'host':'waiting';
+    const bt = st==='accepted'?'✅ Prêt':st==='declined'?'❌ Refusé':'⏳ En attente...';
+    html+=`<div class="session-row">
+      <div class="session-av">${p?.photo_url?'👤':(p?.prenom||'?')[0]}</div>
+      <div class="session-name">${esc(name)}</div>
+      <div class="session-badge ${bc}">${bt}</div>
+    </div>`;
   });
   sessionEl.innerHTML=html;
 
-  // Activer le bouton si au moins 1 joueur sélectionné
-  startBtn.disabled = selectedPlayers.length===0;
-  setMultiMsg(`${selectedPlayers.length} joueur${selectedPlayers.length>1?'s':''} sélectionné${selectedPlayers.length>1?'s':''} · Clique sur LANCER !`,'success');
-}
+  // Activer LANCER : l'hôte peut lancer dès qu'il y a au moins 1 accepté ou même seul
+  const hasAccepted = selectedPlayers.some(u=>inviteStatuses[u]==='accepted');
+  startBtn.disabled = !isHost;
 
-// Statut des invitations envoyées
-const inviteStatuses = {}; // uid => 'pending'|'accepted'|'declined'
-function getInviteStatus(uid){ return inviteStatuses[uid]||'pending'; }
-
-// ═══════════════════════════════════════════
-//  SYSTÈME D'INVITATION (via Supabase)
-// ═══════════════════════════════════════════
-// On réutilise la table game_rooms et game_players,
-// mais on ENVOIE des invitations via private_messages ou une table dédiée.
-// Ici on utilise un broadcast Realtime channel par UID.
-
-function listenForInvites(){
-  if(onlineChannel) sb.removeChannel(onlineChannel);
-  // Canal unique par utilisateur pour recevoir les invitations
-  onlineChannel = sb.channel('player_invite_'+myUID)
-    .on('broadcast',{event:'game_invite'},(msg)=>{
-      if(msg.payload && msg.payload.toUID===myUID){
-        handleIncomingInvite(msg.payload);
-      }
-    })
-    .subscribe();
-}
-
-function handleIncomingInvite(payload){
-  pendingInvite = payload;
-  document.getElementById('inviteFromText').innerHTML=`<b>${esc(payload.fromName)}</b> veut jouer avec toi !<br><span style="font-size:12px;color:#a8d8ea">Niveau : ${payload.level==='short'?'⚡ Court':payload.level==='medium'?'🌟 Moyen':'🏆 Long'}</span>`;
-  document.getElementById('inviteOverlay').classList.add('show');
-  // Auto-fermeture après 30s
-  setTimeout(()=>{
-    if(pendingInvite===payload) declineInvite();
-  }, 30000);
-}
-
-window.acceptInvite = async function(){
-  if(!pendingInvite) return;
-  document.getElementById('inviteOverlay').classList.remove('show');
-  const inv = pendingInvite;
-  pendingInvite = null;
-  // Répondre à l'hôte
-  await sendInviteResponse(inv.sessionId, inv.fromUID, 'accepted', chosenMulti||0);
-  // Rejoindre la salle
-  mySessionId = inv.sessionId;
-  isHost = false;
-  waitForGameStart(inv.sessionId);
-  setMultiMsg(`Tu rejoins la partie de ${esc(inv.fromName)} !`, 'success');
-  // Basculer sur l'onglet multi
-  switchTab('multi');
-};
-
-window.declineInvite = async function(){
-  if(!pendingInvite) return;
-  const inv = pendingInvite;
-  pendingInvite = null;
-  document.getElementById('inviteOverlay').classList.remove('show');
-  await sendInviteResponse(inv.sessionId, inv.fromUID, 'declined', 0);
-};
-
-async function sendInviteResponse(sessionId, hostUID, response, avatarIdx){
-  try {
-    const channel = sb.channel('player_invite_'+hostUID);
-    await channel.send({
-      type:'broadcast', event:'invite_response',
-      payload:{ sessionId, fromUID:myUID, fromName:myPrenom, response, avatarIdx }
-    });
-    sb.removeChannel(channel);
-  } catch(e){}
+  if(hasAccepted){
+    setMultiMsg('🎮 Joueurs prêts ! Tu peux lancer la partie.','success');
+  } else {
+    const waitCount = selectedPlayers.filter(u=>inviteStatuses[u]==='waiting'||!inviteStatuses[u]).length;
+    setMultiMsg(`⏳ En attente de ${waitCount} joueur${waitCount>1?'s':''} ...`,'warning');
+  }
 }
 
 // ═══════════════════════════════════════════
 //  LANCEMENT MULTI
 // ═══════════════════════════════════════════
 window.startMulti = async function(){
-  if(chosenMulti===null){ setMultiMsg('Choisis un avatar d\'abord !','warning'); return; }
-  if(!selectedPlayers.length){ setMultiMsg('Sélectionne au moins un joueur !','warning'); return; }
-
-  // Créer une session dans Supabase
-  const code = String(Math.floor(1000+Math.random()*9000));
-  const seed = Date.now();
-  mySessionId = code;
-  isHost = true;
+  // Ce bouton n'est utilisé que par l'hôte pour LANCER
+  if(!isHost){ setMultiMsg('Seul l\'hôte peut lancer la partie','warning'); return; }
+  if(!mySessionId){ setMultiMsg('Invite d\'abord des joueurs !','warning'); return; }
 
   try {
-    await sb.from('game_rooms').insert({ id:code, host_id:myUID, level:chosenLenMulti, status:'inviting', seed });
-    await sb.from('game_players').insert({ room_id:code, player_id:myUID, player_name:myPrenom, avatar_index:chosenMulti, slot:0, is_ready:true });
-  } catch(e){ setMultiMsg('Erreur création : '+e.message,'error'); return; }
-
-  // Envoyer invitations à chaque joueur sélectionné via Realtime broadcast
-  setMultiMsg(`Invitations envoyées à ${selectedPlayers.length} joueur${selectedPlayers.length>1?'s':''} ...`,'success');
-  Object.keys(inviteStatuses).forEach(k=>delete inviteStatuses[k]);
-
-  // Écouter les réponses
-  listenForInviteResponses(code, seed);
-
-  for(const uid of selectedPlayers){
-    try {
-      const ch = sb.channel('player_invite_'+uid);
-      await ch.send({
-        type:'broadcast', event:'game_invite',
-        payload:{
-          toUID: uid,
-          fromUID: myUID,
-          fromName: myPrenom,
-          sessionId: code,
-          level: chosenLenMulti,
-          seed
-        }
-      });
-      sb.removeChannel(ch);
-    } catch(e){}
-  }
-
-  updateSessionBox();
-};
-
-function listenForInviteResponses(sessionId, seed){
-  // Écouter les réponses sur mon propre canal
-  const myChannel = sb.channel('player_invite_'+myUID);
-  myChannel.on('broadcast',{event:'invite_response'},(msg)=>{
-    const p = msg.payload;
-    if(!p || p.sessionId!==sessionId) return;
-    inviteStatuses[p.fromUID] = p.response;
-
-    if(p.response==='accepted'){
-      // Ajouter à la salle Supabase
-      const usedSlots=[...selectedPlayers.filter(u=>inviteStatuses[u]==='accepted').map((_,i)=>i+1)];
-      const slot = usedSlots.length+1;
-      sb.from('game_players').insert({
-        room_id:sessionId, player_id:p.fromUID, player_name:p.fromName,
-        avatar_index:p.avatarIdx, slot, is_ready:true
-      }).then(()=>{});
-    }
-
-    updateSessionBox();
-
-    // Tous ont répondu ? Activer le lancement
-    const allResponded = selectedPlayers.every(u=>inviteStatuses[u]==='accepted'||inviteStatuses[u]==='declined');
-    const anyAccepted  = selectedPlayers.some(u=>inviteStatuses[u]==='accepted');
-    if(allResponded && anyAccepted){
-      setMultiMsg('Tous prêts ! Lance la partie 🎮','success');
-    }
-  }).subscribe();
-}
-
-function waitForGameStart(sessionId){
-  // Écouter le signal de démarrage depuis l'hôte
-  const ch = sb.channel('game_start_'+sessionId)
-    .on('broadcast',{event:'game_start'},(msg)=>{
-      if(msg.payload) launchMultiGame(msg.payload);
-    }).subscribe();
-}
-
-async function updateMyAvatarInSession(avatarIdx){
-  if(!mySessionId) return;
-  try { await sb.from('game_players').update({avatar_index:avatarIdx}).eq('room_id',mySessionId).eq('player_id',myUID); } catch(e){}
-}
-
-async function updateSessionLevel(level){
-  if(!mySessionId) return;
-  try { await sb.from('game_rooms').update({level}).eq('id',mySessionId); } catch(e){}
-}
-
-window.startMultiFinal = async function(){
-  if(!mySessionId||!isHost) return;
-  const {data:players} = await sb.from('game_players').select('*').eq('room_id',mySessionId).order('slot');
-  const seed = Date.now();
-  await sb.from('game_rooms').update({status:'playing', seed}).eq('id',mySessionId);
-
-  // Broadcaster le démarrage
-  const ch = sb.channel('game_start_'+mySessionId);
-  await ch.send({type:'broadcast',event:'game_start',payload:{id:mySessionId, level:chosenLenMulti, seed}});
-
-  launchMultiGame({id:mySessionId, level:chosenLenMulti, seed});
+    const seed = Date.now();
+    await sb.from('game_rooms').update({ status:'playing', seed, level:chosenLenMulti }).eq('id',mySessionId);
+    // Lancer immédiatement pour l'hôte
+    const {data:players} = await sb.from('game_players').select('*').eq('room_id',mySessionId).order('slot');
+    startOnlineGame({id:mySessionId, level:chosenLenMulti, seed}, players||[]);
+  } catch(e){ setMultiMsg('Erreur lancement : '+e.message,'error'); }
 };
 
 async function launchMultiGame(room){
   const {data:players} = await sb.from('game_players').select('*').eq('room_id',room.id).order('slot');
-  if(!players) return;
+  if(!players||!players.length) return;
   startOnlineGame(room, players);
 }
 
@@ -836,18 +858,10 @@ window.startSolo = function(){
 // ═══════════════════════════════════════════
 function startOnlineGame(room, playersData){
   const me = playersData.find(p=>p.player_id===myUID);
-  if(!me){ alert('Tu n\'es plus dans cette salle !'); return; }
+  if(!me){ setMultiMsg('Erreur : tu n\'es pas dans la salle !','error'); return; }
   const chosen = playersData.map(p=>({idx:p.avatar_index, slot:p.slot, playerId:p.player_id, isMe:p.player_id===myUID}));
   launchGame(room.level, chosen, room);
 }
-
-// Override du bouton lancer selon host/all ready
-document.getElementById('startMultiBtn').addEventListener('click', function(){
-  if(!isHost) return; // non-hôtes attendent
-  startMultiFinal();
-});
-// On retire l'onclick inline
-document.getElementById('startMultiBtn').removeAttribute('onclick');
 
 function setMultiMsg(txt,type=''){
   const el = document.getElementById('pInfoMulti');
@@ -1256,18 +1270,21 @@ window.restartGame = function(){
 window.goLobby = function(){
   if(raf)cancelAnimationFrame(raf);
   if(gameChannel){sb.removeChannel(gameChannel);gameChannel=null;}
-  document.getElementById('winOv').classList.remove('show');
-  document.getElementById('deathOv').classList.remove('show');
-  document.getElementById('gameScreen').classList.remove('active');
-  document.getElementById('lobbyScreen').classList.add('active');
+  stopPlayerDiscovery();
+  if(responsesPollInt){clearInterval(responsesPollInt);responsesPollInt=null;}
+  document.getElementById("winOv").classList.remove("show");
+  document.getElementById("deathOv").classList.remove("show");
+  document.getElementById("gameScreen").classList.remove("active");
+  document.getElementById("lobbyScreen").classList.add("active");
   pops.length=0;Object.keys(keys).forEach(k=>keys[k]=false);
-  // Nettoyer la session
   if(mySessionId){
-    sb.from('game_players').delete().eq('room_id',mySessionId).eq('player_id',myUID).then(()=>{});
+    sb.from("game_players").delete().eq("room_id",mySessionId).eq("player_id",myUID).then(()=>{});
     mySessionId=null;
   }
   selectedPlayers.length=0;
+  Object.keys(inviteStatuses).forEach(k=>delete inviteStatuses[k]);
   isHost=false;
+  lastInviteId=0;
 };
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
