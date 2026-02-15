@@ -1534,6 +1534,8 @@ function drawFan(fan,t,CW){
   ctx.strokeText(label,fx+fan.w/2,fan.y-10);ctx.fillText(label,fx+fan.w/2,fan.y-10);
   ctx.textAlign='left';
 }
+
+function drawBalloon(bal,t,CW){
   const bx2=sc(bal.bx),by2=bal.floatY,wobble=Math.sin(t/16)*4;
   const px=sc(bal.pumpX),py=bal.pumpY;
   if(px>-80&&px<CW+80){
