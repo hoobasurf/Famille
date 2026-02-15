@@ -25,7 +25,6 @@ body{background:#1a1a2e;font-family:'Nunito',sans-serif;overflow:hidden;user-sel
 .lobby-panel{background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);border-radius:22px;padding:20px;width:min(96vw,680px);backdrop-filter:blur(12px);}
 .section-lbl{font-family:‘Press Start 2P’,monospace;font-size:10px;color:#FFD700;text-align:center;letter-spacing:2px;margin-bottom:12px;}
 
-/* Mode tabs */
 .mode-tabs{display:flex;gap:8px;margin-bottom:18px;}
 .mode-tab{flex:1;padding:12px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.12);border-radius:12px;color:white;font-family:‘Nunito’,sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s;}
 .mode-tab:hover{border-color:rgba(255,215,0,.4);}
@@ -52,7 +51,6 @@ body{background:#1a1a2e;font-family:'Nunito',sans-serif;overflow:hidden;user-sel
 .lvl-icon{font-size:20px;display:block;margin-bottom:2px;}
 .lvl-sub{font-size:10px;color:#a8d8ea;margin-top:1px;}
 
-/* ══ DÉCOUVERTE JOUEURS ══ */
 .players-online-box{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px;margin-bottom:14px;}
 .players-online-title{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
 .players-online-title span{font-family:‘Press Start 2P’,monospace;font-size:9px;color:#FFD700;letter-spacing:1px;}
@@ -72,12 +70,10 @@ body{background:#1a1a2e;font-family:'Nunito',sans-serif;overflow:hidden;user-sel
 .player-card-name{font-size:14px;font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .player-card-sub{font-size:11px;color:#a8d8ea;margin-top:2px;}
 .player-card-status{font-size:13px;margin-left:auto;}
-.player-card-check{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:#43e97b;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;}
 
 .no-players-msg{text-align:center;color:rgba(255,255,255,.4);font-size:12px;padding:18px 0;line-height:2;}
 .no-players-icon{font-size:30px;display:block;margin-bottom:8px;}
 
-/* Invitation reçue overlay */
 .invite-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;}
 .invite-overlay.show{display:flex;}
 .invite-card{background:linear-gradient(135deg,#1a1a2e,#302b63);border:2px solid rgba(255,215,0,.5);border-radius:22px;padding:28px;text-align:center;max-width:340px;width:90%;box-shadow:0 0 40px rgba(255,215,0,.3);animation:inviteIn .4s cubic-bezier(.34,1.56,.64,1);}
@@ -90,7 +86,15 @@ body{background:#1a1a2e;font-family:'Nunito',sans-serif;overflow:hidden;user-sel
 .invite-btn-yes{background:linear-gradient(135deg,#43e97b,#38f9d7);color:#0a1a10;}
 .invite-btn-no{background:rgba(231,76,60,.8);color:white;}
 
-/* Session room status */
+/* Waiting overlay for guest */
+.waiting-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:199;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+.waiting-overlay.show{display:flex;}
+.waiting-spinner{width:60px;height:60px;border:5px solid rgba(255,215,0,.3);border-top-color:#FFD700;border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.waiting-title{font-family:‘Press Start 2P’,monospace;font-size:12px;color:#FFD700;text-align:center;}
+.waiting-sub{font-size:13px;color:#a8d8ea;text-align:center;max-width:280px;line-height:1.6;}
+.waiting-cancel{margin-top:8px;padding:10px 24px;background:rgba(231,76,60,.7);border:none;border-radius:10px;color:white;font-weight:700;font-size:13px;cursor:pointer;}
+
 .session-status{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;margin-bottom:14px;}
 .session-row{display:flex;align-items:center;gap:10px;padding:6px 0;}
 .session-av{font-size:20px;}
@@ -134,7 +138,6 @@ canvas{display:block;width:100%;height:100%;}
 @keyframes netpulse{0%,100%{opacity:1}50%{opacity:.4}}
 .net-dot.offline{background:#ff6b6b;animation:none;}
 
-/* Zones tactiles */
 .touch-zone-left,.touch-zone-right{position:absolute;top:0;bottom:110px;z-index:15;width:50%;pointer-events:auto;-webkit-tap-highlight-color:transparent;touch-action:none;}
 .touch-zone-left{left:0;}
 .touch-zone-right{right:0;left:50%;}
@@ -142,7 +145,6 @@ canvas{display:block;width:100%;height:100%;}
 .touch-hint-left{left:12px;}
 .touch-hint-right{right:12px;}
 
-/* Joystick */
 .joystick-wrap{position:absolute;bottom:12px;left:12px;z-index:25;width:120px;height:120px;-webkit-tap-highlight-color:transparent;touch-action:none;}
 .joystick-base{position:absolute;inset:0;border-radius:50%;background:rgba(255,255,255,.07);border:3px solid rgba(255,255,255,.16);}
 .joystick-arrows{position:absolute;inset:0;border-radius:50%;}
@@ -150,7 +152,6 @@ canvas{display:block;width:100%;height:100%;}
 .joystick-arrows::after{content:‘→’;position:absolute;right:7px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.28);font-size:13px;font-weight:900;}
 .joystick-stick{position:absolute;width:48px;height:48px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.9),rgba(180,180,220,.7));border:3px solid rgba(255,255,255,.5);box-shadow:0 4px 14px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.6);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
 
-/* Boutons droite */
 .right-btns{position:absolute;bottom:12px;right:12px;z-index:25;display:flex;flex-direction:column;gap:8px;align-items:center;}
 .cb{width:56px;height:56px;border-radius:50%;border:3px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:white;transition:all .12s;-webkit-tap-highlight-color:transparent;touch-action:none;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.3);}
 .cb:active,.cb.pressed{transform:scale(.88);filter:brightness(1.4);}
@@ -158,12 +159,10 @@ canvas{display:block;width:100%;height:100%;}
 .cb-act{background:rgba(255,165,0,.9);border-color:#FFD700;font-size:22px;box-shadow:0 0 18px rgba(255,165,0,.6);}
 .cb-act.pressed{box-shadow:0 0 34px rgba(255,165,0,.95);}
 
-/* Sélecteur joueur */
 .player-switcher{position:absolute;bottom:140px;left:50%;transform:translateX(-50%);z-index:26;display:flex;gap:8px;align-items:center;}
 .psw-btn{width:38px;height:38px;border-radius:50%;border:3px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:none;background:rgba(0,0,0,.4);transition:all .2s;}
 .psw-btn.active{border-color:#FFD700;background:rgba(255,215,0,.2);transform:scale(1.15);}
 
-/* Overlays */
 .ov{position:absolute;inset:0;z-index:50;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
 .ov.show{display:flex;}
 .ov-emoji{font-size:64px;}
@@ -190,7 +189,6 @@ canvas{display:block;width:100%;height:100%;}
 
 ```
 <div class="lobby-panel">
-  <!-- Tabs -->
   <div class="mode-tabs">
     <div class="mode-tab active" id="tabSolo" onclick="switchTab('solo')">
       <span class="tab-icon">🎮</span>Solo
@@ -208,35 +206,28 @@ canvas{display:block;width:100%;height:100%;}
       <div class="tuto-row"><span class="tuto-icon">🕹️</span><span><b>Mobile :</b> Joystick gauche · Tap gauche/droite pour avancer · ↑ sauter · ⚡ action</span></div>
       <div class="tuto-row"><span class="tuto-icon">⌨️</span><span><b>Clavier :</b> J1=flèches+Z · J2=WASD+Q · J3=IJKL+U</span></div>
     </div>
-
     <div class="section-lbl">🎭 AVATAR</div>
     <div class="avatar-grid" id="avGridSolo"></div>
-
     <div class="section-lbl">🗺️ NIVEAU</div>
     <div class="level-grid" id="lvlGridSolo">
       <button class="lvl-btn selected" onclick="pickLevel('short',this)"><span class="lvl-icon">⚡</span>Court<div class="lvl-sub">~1 min</div></button>
-      <button class="lvl-btn"          onclick="pickLevel('medium',this)"><span class="lvl-icon">🌟</span>Moyen<div class="lvl-sub">~2 min</div></button>
-      <button class="lvl-btn"          onclick="pickLevel('long',this)"><span class="lvl-icon">🏆</span>Long<div class="lvl-sub">~4 min</div></button>
+      <button class="lvl-btn" onclick="pickLevel('medium',this)"><span class="lvl-icon">🌟</span>Moyen<div class="lvl-sub">~2 min</div></button>
+      <button class="lvl-btn" onclick="pickLevel('long',this)"><span class="lvl-icon">🏆</span>Long<div class="lvl-sub">~4 min</div></button>
     </div>
-
     <div class="player-info" id="pInfoSolo">Sélectionne un avatar</div>
     <button class="start-btn" id="startSoloBtn" disabled onclick="startSolo()">▶ JOUER SOLO</button>
   </div>
 
   <!-- ── TAB MULTI ── -->
   <div class="tab-content" id="contentMulti">
-    <!-- Non connecté -->
     <div id="multiNotAuth" style="display:none">
       <div class="msg-info error">⚠️ Tu dois être connecté à BubbleChat pour jouer en ligne.</div>
       <a href="chat.html" style="display:block;margin-top:10px;text-align:center;color:#a8d8ea;font-size:13px;">← Retour au chat</a>
     </div>
-
-    <!-- Connecté -->
     <div id="multiAuth">
       <div class="section-lbl">🎭 TON AVATAR</div>
       <div class="avatar-grid" id="avGridMulti"></div>
 
-      <!-- Joueurs en ligne -->
       <div class="players-online-box">
         <div class="players-online-title">
           <div class="online-pulse"></div>
@@ -251,19 +242,17 @@ canvas{display:block;width:100%;height:100%;}
         </div>
       </div>
 
-      <!-- Joueurs sélectionnés pour jouer -->
       <div id="sessionBox" style="display:none">
         <div class="section-lbl">👥 MA PARTIE</div>
         <div class="session-status" id="sessionStatus"></div>
       </div>
 
-      <!-- Niveau (hôte uniquement) -->
       <div id="lvlLblMulti" style="display:none">
         <div class="section-lbl">🗺️ NIVEAU</div>
         <div class="level-grid" id="lvlGridMulti">
           <button class="lvl-btn selected" onclick="pickLevelMulti('short',this)"><span class="lvl-icon">⚡</span>Court</button>
-          <button class="lvl-btn"          onclick="pickLevelMulti('medium',this)"><span class="lvl-icon">🌟</span>Moyen</button>
-          <button class="lvl-btn"          onclick="pickLevelMulti('long',this)"><span class="lvl-icon">🏆</span>Long</button>
+          <button class="lvl-btn" onclick="pickLevelMulti('medium',this)"><span class="lvl-icon">🌟</span>Moyen</button>
+          <button class="lvl-btn" onclick="pickLevelMulti('long',this)"><span class="lvl-icon">🏆</span>Long</button>
         </div>
       </div>
 
@@ -286,9 +275,18 @@ canvas{display:block;width:100%;height:100%;}
     <div class="invite-from" id="inviteFromText">Quelqu'un veut jouer avec toi !</div>
     <div class="invite-btns">
       <button class="invite-btn invite-btn-yes" onclick="acceptInvite()">✅ Rejoindre !</button>
-      <button class="invite-btn invite-btn-no"  onclick="declineInvite()">❌ Refuser</button>
+      <button class="invite-btn invite-btn-no" onclick="declineInvite()">❌ Refuser</button>
     </div>
   </div>
+</div>
+
+<!-- ✅ NOUVEAU : Overlay d'attente pour l'invité -->
+
+<div class="waiting-overlay" id="waitingOverlay">
+  <div class="waiting-spinner"></div>
+  <div class="waiting-title">EN ATTENTE...</div>
+  <div class="waiting-sub" id="waitingSubText">L'hôte va lancer la partie. Tiens-toi prêt !</div>
+  <button class="waiting-cancel" onclick="cancelWaiting()">❌ Annuler</button>
 </div>
 
 <!-- ══════════ GAME ══════════ -->
@@ -308,32 +306,22 @@ canvas{display:block;width:100%;height:100%;}
 
   <div class="ctrl-hud" id="ctrlHud"></div>
 
-  <!-- Touch zones -->
-
-  <div class="touch-zone-left"  id="tzLeft"></div>
+  <div class="touch-zone-left" id="tzLeft"></div>
   <div class="touch-zone-right" id="tzRight"></div>
   <div class="touch-hint touch-hint-left">◀</div>
   <div class="touch-hint touch-hint-right">▶</div>
-
-  <!-- Joystick -->
 
   <div class="joystick-wrap" id="joyWrap">
     <div class="joystick-base"><div class="joystick-arrows"></div></div>
     <div class="joystick-stick" id="joyStick"></div>
   </div>
 
-  <!-- Player switcher -->
-
   <div class="player-switcher" id="playerSwitcher"></div>
-
-  <!-- Right buttons -->
 
   <div class="right-btns">
     <button class="cb cb-act" id="btnAct">⚡</button>
     <button class="cb cb-jump" id="btnJump">↑</button>
   </div>
-
-  <!-- Overlays -->
 
   <div class="ov" id="winOv">
     <div class="ov-emoji">🏆</div>
@@ -358,16 +346,10 @@ canvas{display:block;width:100%;height:100%;}
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-// ═══════════════════════════════════════════
-//  SUPABASE
-// ═══════════════════════════════════════════
 const SUPA_URL = 'https://eeikriwrwuynwpzodbbt.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlaWtyaXdyd3V5bndwem9kYmJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1NzQ3NjYsImV4cCI6MjA4NjE1MDc2Nn0.MJ6CSmrttEWcrdfy5C7nP4sE_pe19sGNE-WasASPDNc';
 const sb = createClient(SUPA_URL, SUPA_KEY);
 
-// ═══════════════════════════════════════════
-//  IDENTITÉ JOUEUR (depuis BubbleChat)
-// ═══════════════════════════════════════════
 function getFingerprint(){
   let f = localStorage.getItem('browserFingerprint');
   if(!f){ f = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('browserFingerprint', f); }
@@ -379,9 +361,6 @@ const myUID      = myPrenom ? (myPrenom + '_' + myFP) : null;
 const isLoggedIn = !!myPrenom;
 const myPhoto    = localStorage.getItem('userPhotoUrl') || localStorage.getItem('tempPhotoPreview') || null;
 
-// ═══════════════════════════════════════════
-//  CONSTANTES JEU
-// ═══════════════════════════════════════════
 const T=48,GRAV=0.52,JFORCE=-12.5,SPD=3.2,GAP_W=4;
 const GROUND_Y=13, WORLD_H=18;
 const AVATARS=[
@@ -402,26 +381,38 @@ const CTRL=[
   {left:'Numpad4',  right:'Numpad6',   jump:'Numpad8',  act:'Numpad5'},
 ];
 
-// ═══════════════════════════════════════════
-//  ÉTAT LOBBY
-// ═══════════════════════════════════════════
 let chosenSolo   = null;
 let chosenMulti  = null;
 let chosenLen    = 'short';
 let chosenLenMulti = 'short';
 let currentTab   = 'solo';
 
-// ── Nouveaux états pour la découverte joueurs ──
-let onlinePlayers   = [];      // joueurs en ligne (depuis profiles)
-let selectedPlayers = [];      // UIDs des joueurs invités
-let mySessionId     = null;    // ID de ma session en cours
+let onlinePlayers   = [];
+let selectedPlayers = [];
+let mySessionId     = null;
 let isHost          = false;
 let sessionChannel  = null;
 let onlineChannel   = null;
 let playersPollInt  = null;
 let sessionPollInt  = null;
 let pendingInvite   = null;
-const inviteStatuses = {};  // uid => waiting|accepted|declined
+const inviteStatuses = {};
+
+// ── WAITING OVERLAY (pour l'invité) ──
+let waitingPollInt = null;
+let waitingRoomId  = null;
+
+window.cancelWaiting = function(){
+  if(waitingPollInt){ clearInterval(waitingPollInt); waitingPollInt=null; }
+  document.getElementById('waitingOverlay').classList.remove('show');
+  if(waitingRoomId && myUID){
+    sb.from('game_players').delete().eq('room_id', waitingRoomId).eq('player_id', myUID).then(()=>{});
+  }
+  waitingRoomId = null;
+  mySessionId = null;
+  isHost = false;
+  setMultiMsg('Partie annulée.', 'warning');
+};
 
 // ── STARS ──
 (()=>{
@@ -434,7 +425,6 @@ const inviteStatuses = {};  // uid => waiting|accepted|declined
   }
 })();
 
-// ── AVATAR GRIDS ──
 function makeAvGrid(gridId, onSelect){
   const g = document.getElementById(gridId); g.innerHTML='';
   AVATARS.forEach((av,i)=>{
@@ -452,15 +442,12 @@ makeAvGrid('avGridSolo', (i,gid)=>{
 makeAvGrid('avGridMulti',(i,gid)=>{
   chosenMulti=i; selectAvatar(gid,i);
   document.getElementById('pInfoMulti').textContent=`${AVATARS[i].e} ${AVATARS[i].n} — clique sur un joueur pour l'inviter !`;
-  // Mettre à jour mon avatar dans la session si j'en ai une
-  
 });
 
 function selectAvatar(gridId,sel){
   document.querySelectorAll(`#${gridId} .av-slot`).forEach((el,j)=>{ el.classList.toggle('selected',j===sel); });
 }
 
-// ── TABS ──
 window.switchTab = function(tab){
   currentTab=tab;
   document.getElementById('tabSolo').classList.toggle('active',tab==='solo');
@@ -474,7 +461,6 @@ window.switchTab = function(tab){
     } else {
       document.getElementById('multiNotAuth').style.display='none';
       document.getElementById('multiAuth').style.display='block';
-      // Enregistrer présence et démarrer la découverte
       registerPresence();
       startPlayerDiscovery();
     }
@@ -483,18 +469,13 @@ window.switchTab = function(tab){
   }
 };
 
-// ── LEVEL ──
 window.pickLevel = function(k,el){ chosenLen=k; document.querySelectorAll('#lvlGridSolo .lvl-btn').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); };
 window.pickLevelMulti = function(k,el){
   chosenLenMulti=k;
   document.querySelectorAll('#lvlGridMulti .lvl-btn').forEach(b=>b.classList.remove('selected'));
   el.classList.add('selected');
-  
 };
 
-// ═══════════════════════════════════════════
-//  PRÉSENCE EN LIGNE
-// ═══════════════════════════════════════════
 async function registerPresence(){
   if(!myUID) return;
   try {
@@ -506,14 +487,10 @@ async function registerPresence(){
   } catch(e){}
 }
 
-// ═══════════════════════════════════════════
-//  DÉCOUVERTE DES JOUEURS EN LIGNE
-// ═══════════════════════════════════════════
 function startPlayerDiscovery(){
   loadOnlinePlayers();
   if(playersPollInt) clearInterval(playersPollInt);
   playersPollInt = setInterval(loadOnlinePlayers, 4000);
-  // Polling invitations reçues toutes les 2s
   if(sessionPollInt) clearInterval(sessionPollInt);
   sessionPollInt = setInterval(pollIncomingInvites, 2000);
 }
@@ -526,7 +503,7 @@ function stopPlayerDiscovery(){
 async function loadOnlinePlayers(){
   if(!myUID) return;
   try {
-    const cutoff = new Date(Date.now()-90000).toISOString(); // actifs < 90s
+    const cutoff = new Date(Date.now()-90000).toISOString();
     const {data} = await sb.from('profiles')
       .select('unique_id, prenom, photo_url, is_online, last_seen')
       .neq('unique_id', myUID)
@@ -555,9 +532,7 @@ function renderOnlinePlayers(){
     card.className = 'player-card'+(isSelected?' selected-player':'')+(status==='accepted'?' accepted':status==='declined'?' declined':'');
     card.dataset.uid = p.unique_id;
     const avHtml = p.photo_url ? `<img src="${esc(p.photo_url)}" alt="">` : (p.prenom||'?')[0].toUpperCase();
-    const statusIcon = isSelected
-      ? (status==='accepted'?'✅':status==='declined'?'❌':'⏳')
-      : '🎮';
+    const statusIcon = isSelected ? (status==='accepted'?'✅':status==='declined'?'❌':'⏳') : '🎮';
     card.innerHTML=`
       <div class="player-card-avatar">${avHtml}</div>
       <div class="player-card-info">
@@ -571,17 +546,9 @@ function renderOnlinePlayers(){
   });
 }
 
-// ═══════════════════════════════════════════
-//  SYSTÈME D'INVITATION — 100% POLLING
-//  On utilise game_invites (ou private_messages comme canal)
-//  Ici on utilise une table game_invites simple via game_rooms
-// ═══════════════════════════════════════════
-
-// Envoyer une invitation : insérer une ligne dans game_invites
 async function sendInviteTo(player){
   if(chosenMulti===null){ setMultiMsg('Choisis ton avatar d\'abord !','warning'); return; }
 
-  // Créer la salle si pas encore fait
   if(!mySessionId){
     const code = String(Math.floor(1000+Math.random()*9000));
     mySessionId = code;
@@ -592,13 +559,11 @@ async function sendInviteTo(player){
     } catch(e){ setMultiMsg('Erreur : '+e.message,'error'); mySessionId=null; return; }
   }
 
-  // Ajouter le joueur à la liste sélectionnée
   if(!selectedPlayers.includes(player.unique_id)){
     selectedPlayers.push(player.unique_id);
     inviteStatuses[player.unique_id] = 'waiting';
   }
 
-  // Écrire l'invitation dans private_messages (comme un message spécial)
   const inviteMsg = JSON.stringify({
     __type:'game_invite', roomId:mySessionId,
     fromName:myPrenom, fromUID:myUID,
@@ -616,8 +581,6 @@ async function sendInviteTo(player){
   renderOnlinePlayers();
   updateSessionBox();
   setMultiMsg(`Invitation envoyée à ${esc(player.prenom)} !`, 'success');
-
-  // Démarrer le polling des réponses
   startResponsePolling();
 }
 
@@ -629,20 +592,17 @@ function startResponsePolling(){
   responsesPollInt = setInterval(pollInviteResponses, 2500);
 }
 
-// L'hôte vérifie si les invités ont répondu (en regardant game_players)
 async function pollInviteResponses(){
   if(!mySessionId||!isHost) return;
   try {
     const {data:players} = await sb.from('game_players').select('*').eq('room_id',mySessionId).order('slot');
     if(!players) return;
-    // Voir qui a rejoint
     players.forEach(p=>{
       if(p.player_id!==myUID && selectedPlayers.includes(p.player_id)){
         inviteStatuses[p.player_id]='accepted';
       }
     });
 
-    // Vérifier aussi les refus via private_messages
     const now = Date.now();
     if(now - lastResponseCheck > 3000){
       lastResponseCheck = now;
@@ -668,10 +628,9 @@ async function pollInviteResponses(){
   } catch(e){}
 }
 
-// Les invités vérifient s'ils ont des invitations dans leurs messages
 let lastInviteId = 0;
 async function pollIncomingInvites(){
-  if(!myUID || mySessionId) return; // pas si déjà dans une session
+  if(!myUID || mySessionId) return;
   try {
     const cutoff = new Date(Date.now()-120000).toISOString();
     const {data:msgs} = await sb.from('private_messages')
@@ -687,7 +646,6 @@ async function pollIncomingInvites(){
         const p = JSON.parse(m.message);
         if(p.__type==='game_invite' && !pendingInvite){
           lastInviteId = m.id;
-          // Marquer comme lu
           sb.from('private_messages').update({is_read:true}).eq('id',m.id).then(()=>{});
           showInviteOverlay(p, m.id);
         }
@@ -712,13 +670,17 @@ window.acceptInvite = async function(){
 
   mySessionId = inv.roomId;
   isHost = false;
+  waitingRoomId = inv.roomId;
 
-  // Choisir un avatar si pas encore fait
-  const avIdx = chosenMulti!==null ? chosenMulti : 0;
+  // ✅ FIX : Utiliser avatar par défaut si pas encore choisi (évite avatar manquant sur iPhone)
+  const avIdx = (chosenMulti !== null) ? chosenMulti : (inv.avatarIdx !== undefined ? Math.min(inv.avatarIdx + 1, AVATARS.length - 1) : 1);
+  if(chosenMulti === null){
+    chosenMulti = avIdx;
+    selectAvatar('avGridMulti', avIdx);
+  }
 
-  // S'inscrire dans game_players
   try {
-    const {data:existing} = await sb.from('game_players').select('id').eq('room_id',inv.roomId).eq('player_id',myUID).single();
+    const {data:existing} = await sb.from('game_players').select('id').eq('room_id',inv.roomId).eq('player_id',myUID).maybeSingle();
     if(!existing){
       const {data:allP} = await sb.from('game_players').select('slot').eq('room_id',inv.roomId);
       const usedSlots=(allP||[]).map(p=>p.slot);
@@ -728,9 +690,8 @@ window.acceptInvite = async function(){
         avatar_index:avIdx, slot, is_ready:true
       });
     }
-  } catch(e){}
+  } catch(e){ console.warn('Erreur inscription:', e); }
 
-  // Envoyer la réponse à l'hôte via private_messages
   try {
     await sb.from('private_messages').insert({
       sender_unique_id: myUID,
@@ -740,10 +701,12 @@ window.acceptInvite = async function(){
     });
   } catch(e){}
 
+  // ✅ FIX : Afficher l'overlay d'attente visible sur iPhone
+  document.getElementById('waitingSubText').textContent = `En attente que ${esc(inv.fromName)} lance la partie...`;
+  document.getElementById('waitingOverlay').classList.add('show');
   setMultiMsg(`✅ Tu rejoins la partie de ${esc(inv.fromName)} !`, 'success');
-  switchTab('multi');
 
-  // Attendre le lancement (polling game_rooms status)
+  // ✅ FIX : Lancer waitForGameStart avec intervalle plus court et plus de tentatives
   waitForGameStart(inv.roomId);
 };
 
@@ -761,27 +724,72 @@ window.declineInvite = async function(){
   } catch(e){}
 };
 
+// ✅ FIX PRINCIPAL : waitForGameStart amélioré pour iPhone/Android
 function waitForGameStart(roomId){
+  // Stopper tout polling précédent
+  if(waitingPollInt){ clearInterval(waitingPollInt); waitingPollInt=null; }
+
   let attempts = 0;
-  const maxAttempts = 60;
-  setMultiMsg('⏳ En attente du lancement...', 'warning');
-  const poll = setInterval(async ()=>{
+  const maxAttempts = 120; // 2 minutes max (120 * 1000ms)
+  let lastStatus = '';
+
+  // ✅ Lancer immédiatement une première vérification
+  checkRoomStatus();
+
+  waitingPollInt = setInterval(checkRoomStatus, 1000); // ✅ Toutes les secondes (au lieu de 1.5s)
+
+  async function checkRoomStatus(){
     attempts++;
     if(attempts > maxAttempts){
-      clearInterval(poll);
-      setMultiMsg('⏰ Délai dépassé, la partie na pas démarré.', 'error');
+      clearInterval(waitingPollInt); waitingPollInt=null;
+      document.getElementById('waitingOverlay').classList.remove('show');
+      setMultiMsg('⏰ La partie n\'a pas démarré. Réessaie !', 'error');
+      mySessionId = null; isHost = false; waitingRoomId = null;
       return;
     }
+
     try {
-      const {data:room, error} = await sb.from('game_rooms').select('status,level,seed').eq('id',roomId).maybeSingle();
-      if(error){ console.warn('waitForGameStart error:', error.message); return; }
-      if(!room){ console.warn('Salle introuvable:', roomId); return; }
-      if(room.status==='playing'){
-        clearInterval(poll);
+      // ✅ FIX : Utiliser .single() remplacé par .maybeSingle() pour éviter erreur 406
+      const {data:room, error} = await sb.from('game_rooms')
+        .select('status,level,seed')
+        .eq('id', roomId)
+        .maybeSingle();
+
+      if(error){
+        console.warn('Erreur poll salle:', error.message);
+        return; // Réessayer au prochain tick
+      }
+      if(!room){
+        console.warn('Salle introuvable:', roomId);
+        // ✅ Ne pas abandonner tout de suite, la salle peut être en création
+        if(attempts > 20){
+          clearInterval(waitingPollInt); waitingPollInt=null;
+          document.getElementById('waitingOverlay').classList.remove('show');
+          setMultiMsg('❌ Salle introuvable. Redemande une invitation !', 'error');
+          mySessionId = null; isHost = false; waitingRoomId = null;
+        }
+        return;
+      }
+
+      // ✅ Mise à jour du sous-titre pendant l'attente
+      if(room.status !== lastStatus){
+        lastStatus = room.status;
+        if(room.status === 'waiting'){
+          document.getElementById('waitingSubText').textContent = `En attente du lancement... (${attempts}s)`;
+        }
+      }
+
+      if(room.status === 'playing'){
+        clearInterval(waitingPollInt); waitingPollInt=null;
+        document.getElementById('waitingOverlay').classList.remove('show');
+        waitingRoomId = null;
         launchMultiGame({id:roomId, level:room.level, seed:room.seed});
       }
-    } catch(e){ console.warn('waitForGameStart catch:', e); }
-  }, 1500);
+    } catch(e){
+      console.warn('Erreur waitForGameStart:', e);
+      // ✅ Ne pas abandonner sur erreur réseau (iPhone peut couper temporairement)
+    }
+  }
 }
 
 function updateSessionBox(){
@@ -820,7 +828,6 @@ function updateSessionBox(){
   });
   sessionEl.innerHTML=html;
 
-  // Activer LANCER : l'hôte peut lancer dès qu'il y a au moins 1 accepté ou même seul
   const hasAccepted = selectedPlayers.some(u=>inviteStatuses[u]==='accepted');
   startBtn.disabled = !isHost;
 
@@ -832,16 +839,11 @@ function updateSessionBox(){
   }
 }
 
-// ═══════════════════════════════════════════
-//  LANCEMENT MULTI
-// ═══════════════════════════════════════════
 window.startMulti = async function(){
-  // Ce bouton n'est utilisé que par l'hôte pour LANCER
   if(!isHost){ setMultiMsg('Seul l\'hôte peut lancer la partie','warning'); return; }
   if(!mySessionId){ setMultiMsg('Invite d\'abord des joueurs !','warning'); return; }
 
   try {
-    // S'assurer que l'hôte est bien dans game_players
     const {data:hostExisting} = await sb.from('game_players').select('id').eq('room_id',mySessionId).eq('player_id',myUID).maybeSingle();
     if(!hostExisting){
       const {data:allP} = await sb.from('game_players').select('slot').eq('room_id',mySessionId);
@@ -854,39 +856,56 @@ window.startMulti = async function(){
     }
 
     const seed = Date.now();
-    await sb.from('game_rooms').update({ status:'playing', seed, level:chosenLenMulti }).eq('id',mySessionId);
-    // Lancer immédiatement pour l'hôte
+    // ✅ FIX : Mise à jour en deux étapes pour s'assurer que le seed est bien enregistré avant status=playing
+    await sb.from('game_rooms').update({ seed, level:chosenLenMulti }).eq('id',mySessionId);
+    await new Promise(r => setTimeout(r, 200)); // Petit délai pour que Supabase propage
+    await sb.from('game_rooms').update({ status:'playing' }).eq('id',mySessionId);
+
     const {data:players} = await sb.from('game_players').select('*').eq('room_id',mySessionId).order('slot');
     startOnlineGame({id:mySessionId, level:chosenLenMulti, seed}, players||[]);
   } catch(e){ setMultiMsg('Erreur lancement : '+e.message,'error'); }
 };
 
 async function launchMultiGame(room){
-  const {data:players} = await sb.from('game_players').select('*').eq('room_id',room.id).order('slot');
-  if(!players||!players.length) return;
-  startOnlineGame(room, players);
+  try {
+    const {data:players} = await sb.from('game_players').select('*').eq('room_id',room.id).order('slot');
+    if(!players||!players.length){
+      // ✅ FIX : Retry si les joueurs ne sont pas encore chargés
+      await new Promise(r => setTimeout(r, 500));
+      const {data:players2} = await sb.from('game_players').select('*').eq('room_id',room.id).order('slot');
+      if(!players2||!players2.length) return;
+      startOnlineGame(room, players2);
+      return;
+    }
+    startOnlineGame(room, players);
+  } catch(e){ console.warn('launchMultiGame error:', e); }
 }
 
-// ═══════════════════════════════════════════
-//  DÉMARRAGE SOLO
-// ═══════════════════════════════════════════
 window.startSolo = function(){
   if(chosenSolo===null) return;
   launchGame(chosenLen, [{idx:chosenSolo,slot:0}], null);
 };
 
-// ═══════════════════════════════════════════
-//  DÉMARRAGE MULTI
-// ═══════════════════════════════════════════
+// ✅ FIX : startOnlineGame gère mieux le cas où l'invité n'est pas encore dans la liste
 function startOnlineGame(room, playersData){
-  const me = playersData.find(p=>p.player_id===myUID);
+  let me = playersData.find(p=>p.player_id===myUID);
   if(!me){
-    // Fallback : se rajouter soi-même si absent de la liste
+    // ✅ Si on n'est pas encore dans la liste, on se rajoute avec les bonnes infos
     const usedSlots = playersData.map(p=>p.slot);
     const slot = [0,1,2,3].find(s=>!usedSlots.includes(s))??playersData.length;
-    playersData = [...playersData, {player_id:myUID, player_name:myPrenom, avatar_index:chosenMulti||0, slot, is_ready:true}];
+    const fallbackAv = chosenMulti !== null ? chosenMulti : 1;
+    playersData = [...playersData, {
+      player_id:myUID, player_name:myPrenom,
+      avatar_index:fallbackAv, slot, is_ready:true
+    }];
+    me = playersData[playersData.length - 1];
   }
-  const chosen = playersData.map(p=>({idx:p.avatar_index, slot:p.slot, playerId:p.player_id, isMe:p.player_id===myUID}));
+  const chosen = playersData.map(p=>({
+    idx: Math.min(Math.max(p.avatar_index||0, 0), AVATARS.length-1), // ✅ Sécuriser l'index avatar
+    slot:p.slot,
+    playerId:p.player_id,
+    isMe:p.player_id===myUID
+  }));
   launchGame(room.level, chosen, room);
 }
 
@@ -897,7 +916,7 @@ function setMultiMsg(txt,type=''){
 }
 
 // ═══════════════════════════════════════════
-//  MOTEUR DE JEU (identique à l'original)
+//  MOTEUR DE JEU
 // ═══════════════════════════════════════════
 let canvas,ctx,gs,raf,touchPid=0;
 const keys={};
@@ -966,12 +985,13 @@ function generateLevel(key,seed=12345){
 }
 
 function mkPlayer(avIdx,slot,startX,isRemote=false,pid='local'){
-  return{id:slot,av:AVATARS[avIdx],playerId:pid,x:startX,y:(GROUND_Y-2)*T,w:34,h:40,vx:0,vy:0,onGround:false,alive:true,finished:false,riding:null,score:0,facing:1,wf:0,wt:0,jp:false,isRemote};
+  return{id:slot,av:AVATARS[Math.min(Math.max(avIdx,0),AVATARS.length-1)],playerId:pid,x:startX,y:(GROUND_Y-2)*T,w:34,h:40,vx:0,vy:0,onGround:false,alive:true,finished:false,riding:null,score:0,facing:1,wf:0,wt:0,jp:false,isRemote};
 }
 
 function launchGame(levelKey, chosenPlayers, room){
   if(raf) cancelAnimationFrame(raf);
   stopPlayerDiscovery();
+  if(waitingPollInt){ clearInterval(waitingPollInt); waitingPollInt=null; }
 
   document.getElementById('lobbyScreen').classList.remove('active');
   document.getElementById('gameScreen').classList.add('active');
@@ -1009,7 +1029,6 @@ function launchGame(levelKey, chosenPlayers, room){
 
 function fitCanvas(){if(!canvas)return;canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;}
 
-// ─── RÉSEAU ───
 let gameChannel=null,lastStateSent=0;
 function startNetworking(roomId){
   if(gameChannel) sb.removeChannel(gameChannel);
@@ -1044,7 +1063,6 @@ function sendState(){
 }
 function sendEvent(type,data){if(!gs?.room||!gameChannel)return;gameChannel.send({type:'broadcast',event:'game_event',payload:{type,...data}});}
 
-// ─── BOUCLE JEU ───
 function gameLoop(){if(!gs||gs.over)return;gs.tick++;update();draw();updateHUD();sendState();raf=requestAnimationFrame(gameLoop);}
 
 function update(){
@@ -1227,7 +1245,6 @@ function rr(ctx,x,y,w,h,r){
   ctx.beginPath();ctx.moveTo(x+r[0],y);ctx.lineTo(x+w-r[1],y);ctx.quadraticCurveTo(x+w,y,x+w,y+r[1]);ctx.lineTo(x+w,y+h-r[2]);ctx.quadraticCurveTo(x+w,y+h,x+w-r[2],y+h);ctx.lineTo(x+r[3],y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r[3]);ctx.lineTo(x,y+r[0]);ctx.quadraticCurveTo(x,y,x+r[0],y);ctx.closePath();
 }
 
-// ─── HUD ───
 function buildHUD(){
   const h=document.getElementById('hudPlayers');h.innerHTML='';
   gs.players.forEach((p,i)=>{
@@ -1245,7 +1262,6 @@ function updateHUD(){
   });
 }
 
-// ─── CONTRÔLES TACTILES ───
 function buildTouchControls(){
   const jw=document.getElementById('joyWrap'),js=document.getElementById('joyStick');
   const p=gs.players[touchPid];const c=p?.av.c||'rgba(255,255,255,.5)';
@@ -1285,7 +1301,6 @@ function buildTouchControls(){
   }
 }
 
-// ─── NAVIGATION ───
 window.restartGame = function(){
   document.getElementById('winOv').classList.remove('show');
   document.getElementById('deathOv').classList.remove('show');
@@ -1299,24 +1314,26 @@ window.goLobby = function(){
   if(gameChannel){sb.removeChannel(gameChannel);gameChannel=null;}
   stopPlayerDiscovery();
   if(responsesPollInt){clearInterval(responsesPollInt);responsesPollInt=null;}
-  document.getElementById("winOv").classList.remove("show");
-  document.getElementById("deathOv").classList.remove("show");
-  document.getElementById("gameScreen").classList.remove("active");
-  document.getElementById("lobbyScreen").classList.add("active");
+  if(waitingPollInt){clearInterval(waitingPollInt);waitingPollInt=null;}
+  document.getElementById('winOv').classList.remove('show');
+  document.getElementById('deathOv').classList.remove('show');
+  document.getElementById('waitingOverlay').classList.remove('show');
+  document.getElementById('gameScreen').classList.remove('active');
+  document.getElementById('lobbyScreen').classList.add('active');
   pops.length=0;Object.keys(keys).forEach(k=>keys[k]=false);
   if(mySessionId){
-    sb.from("game_players").delete().eq("room_id",mySessionId).eq("player_id",myUID).then(()=>{});
+    sb.from('game_players').delete().eq('room_id',mySessionId).eq('player_id',myUID).then(()=>{});
     mySessionId=null;
   }
   selectedPlayers.length=0;
   Object.keys(inviteStatuses).forEach(k=>delete inviteStatuses[k]);
   isHost=false;
   lastInviteId=0;
+  waitingRoomId=null;
 };
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-// Maintenir la présence
 setInterval(()=>{ if(myUID&&currentTab==='multi') registerPresence(); }, 25000);
 </script>
 
