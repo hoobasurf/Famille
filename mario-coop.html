@@ -1067,8 +1067,11 @@ function gameLoop(){if(!gs||gs.over)return;gs.tick++;update();draw();updateHUD()
 
 function update(){
   const{lv,players}=gs;
-  lv.bridges.forEach(br=>{br.open=br.pressed1||br.pressed2;});
-  lv.balloons.forEach(bal=>{if(bal.pumper>=0){bal.floatY-=2.0;if(bal.floatY<80)bal.floatY=80;}else{bal.floatY+=1.3;if(bal.floatY>bal.initY)bal.floatY=bal.initY;}});
+  // Solo : un seul bouton suffit. Multi : les deux côtés requis
+  lv.bridges.forEach(br=>{
+    if(!gs.room) br.open = br.pressed1 || br.pressed2;
+    else br.open = br.pressed1 || br.pressed2;
+  });  lv.balloons.forEach(bal=>{if(bal.pumper>=0){bal.floatY-=2.0;if(bal.floatY<80)bal.floatY=80;}else{bal.floatY+=1.3;if(bal.floatY>bal.initY)bal.floatY=bal.initY;}});
   players.forEach((p,pid)=>{if(p.isRemote)return;updatePlayer(p,pid);});
   checkEnd();
 }
@@ -1096,12 +1099,19 @@ function updatePlayer(p,pid){
     lv.bridges.forEach(br=>{
       const on1=overlap(p.x,p.y,p.w,p.h,br.btn1x,br.btn1y,br.btn1w,br.btn1h);
       const wasP1=br.pressed1&&br.presser1===pid;
-      if(on1&&act){if(!br.pressed1){br.pressed1=true;br.presser1=pid;sendEvent('bridge_press',{bridgeId:br.id,side:1,val:true,slot:pid});}}
-      else if(wasP1){br.pressed1=false;br.presser1=-1;sendEvent('bridge_press',{bridgeId:br.id,side:1,val:false,slot:pid});}
-      const on2=overlap(p.x,p.y,p.w,p.h,br.btn2x,br.btn2y,br.btn2w,br.btn2h);
-      const wasP2=br.pressed2&&br.presser2===pid;
-      if(on2&&act){if(!br.pressed2){br.pressed2=true;br.presser2=pid;sendEvent('bridge_press',{bridgeId:br.id,side:2,val:true,slot:pid});}}
-      else if(wasP2){br.pressed2=false;br.presser2=-1;sendEvent('bridge_press',{bridgeId:br.id,side:2,val:false,slot:pid});}
+      if(!gs.room){
+        // ✅ SOLO : appuie sur ⚡ sur le bouton gauche → pont s'ouvre et reste ouvert
+        if(on1&&act&&!br.pressed1){br.pressed1=true;br.presser1=pid;}
+        // En solo pas de btn2, pas de fermeture automatique
+      } else {
+        // MULTI : il faut maintenir les 2 boutons (comportement original)
+        if(on1&&act){if(!br.pressed1){br.pressed1=true;br.presser1=pid;sendEvent('bridge_press',{bridgeId:br.id,side:1,val:true,slot:pid});}}
+        else if(wasP1){br.pressed1=false;br.presser1=-1;sendEvent('bridge_press',{bridgeId:br.id,side:1,val:false,slot:pid});}
+        const on2=overlap(p.x,p.y,p.w,p.h,br.btn2x,br.btn2y,br.btn2w,br.btn2h);
+        const wasP2=br.pressed2&&br.presser2===pid;
+        if(on2&&act){if(!br.pressed2){br.pressed2=true;br.presser2=pid;sendEvent('bridge_press',{bridgeId:br.id,side:2,val:true,slot:pid});}}
+        else if(wasP2){br.pressed2=false;br.presser2=-1;sendEvent('bridge_press',{bridgeId:br.id,side:2,val:false,slot:pid});}
+      }
     });
     lv.balloons.forEach(bal=>{
       const onP=overlap(p.x,p.y,p.w,p.h,bal.pumpX,bal.pumpY,bal.pumpW,bal.pumpH);
@@ -1192,8 +1202,13 @@ function drawBridge(br,t,CW){
     if(br.open){ctx.fillStyle='#c8952a';ctx.fillRect(bsx,br.by,br.bw,br.bh+2);ctx.fillStyle='#b07820';for(let x=0;x<br.bw;x+=14)ctx.fillRect(bsx+x,br.by+2,4,br.bh-4);ctx.shadowColor='#FFD700';ctx.shadowBlur=8;ctx.fillStyle='rgba(255,215,0,.15)';ctx.fillRect(bsx,br.by,br.bw,br.bh);ctx.shadowBlur=0;}
     else{const g=ctx.createLinearGradient(0,br.by,0,br.by+60);g.addColorStop(0,'rgba(0,0,150,.15)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(bsx,br.by,br.bw,60);ctx.strokeStyle='rgba(255,60,60,.4)';ctx.lineWidth=2;ctx.setLineDash([5,4]);ctx.strokeRect(bsx+2,br.by,br.bw-4,br.bh);ctx.setLineDash([]);ctx.font='bold 10px Nunito';ctx.fillStyle='rgba(255,80,80,.7)';ctx.textAlign='center';ctx.fillText('☠ VIDE',bsx+br.bw/2,br.by+br.bh+13);ctx.textAlign='left';}
   }
-  drawBtn(br.btn1x,br.btn1y,br.btn1w,br.btn1h,br.pressed1,'🔴 MAINTENIR ⚡','#e74c3c','#27ae60',t,false);
-  drawBtn(br.btn2x,br.btn2y,br.btn2w,br.btn2h,br.pressed2,'🟣 AUTRE CÔTÉ ⚡','#8e44ad','#27ae60',t,true);
+  // En solo : un seul bouton suffit. En multi : 2 boutons requis
+  if(gs.room){
+    drawBtn(br.btn1x,br.btn1y,br.btn1w,br.btn1h,br.pressed1,'🔴 MAINTENIR ⚡','#e74c3c','#27ae60',t,false);
+    drawBtn(br.btn2x,br.btn2y,br.btn2w,br.btn2h,br.pressed2,'🟣 AUTRE CÔTÉ ⚡','#8e44ad','#27ae60',t,true);
+  } else {
+    drawBtn(br.btn1x,br.btn1y,br.btn1w,br.btn1h,br.pressed1,'⚡ MAINTENIR','#e74c3c','#27ae60',t,false);
+  }
 }
 
 function drawBtn(bx,by,bw,bh,pressed,label,colOff,colOn,t,isRight){
