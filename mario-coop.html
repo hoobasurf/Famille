@@ -17,7 +17,10 @@ body{background:#1a1a2e;font-family:'Nunito',sans-serif;overflow:hidden;user-sel
 .stars-bg{position:absolute;inset:0;pointer-events:none;}
 .star{position:absolute;background:white;border-radius:50%;animation:twinkle 2s infinite alternate;}
 @keyframes twinkle{from{opacity:.2}to{opacity:1}}
-.lobby-wrap{display:flex;flex-direction:column;align-items:center;padding:8px;gap:6px;z-index:10;width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:24px;}
+.lobby-wrap{display:flex;flex-direction:column;align-items:center;padding:8px;gap:6px;z-index:10;width:100%;height:calc(100% - 72px);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* Barre bouton fixe en bas du lobby */
+.lobby-start-bar{position:absolute;bottom:0;left:0;right:0;z-index:20;padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));background:linear-gradient(to top,rgba(15,12,41,1) 60%,transparent);}
 .lobby-title{font-family:‘Press Start 2P’,monospace;font-size:clamp(13px,2.5vw,26px);color:#FFD700;text-shadow:3px 3px 0 #b8860b;animation:bounce 2s ease-in-out infinite;text-align:center;}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .lobby-sub{font-size:11px;color:#a8d8ea;text-align:center;}
@@ -240,7 +243,6 @@ canvas{display:block;width:100%;height:100%;}
       <button class="lvl-btn" onclick="pickLevel('long',this)"><span class="lvl-icon">🏆</span>Long<div class="lvl-sub">~4 min</div></button>
     </div>
     <div class="player-info" id="pInfoSolo">Sélectionne un avatar</div>
-    <button class="start-btn" id="startSoloBtn" disabled onclick="startSolo()">▶ JOUER SOLO</button>
   </div>
 
   <!-- ── TAB MULTI ── -->
@@ -282,12 +284,16 @@ canvas{display:block;width:100%;height:100%;}
       </div>
 
       <div class="player-info" id="pInfoMulti">Choisis ton avatar puis clique sur un joueur pour jouer</div>
-      <button class="start-btn" id="startMultiBtn" disabled onclick="startMulti()">▶ LANCER LA PARTIE</button>
     </div>
   </div>
 </div>
 ```
 
+  </div>
+  <!-- Boutons TOUJOURS visibles en bas -->
+  <div class="lobby-start-bar">
+    <button class="start-btn" id="startSoloBtn" disabled onclick="startSolo()">▶ JOUER SOLO</button>
+    <button class="start-btn" id="startMultiBtn" disabled onclick="startMulti()" style="display:none">▶ LANCER LA PARTIE</button>
   </div>
 </div>
 
@@ -492,6 +498,9 @@ window.switchTab = function(tab){
   document.getElementById('tabMulti').classList.toggle('active',tab==='multi');
   document.getElementById('contentSolo').classList.toggle('active',tab==='solo');
   document.getElementById('contentMulti').classList.toggle('active',tab==='multi');
+  // Afficher le bon bouton en bas
+  document.getElementById('startSoloBtn').style.display=tab==='solo'?'block':'none';
+  document.getElementById('startMultiBtn').style.display=tab==='multi'?'block':'none';
   if(tab==='multi'){
     if(!isLoggedIn){
       document.getElementById('multiNotAuth').style.display='block';
