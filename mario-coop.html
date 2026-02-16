@@ -3,12 +3,13 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>🍄 CoopRun</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#1a1a2e;font-family:'Nunito',sans-serif;overflow:hidden;user-select:none;height:100vh;display:flex;flex-direction:column;}
+html{background:#1a1a2e;}
+body{background:#1a1a2e;font-family:'Nunito',Arial,sans-serif;overflow:hidden;user-select:none;height:100vh;display:flex;flex-direction:column;}
 .screen{display:none;width:100%;height:100vh;}
 .screen.active{display:flex;flex-direction:column;}
 
@@ -148,14 +149,14 @@ canvas{display:block;width:100%;height:100%;}
 .touch-hint-left{left:12px;}
 .touch-hint-right{right:12px;}
 
-.joystick-wrap{position:absolute;bottom:max(16px,env(safe-area-inset-bottom)+8px);left:12px;z-index:25;width:100px;height:100px;-webkit-tap-highlight-color:transparent;touch-action:none;}
+.joystick-wrap{position:absolute;bottom:20px;left:12px;z-index:25;width:100px;height:100px;-webkit-tap-highlight-color:transparent;touch-action:none;}
 .joystick-base{position:absolute;inset:0;border-radius:50%;background:rgba(255,255,255,.07);border:3px solid rgba(255,255,255,.16);}
 .joystick-arrows{position:absolute;inset:0;border-radius:50%;}
 .joystick-arrows::before{content:‘←’;position:absolute;left:7px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.28);font-size:13px;font-weight:900;}
 .joystick-arrows::after{content:‘→’;position:absolute;right:7px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.28);font-size:13px;font-weight:900;}
 .joystick-stick{position:absolute;width:40px;height:40px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.9),rgba(180,180,220,.7));border:3px solid rgba(255,255,255,.5);box-shadow:0 4px 14px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.6);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
 
-.right-btns{position:absolute;bottom:max(16px,env(safe-area-inset-bottom)+8px);right:12px;z-index:25;display:flex;flex-direction:column;gap:6px;align-items:center;}
+.right-btns{position:absolute;bottom:20px;right:12px;z-index:25;display:flex;flex-direction:column;gap:6px;align-items:center;}
 .cb{width:50px;height:50px;border-radius:50%;border:3px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:white;transition:all .12s;-webkit-tap-highlight-color:transparent;touch-action:none;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.3);}
 .cb:active,.cb.pressed{transform:scale(.88);filter:brightness(1.4);}
 .cb-jump{background:rgba(231,76,60,.85);border-color:#e74c3c;width:54px;height:54px;}
@@ -192,7 +193,13 @@ canvas{display:block;width:100%;height:100%;}
 .jp-bar-fill{height:100%;border-radius:4px;transition:width .1s;}
 .jp-label{font-size:9px;font-weight:700;color:white;text-shadow:1px 1px 2px black;}
 
-/* ── UNDERWATER overlay tint ── */
+/* Safe area iPhone */
+@supports(padding-bottom: env(safe-area-inset-bottom)){
+.joystick-wrap{bottom:calc(20px + env(safe-area-inset-bottom));}
+.right-btns{bottom:calc(20px + env(safe-area-inset-bottom));}
+.lobby-start-bar{padding-bottom:calc(10px + env(safe-area-inset-bottom));}
+}
+
 .underwater-tint{position:absolute;inset:0;pointer-events:none;z-index:5;background:rgba(0,60,120,.25);display:none;}
 .underwater-tint.show{display:block;}
 </style>
@@ -401,16 +408,28 @@ const myPhoto    = localStorage.getItem('userPhotoUrl') || localStorage.getItem(
 const T=48,GRAV=0.52,JFORCE=-12.5,SPD=3.2,GAP_W=4;
 const GROUND_Y=13, WORLD_H=18;
 const AVATARS=[
-  {e:'🧑‍🚀',n:'Astro',    c:'#e74c3c',d:'#c0392b'},
-  {e:'🧙',  n:'Mago',    c:'#3498db',d:'#2980b9'},
-  {e:'🦊',  n:'Renard',  c:'#f39c12',d:'#d68910'},
-  {e:'🐸',  n:'Grenouille',c:'#2ecc71',d:'#27ae60'},
-  {e:'🤖',  n:'Robot',   c:'#9b59b6',d:'#8e44ad'},
-  {e:'🐱',  n:'Chat',    c:'#e91e63',d:'#c2185b'},
-  {e:'⚡',  n:'Éclair',  c:'#ff9800',d:'#e65100'},
-  {e:'🌙',  n:'Lune',    c:'#00bcd4',d:'#0097a7'},
+  {e:'🦁',n:'Simba',     c:'#f4a460',d:'#cd853f'},
+  {e:'🐭',n:'Mickey',    c:'#222222',d:'#111111'},
+  {e:'🧊',n:'Elsa',      c:'#74b9ff',d:'#0984e3'},
+  {e:'🤠',n:'Woody',     c:'#f9ca24',d:'#f0932b'},
+  {e:'🐠',n:'Némo',      c:'#e17055',d:'#d63031'},
+  {e:'🐘',n:'Dumbo',     c:'#a29bfe',d:'#6c5ce7'},
+  {e:'🐻',n:'Baloo',     c:'#636e72',d:'#2d3436'},
+  {e:'🦆',n:'Donald',    c:'#0652DD',d:'#1289A7'},
+  {e:'🐺',n:'Loup',      c:'#808e9b',d:'#485460'},
+  {e:'🦊',n:'Renard',    c:'#f39c12',d:'#d68910'},
+  {e:'🐸',n:'Grenouille',c:'#2ecc71',d:'#27ae60'},
+  {e:'🐯',n:'Tigrou',    c:'#e55039',d:'#b03a2e'},
+  {e:'🦄',n:'Licorne',   c:'#fd79a8',d:'#e84393'},
+  {e:'🐲',n:'Dragon',    c:'#00b894',d:'#00cec9'},
+  {e:'🦋',n:'Papillon',  c:'#a29bfe',d:'#6c5ce7'},
+  {e:'🐧',n:'Pingouin',  c:'#2d3436',d:'#000000'},
+  {e:'🦖',n:'Dino',      c:'#55efc4',d:'#00b894'},
+  {e:'🧟',n:'Zombie',    c:'#6ab04c',d:'#4a8f35'},
+  {e:'🧜',n:'Sirène',    c:'#22a6b3',d:'#0984e3'},
+  {e:'🦸',n:'Héros',     c:'#e74c3c',d:'#c0392b'},
 ];
-const LEVEL_CFG={ short:{bridges:2,balloons:1,catapults:1,worldCells:130}, medium:{bridges:3,balloons:2,catapults:2,worldCells:220}, long:{bridges:5,balloons:3,catapults:3,worldCells:400} };
+const LEVEL_CFG={ short:{bridges:2,balloons:1,catapults:1,potions:1,teleports:1,worldCells:130}, medium:{bridges:3,balloons:2,catapults:2,potions:2,teleports:2,worldCells:220}, long:{bridges:5,balloons:3,catapults:3,potions:3,teleports:2,worldCells:400} };
 const CTRL=[
   {left:'ArrowLeft',right:'ArrowRight',jump:'ArrowUp',  act:'KeyZ'},
   {left:'KeyA',     right:'KeyD',      jump:'KeyW',     act:'KeyQ'},
@@ -993,9 +1012,10 @@ function generateLevel(key,seed=12345){
   const cfg=LEVEL_CFG[key];
   const W=cfg.worldCells;
   const rand=seededRand(seed);
-  const plats=[],bridges=[],balloons=[],coins=[],catapults=[];
+  const plats=[],bridges=[],balloons=[],coins=[],catapults=[],potions=[],teleports=[];
   const numBr=cfg.bridges,numBal=cfg.balloons,numCat=cfg.catapults;
-  const total=numBr+numBal+numCat;
+  const numPot=cfg.potions||0,numTel=cfg.teleports||0;
+  const total=numBr+numBal+numCat+numPot+numTel;
   const startX=10,endX=W-10,span=endX-startX;
   const obsX=[];
   for(let i=0;i<total;i++) obsX.push(Math.round(startX+span*(i+1)/(total+1)));
@@ -1005,10 +1025,12 @@ function generateLevel(key,seed=12345){
   for(let i=0;i<numBr;i++) types.push('bridge');
   for(let i=0;i<numBal;i++) types.push('balloon');
   for(let i=0;i<numCat;i++) types.push('catapult');
+  for(let i=0;i<numPot;i++) types.push('potion');
+  for(let i=0;i<numTel;i++) types.push('teleport');
   for(let i=types.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[types[i],types[j]]=[types[j],types[i]];}
 
   const gapZones=[];
-  let bridgeIdx=0,balloonIdx=0,catapultIdx=0;
+  let bridgeIdx=0,balloonIdx=0,catapultIdx=0,potionIdx=0,teleportIdx=0;
 
   obsX.forEach((cx,i)=>{
     const type=types[i];
@@ -1028,26 +1050,35 @@ function generateLevel(key,seed=12345){
         pumpX:(cx-4)*T,pumpY:GROUND_Y*T-T*0.9,pumpW:T*0.85,pumpH:T*0.85,pumper:-1,rider:-1});
 
     } else if(type==='catapult'){
-      // 🚀 Catapulte : coupelle à gauche, levier à droite, plateforme haute à atteindre
       const gY=GROUND_Y*T;
-      const cupX=(cx-2)*T, leverX=(cx+3)*T;
-      const highPlatX=(cx+7)*T, highPlatY=(GROUND_Y-7)*T;
-      plats.push({x:highPlatX,y:highPlatY,w:T*3,h:T,type:'catapult-target'});
+      const cupX=(cx-1)*T;
+      // Plateforme cible : juste au-dessus et 5 cases à droite (atteignable)
+      const highPlatX=(cx+4)*T, highPlatY=(GROUND_Y-6)*T;
+      plats.push({x:highPlatX,y:highPlatY,w:T*4,h:T,type:'catapult-target'});
       coins.push({x:highPlatX+T,y:highPlatY-T+4,col:false,bonus:true});
       catapults.push({id:catapultIdx++,
-        cupX,cupY:gY-T*0.7,cupW:T*1.2,cupH:T*0.5,
-        leverX,leverY:gY-T*0.9,leverW:T*0.85,leverH:T*0.85,
-        fired:false,fireTimer:0,rider:-1});
-    }
-  });
+        cupX,cupY:gY-T*0.6,cupW:T*1.2,cupH:T*0.5,
+        targetX:highPlatX,targetY:highPlatY,
+        fired:false,fireTimer:0,rider:-1,autoTimer:0});
+    } else if(type==='potion'){
+      // 🧪 Potion géante : ramasse → énorme pendant 8 sec, écrase tout
+      potions.push({id:potionIdx++,x:(cx)*T,y:(GROUND_Y-1)*T,w:T*0.8,h:T*0.9,col:false});
 
-  // Sol (avec trous des ponts)
+    } else if(type==='teleport'){
+      const bx=(cx)*T, bY=GROUND_Y*T-T;
+      const destX=(Math.min(cx+12,W-5))*T, destY=GROUND_Y*T-T;
+      teleports.push({id:teleportIdx++,
+        ax:bx,ay:bY,aw:T*1.2,ah:T*1.5,
+        bx:destX,by:destY,bw:T*1.2,bh:T*1.5,
+        spin:0,cooldown:0});
+    }
+  }); // ← fermeture du obsX.forEach
+
   const sortedGaps=[...gapZones].sort((a,b)=>a.gL-b.gL);
   let cur=0;
   sortedGaps.forEach(g=>{if(cur<g.gL)plats.push({x:cur*T,y:GROUND_Y*T,w:(g.gL-cur)*T,h:(WORLD_H-GROUND_Y)*T,type:'ground'});cur=g.gR;});
   plats.push({x:cur*T,y:GROUND_Y*T,w:(W-cur)*T,h:(WORLD_H-GROUND_Y)*T,type:'ground'});
 
-  // Plateformes décoratives
   for(let i=0;i<Math.floor(W/14);i++){
     const fx=7+i*14+Math.floor(rand()*4);
     if(sortedGaps.some(g=>fx>=g.gL-2&&fx<=g.gR+3))continue;
@@ -1062,11 +1093,17 @@ function generateLevel(key,seed=12345){
   }
   const flagX=(W-4)*T;
   plats.push({x:(W-4)*T,y:GROUND_Y*T,w:T,h:(WORLD_H-GROUND_Y)*T,type:'flag'});
-  return{plats,bridges,balloons,coins,catapults,flagX,worldW:W*T,worldH:WORLD_H*T};
+  return{plats,bridges,balloons,coins,catapults,potions,teleports,flagX,worldW:W*T,worldH:WORLD_H*T};
 }
 
 function mkPlayer(avIdx,slot,startX,isRemote=false,pid='local'){
-  return{id:slot,av:AVATARS[Math.min(Math.max(avIdx,0),AVATARS.length-1)],playerId:pid,x:startX,y:(GROUND_Y-2)*T,w:34,h:40,vx:0,vy:0,onGround:false,alive:true,finished:false,riding:null,score:0,facing:1,wf:0,wt:0,jp:false,isRemote};
+  return{id:slot,av:AVATARS[Math.min(Math.max(avIdx,0),AVATARS.length-1)],playerId:pid,
+    x:startX,y:(GROUND_Y-2)*T,w:34,h:40,vx:0,vy:0,onGround:false,
+    alive:true,finished:false,riding:null,score:0,facing:1,wf:0,wt:0,jp:false,isRemote,
+    // Potion géante
+    giantTimer:0,giantMax:480, // 8 secondes à 60fps
+    // Accrochage à un géant
+    hookedTo:-1,hookOffX:0,hookOffY:0};
 }
 
 function launchGame(levelKey, chosenPlayers, room, theme='jungle'){
@@ -1197,6 +1234,69 @@ function update(){
   });
   lv.catapults.forEach(cat=>{if(cat.fired&&--cat.fireTimer<=0)cat.fired=false;});
 
+  // 🧪 Potions géantes — ramasser + timer + collecte auto étoiles
+  lv.potions=lv.potions||[];
+  lv.potions.forEach(pot=>{
+    if(pot.col)return;
+    players.forEach(p=>{
+      if(!p.alive)return;
+      if(overlap(p.x,p.y,p.w,p.h,pot.x,pot.y,pot.w,pot.h)){
+        pot.col=true;p.giantTimer=p.giantMax;
+        pop(p.x,p.y,'🧪 GÉANT !','#ff6b81');
+      }
+    });
+  });
+  players.forEach(p=>{
+    if(p.giantTimer>0){
+      p.giantTimer--;
+      // Taille géante
+      p.w=80;p.h=90;
+      // Ramasse toutes les étoiles/pièces proches
+      lv.coins.forEach(c=>{
+        if(!c.col&&overlap(p.x,p.y,p.w,p.h,c.x,c.y,28,28)){
+          c.col=true;p.score+=c.bonus?3:1;
+        }
+      });
+      // Multi : les autres joueurs peuvent s'accrocher
+      players.forEach((other,oid)=>{
+        if(other===p||!other.alive||other.giantTimer>0)return;
+        if(other.hookedTo===-1&&overlap(other.x,other.y,other.w,other.h,p.x,p.y,p.w,p.h)){
+          // Proposer accrochage : s'ils appuient ⚡ près du géant
+          // (géré dans updatePlayer)
+        }
+        if(other.hookedTo===p.id){
+          other.x=p.x+other.hookOffX;
+          other.y=p.y+other.hookOffY;
+          other.vx=0;other.vy=0;
+        }
+      });
+    } else if(p.giantTimer===0&&p.w===80){
+      // Fin de la potion : retrouver taille normale
+      p.w=34;p.h=40;p.hookedTo=-1;
+    }
+    // Décrocher si le géant redevient normal
+    if(p.hookedTo>=0){
+      const giant=players[p.hookedTo];
+      if(!giant||giant.giantTimer<=0)p.hookedTo=-1;
+    }
+  });
+
+  // 🌀 Téléportation
+  lv.teleports=lv.teleports||[];
+  lv.teleports.forEach(tp=>{
+    if(tp.cooldown>0){tp.cooldown--;return;}
+    tp.spin=(tp.spin||0)+3;
+    players.forEach(p=>{
+      if(!p.alive)return;
+      // Portail A → B
+      if(overlap(p.x,p.y,p.w,p.h,tp.ax,tp.ay,tp.aw,tp.ah)){
+        p.x=tp.bx+tp.bw/2-p.w/2;p.y=tp.by-p.h;p.vy=0;
+        tp.cooldown=60;
+        pop(p.x,p.y,'🌀 WARP!','#a29bfe');
+      }
+    });
+  });
+
   // Thème espace : recharge lente jetpack si au sol
   if(gs.theme==='space'){
     players.forEach(p=>{
@@ -1229,7 +1329,21 @@ function updatePlayer(p,pid){
   if(!p.alive||p.finished)return;
   const{lv}=gs;
   const isMyCtrl=(pid===touchPid)||(gs.room===null);
-  // Ballon
+
+  // 🔗 Accroché à un géant ? → se laisser porter
+  if(p.hookedTo>=0){
+    const giant=gs.players[p.hookedTo];
+    if(giant&&giant.giantTimer>0){
+      const act2=isMyCtrl?held(pid,'act'):false;
+      // Décrocher si ⚡ à nouveau
+      if(act2&&!p._actLast){p.hookedTo=-1;}
+      p.jp=act2;p._actLast=act2;
+      if(p.y>gs.lv.worldH+100)killP(p,pid);
+      checkFlag(p,pid);return;
+    } else {p.hookedTo=-1;}
+  }
+
+  // 🎈 Ballon : attendre que le joueur monte dessus PUIS le lancer
   if(p.riding!==null){
     const bal=lv.balloons[p.riding];
     p.x=bal.bx+bal.bw/2-p.w/2;p.y=bal.floatY-p.h-4;p.vx=0;p.vy=0;p.onGround=false;
@@ -1242,32 +1356,36 @@ function updatePlayer(p,pid){
   if(isMyCtrl){if(held(pid,'left')){p.vx=-SPD;p.facing=-1;}if(held(pid,'right')){p.vx=SPD;p.facing=1;}}
   const jp=isMyCtrl?held(pid,'jump'):false;
 
-  // 🚀 ESPACE : Jetpack
+  // 🚀 ESPACE : Jetpack — poussée douce avec plafond de vitesse
   if(gs.theme==='space'&&isMyCtrl){
     const thrust=held(pid,'act');
     p.jpOn=false;
     if(thrust&&p.jpFuel>0){
-      p.vy-=0.9; // poussée vers le haut
-      p.jpFuel=Math.max(0,p.jpFuel-0.8);
+      p.vy=Math.max(p.vy-0.55,-4); // poussée douce, max -4 vers le haut
+      p.jpFuel=Math.max(0,p.jpFuel-0.6);
       p.jpOn=true;
-      if(gs.tick%8===0)pop(p.x+p.w/2,p.y+p.h,'🔥','#ff6600');
+      if(gs.tick%12===0)pop(p.x+p.w/2,p.y+p.h,'🔥','#ff6600');
     }
+    // Gravité réduite dans l'espace même sans jetpack
+    p.vy=Math.min(p.vy+GRAV*0.4, 6);
   }
 
-  // 🌊 OCÉAN : Nage (gravité réduite, maintenir ↑ pour monter)
-  const gravMult=(gs.theme==='ocean')?0.25:1;
-  const termVy=(gs.theme==='ocean')?4:99;
+  // 🌊 OCÉAN : Nage / Gravité selon thème
+  const isSpace=(gs.theme==='space');
+  const isOcean=(gs.theme==='ocean');
+  const gravMult=isOcean?0.25:isSpace?0:1; // espace : gravité déjà gérée dans le bloc jetpack
+  const termVy=isOcean?4:isSpace?6:99;
 
   if(jp&&!p.jp){
-    if(gs.theme==='ocean'){
-      p.vy-=4; // nage vers le haut
-    } else if(p.onGround){
+    if(isOcean){
+      p.vy-=4;
+    } else if(!isSpace&&p.onGround){
       p.vy=JFORCE;p.onGround=false;
     }
   }
 
   // Courants océaniques
-  if(gs.theme==='ocean'){
+  if(isOcean){
     gs.lv.currents.forEach(cur=>{
       if(overlap(p.x,p.y,p.w,p.h,cur.x,0,cur.w,WORLD_H*T)){
         p.vx+=cur.dir*cur.strength;
@@ -1276,7 +1394,8 @@ function updatePlayer(p,pid){
     });
   }
 
-  p.jp=jp;p.vy=Math.min(p.vy+GRAV*gravMult, termVy);
+  p.jp=jp;
+  if(!isSpace) p.vy=Math.min(p.vy+GRAV*gravMult, termVy);
   p.x+=p.vx;if(p.x<0)p.x=0;p.y+=p.vy;p.onGround=false;
   // Collisions
   lv.plats.forEach(pl=>resolvePlat(p,pl));
@@ -1327,12 +1446,20 @@ function updatePlayer(p,pid){
     }
     if(cat.rider===pid&&!cat.fired){
       p.x=cat.cupX+cat.cupW/2-p.w/2;p.y=cat.cupY-p.h;p.vx=0;p.onGround=true;
-      // Solo : compte à rebours auto 2 secondes
       if(!gs.room){
         cat.autoTimer=(cat.autoTimer||0)+1;
-        if(cat.autoTimer>=120){
-          cat.fired=true;cat.fireTimer=50;
-          p.vx=5;p.vy=-16;p.onGround=false;cat.rider=-1;
+        if(cat.autoTimer>=100){
+          cat.fired=true;cat.fireTimer=60;
+          // Calculer vx/vy pour atteindre la cible
+          const tx=cat.targetX+T*2, ty=cat.targetY;
+          const dx=(tx-(cat.cupX+cat.cupW/2));
+          const dy=(ty-(cat.cupY-p.h));
+          // t = frames pour couvrir dx à vx donné → vx=3.5, calculer vy
+          const frames=dx/3.5;
+          p.vx=3.5;
+          p.vy=dy/frames - GRAV*frames/2;
+          p.vy=Math.max(p.vy,-15); // pas trop fort vers le haut
+          p.onGround=false;cat.rider=-1;
           pop(p.x,p.y,'🚀 CATAPULTÉ!','#FF6B35');
         }
       }
@@ -1350,6 +1477,18 @@ function updatePlayer(p,pid){
   });
 
   // Mémoriser état act pour détecter le front montant (évite toggles multiples)
+  // 🔗 S'accrocher à un géant proche
+  if(act&&!p._actLast&&p.hookedTo<0){
+    gs.players.forEach((giant,gid)=>{
+      if(gid===pid||!giant.alive||giant.giantTimer<=0)return;
+      if(overlap(p.x,p.y,p.w,p.h,giant.x-10,giant.y-10,giant.w+20,giant.h+20)){
+        p.hookedTo=gid;
+        p.hookOffX=p.x-giant.x;
+        p.hookOffY=p.y-giant.y;
+        pop(p.x,p.y,'🔗 Accroché!','#fdcb6e');
+      }
+    });
+  }
   p._actLast=act;
   // Pieces
   lv.coins.forEach(c=>{if(!c.col&&overlap(p.x,p.y,p.w,p.h,c.x,c.y,28,28)){c.col=true;p.score+=c.bonus?3:1;pop(c.x,c.y,c.bonus?'+3⭐':'+1🪙','#FFD700');}});
@@ -1498,7 +1637,48 @@ function draw(){
   }
 
   lv.coins.forEach(c=>{if(c.col)return;const cx=sc(c.x);if(cx<-30||cx>CW+30)return;const bob=Math.sin(t/20+c.x)*3;ctx.font='20px sans-serif';ctx.fillText(c.bonus?'⭐':'🪙',cx,c.y+bob+22);});
+
+  // 🧪 Potions
+  (lv.potions||[]).forEach(pot=>{
+    if(pot.col)return;
+    const px=sc(pot.x);if(px<-40||px>CW+40)return;
+    const bob=Math.sin(t/12)*4;
+    ctx.font='32px sans-serif';ctx.textAlign='center';
+    ctx.fillText('🧪',px+pot.w/2,pot.y+bob+30);
+    ctx.globalAlpha=0.6+0.4*Math.sin(t/8);
+    ctx.font='bold 9px Nunito';ctx.fillStyle='#ff6b81';
+    ctx.fillText('GÉANT',px+pot.w/2,pot.y+bob-4);
+    ctx.globalAlpha=1;ctx.textAlign='left';
+  });
+
+  // 🌀 Téléports
+  (lv.teleports||[]).forEach(tp=>{
+    const spin=tp.spin||0;
+    [['A',tp.ax,tp.ay,tp.aw,tp.ah,'#a29bfe'],['B',tp.bx,tp.by,tp.bw,tp.bh,'#fd79a8']].forEach(([lbl,tx,ty,tw,th,col])=>{
+      const px=sc(tx);if(px<-60||px>CW+60)return;
+      ctx.save();
+      ctx.translate(px+tw/2,ty+th/2);ctx.rotate(spin*Math.PI/180*(lbl==='A'?1:-1));
+      ctx.font=`${th}px sans-serif`;ctx.textAlign='center';ctx.fillText('🌀',0,th/2);
+      ctx.restore();
+      ctx.font='bold 9px Nunito';ctx.fillStyle=col;ctx.textAlign='center';
+      ctx.fillText('PORTAIL '+lbl,sc(tx)+tw/2,ty-5);ctx.textAlign='left';
+    });
+  });
+
   gs.players.forEach(p=>drawPlayer(p,t,CW,theme));
+
+  // Barre jauge géant
+  gs.players.forEach((p,i)=>{
+    if(p.giantTimer<=0||!p.alive)return;
+    const barW=100,barH=10;
+    const bx=canvas.width/2-barW/2,by=60+i*18;
+    ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(bx,by,barW,barH);
+    const pct=p.giantTimer/p.giantMax;
+    const col=pct>0.5?'#ff6b81':pct>0.25?'#fdcb6e':'#e17055';
+    ctx.fillStyle=col;ctx.fillRect(bx,by,barW*pct,barH);
+    ctx.font='bold 9px Nunito';ctx.fillStyle='white';ctx.textAlign='center';
+    ctx.fillText(`${p.av.n} 🧪 GÉANT`,canvas.width/2,by-3);ctx.textAlign='left';
+  });
 
   // Pops
   for(let i=pops.length-1;i>=0;i--){
@@ -1629,18 +1809,62 @@ function drawBalloon(bal,t,CW){
 }
 
 function drawPlayer(p,t,CW,theme='jungle'){
-  if(!p.alive)return;const x=sc(p.x),y=p.y;if(x<-60||x>CW+60)return;
-  ctx.fillStyle='rgba(0,0,0,.18)';ctx.beginPath();ctx.ellipse(x+p.w/2,y+p.h+3,12,4,0,0,Math.PI*2);ctx.fill();
+  if(!p.alive)return;
+  const x=sc(p.x),y=p.y;
+  if(x<-120||x>CW+120)return;
+
+  const isGiant=p.giantTimer>0;
+  const pulse=isGiant?1+0.08*Math.sin(t/4):1;
+
+  // Ombre
+  ctx.fillStyle='rgba(0,0,0,.18)';ctx.beginPath();
+  ctx.ellipse(x+p.w/2,y+p.h+3,p.w/2*pulse,4,0,0,Math.PI*2);ctx.fill();
+
+  // Lien d'accrochage
+  if(p.hookedTo>=0){
+    const giant=gs.players[p.hookedTo];
+    if(giant){
+      const gx=sc(giant.x+giant.w/2),gy=giant.y+giant.h/2;
+      ctx.strokeStyle='#fdcb6e';ctx.lineWidth=3;ctx.setLineDash([4,3]);
+      ctx.beginPath();ctx.moveTo(x+p.w/2,y+p.h/2);ctx.lineTo(gx,gy);ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
   ctx.save();
-  if(p.facing<0){ctx.translate(x+p.w,0);ctx.scale(-1,1);ctx.translate(-x,0);}
-  ctx.fillStyle=p.av.c;rr(ctx,x+3,y+6,p.w-6,p.h-8,7);ctx.fill();
-  ctx.fillStyle=p.av.d;rr(ctx,x+3,y+6+(p.h-8)*.5,p.w-6,(p.h-8)*.5,[0,0,7,7]);ctx.fill();
+  ctx.translate(x+p.w/2,y+p.h/2);
+  ctx.scale(p.facing*pulse,pulse);
+
+  // Corps coloré
+  const hw=p.w/2-3,hh=p.h/2-4;
+  ctx.fillStyle=p.av.c;
+  rr(ctx,-hw,-hh,hw*2,hh*2,7);ctx.fill();
+  ctx.fillStyle=p.av.d;
+  rr(ctx,-hw,0,hw*2,hh,[0,0,7,7]);ctx.fill();
+
+  // Effet géant : lueur rose
+  if(isGiant){
+    ctx.shadowColor='#ff6b81';ctx.shadowBlur=20;
+    ctx.strokeStyle='#ff6b81';ctx.lineWidth=3;
+    rr(ctx,-hw,-hh,hw*2,hh*2,7);ctx.stroke();
+    ctx.shadowBlur=0;
+  }
+
+  // Emoji personnage — gros et centré
   const bob=p.onGround&&Math.abs(p.vx)>.1?Math.abs(Math.sin(t/5))*2:0;
-  ctx.font=`${p.w-4}px sans-serif`;ctx.textAlign='center';ctx.fillText(p.av.e,x+p.w/2,y+p.h-1-bob);ctx.textAlign='left';
+  const emojiSize=Math.max(p.w-2,30);
+  ctx.font=`${emojiSize}px sans-serif`;ctx.textAlign='center';
+  ctx.fillText(p.av.e,0,hh-bob+2);
   ctx.restore();
+
+  // Nom
   ctx.font='bold 8px Nunito,sans-serif';ctx.textAlign='center';
-  ctx.strokeStyle='rgba(0,0,0,.7)';ctx.lineWidth=3;ctx.strokeText(p.av.n,x+p.w/2,y-4);ctx.fillStyle='white';ctx.fillText(p.av.n,x+p.w/2,y-4);
-  if(p.isRemote){ctx.fillStyle=p.av.c;ctx.fillText('📱',x+p.w/2,y-14);}
+  ctx.strokeStyle='rgba(0,0,0,.8)';ctx.lineWidth=3;
+  const labelY=y-6*(isGiant?2:1);
+  ctx.strokeText(isGiant?`⚡${p.av.n}⚡`:p.av.n,x+p.w/2,labelY);
+  ctx.fillStyle=isGiant?'#ff6b81':'white';
+  ctx.fillText(isGiant?`⚡${p.av.n}⚡`:p.av.n,x+p.w/2,labelY);
+  if(p.isRemote){ctx.fillStyle=p.av.c;ctx.fillText('📱',x+p.w/2,labelY-12);}
   ctx.textAlign='left';
 }
 
