@@ -81,6 +81,14 @@
         box-shadow: 0 0 16px rgba(255,107,157,.5), inset 0 0 20px rgba(255,107,157,.08);
     }
 
+    /* Page mur commun : pas de grille, juste le flux */
+    #communWallPage { display: none; }
+    #communWallPage.active { display: block; }
+
+    /* Page murs persos : grille de profils */
+    #persoWallsPage { display: none; }
+    #persoWallsPage.active { display: block; }
+
     .profiles-grid {
         display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
         gap: 22px; margin-bottom: 36px;
@@ -114,51 +122,9 @@
     .profile-name { color: white; font-weight: 700; font-size: 17px; margin-bottom: 6px; }
     .profile-count { color: rgba(255,255,255,.55); font-size: 13px; }
 
-    /* MODAL */
-    .modal-overlay {
-        position: fixed; inset: 0; background: rgba(0,0,0,.8);
-        backdrop-filter: blur(10px); z-index: 9999;
-        display: none; align-items: center; justify-content: center; padding: 20px;
-    }
-    .modal-overlay.open { display: flex; animation: fadeIn .25s; }
-    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-    .modal {
-        background: rgba(15,15,25,.97); border-radius: 24px; width: 100%;
-        max-width: 680px; max-height: 90vh; display: flex; flex-direction: column;
-        border: 2px solid rgba(255,107,157,.3);
-        box-shadow: 0 0 60px rgba(192,111,255,.2), 0 30px 80px rgba(0,0,0,.8);
-        animation: slideUp .35s cubic-bezier(.34,1.56,.64,1);
-    }
-    @keyframes slideUp { from{opacity:0;transform:translateY(40px) scale(.92)} to{opacity:1;transform:none} }
-    .modal-header {
-        padding: 22px 26px; border-bottom: 1px solid rgba(255,255,255,.08);
-        display: flex; align-items: center; gap: 16px; flex-shrink: 0;
-    }
-    .modal-header-avatar {
-        width: 54px; height: 54px; border-radius: 50%;
-        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-        overflow: hidden; border: 2px solid rgba(255,255,255,.25);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 22px; color: white; font-weight: 900;
-    }
-    .modal-header-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .modal-header-info { flex: 1; }
-    .modal-header-name { color: white; font-weight: 700; font-size: 20px; }
-    .modal-header-status { color: rgba(255,255,255,.5); font-size: 13px; margin-top: 2px; }
-    .modal-close {
-        width: 38px; height: 38px; border-radius: 50%;
-        background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
-        color: white; font-size: 22px; display: flex; align-items: center;
-        justify-content: center; cursor: pointer; transition: all .3s;
-    }
-    .modal-close:hover { background: rgba(255,107,157,.3); transform: rotate(90deg); }
-    .modal-content { flex: 1; overflow-y: auto; padding: 22px 26px; }
-    .modal-content::-webkit-scrollbar { width: 6px; }
-    .modal-content::-webkit-scrollbar-track { background: transparent; }
-    .modal-content::-webkit-scrollbar-thumb { background: linear-gradient(135deg,var(--neon-pink),var(--neon-purple)); border-radius: 10px; }
-    .modal-footer {
-        padding: 18px 26px; border-top: 1px solid rgba(255,255,255,.08);
-        display: flex; gap: 10px; flex-shrink: 0;
+    /* POSTS CONTAINER (commun ou modal) */
+    .posts-container {
+        max-width: 680px; margin: 0 auto;
     }
 
     /* COMPOSER */
@@ -207,21 +173,18 @@
         border-radius: 8px; border: 1px solid rgba(255,107,157,.3); display: none;
     }
 
-    /* POST avec NÉON encadré */
+    /* POST avec NÉON */
     .post {
         border-radius: 18px; padding: 20px 22px; margin-bottom: 22px;
         position: relative;
         background: rgba(15,15,25,.88); backdrop-filter: blur(10px);
-        animation: slideIn .35s ease;
-        /* neon border via box-shadow multicouche */
+        animation: slideIn .35s ease, neonPulse 3s ease-in-out infinite;
         box-shadow:
             0 0 0 2px var(--neon-pink),
             0 0 10px var(--neon-pink),
             0 0 25px rgba(192,111,255,.5),
             0 0 50px rgba(192,111,255,.2);
     }
-    /* Animation pulsation néon */
-    .post { animation: slideIn .35s ease, neonPulse 3s ease-in-out infinite; }
     @keyframes neonPulse {
         0%,100% {
             box-shadow: 0 0 0 2px var(--neon-pink), 0 0 8px var(--neon-pink), 0 0 20px rgba(192,111,255,.4), 0 0 40px rgba(192,111,255,.15);
@@ -256,6 +219,10 @@
     }
     .post-action:hover { background: rgba(255,255,255,.08); color: white; }
     .post-action.liked { color: var(--neon-pink); }
+    .likes-list {
+        color: rgba(255,255,255,.5); font-size: 12px; margin-top: 6px;
+        padding-left: 32px;
+    }
 
     /* COMMENTS */
     .comments-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.07); }
@@ -330,6 +297,53 @@
     }
     .bg-reset-btn:hover { background: rgba(255,255,255,.15); color: white; }
 
+    /* MODAL */
+    .modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,.8);
+        backdrop-filter: blur(10px); z-index: 9999;
+        display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; animation: fadeIn .25s; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .modal {
+        background: rgba(15,15,25,.97); border-radius: 24px; width: 100%;
+        max-width: 680px; max-height: 90vh; display: flex; flex-direction: column;
+        border: 2px solid rgba(255,107,157,.3);
+        box-shadow: 0 0 60px rgba(192,111,255,.2), 0 30px 80px rgba(0,0,0,.8);
+        animation: slideUp .35s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes slideUp { from{opacity:0;transform:translateY(40px) scale(.92)} to{opacity:1;transform:none} }
+    .modal-header {
+        padding: 22px 26px; border-bottom: 1px solid rgba(255,255,255,.08);
+        display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+    }
+    .modal-header-avatar {
+        width: 54px; height: 54px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+        overflow: hidden; border: 2px solid rgba(255,255,255,.25);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 22px; color: white; font-weight: 900;
+    }
+    .modal-header-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .modal-header-info { flex: 1; }
+    .modal-header-name { color: white; font-weight: 700; font-size: 20px; }
+    .modal-header-status { color: rgba(255,255,255,.5); font-size: 13px; margin-top: 2px; }
+    .modal-close {
+        width: 38px; height: 38px; border-radius: 50%;
+        background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+        color: white; font-size: 22px; display: flex; align-items: center;
+        justify-content: center; cursor: pointer; transition: all .3s;
+    }
+    .modal-close:hover { background: rgba(255,107,157,.3); transform: rotate(90deg); }
+    .modal-content { flex: 1; overflow-y: auto; padding: 22px 26px; }
+    .modal-content::-webkit-scrollbar { width: 6px; }
+    .modal-content::-webkit-scrollbar-track { background: transparent; }
+    .modal-content::-webkit-scrollbar-thumb { background: linear-gradient(135deg,var(--neon-pink),var(--neon-purple)); border-radius: 10px; }
+    .modal-footer {
+        padding: 18px 26px; border-top: 1px solid rgba(255,255,255,.08);
+        display: flex; gap: 10px; flex-shrink: 0;
+    }
+
     .empty-state { text-align: center; padding: 50px 20px; color: rgba(255,255,255,.45); }
     .empty-state-icon { font-size: 54px; margin-bottom: 14px; }
     .empty-state-text { font-size: 15px; line-height: 1.6; }
@@ -360,18 +374,43 @@
 
 <div class="tabs">
     <div class="tab active" id="tabCommun">🌐 Mur commun</div>
-    <div class="tab"        id="tabPerso" >🔒 Mur personnel</div>
+    <div class="tab"        id="tabPerso" >👤 Murs personnels</div>
 </div>
 
-<div class="profiles-grid" id="profilesGrid"></div>
+<!-- PAGE MUR COMMUN -->
+<div id="communWallPage" class="active">
+    <div class="posts-container">
+        <div class="post-composer">
+            <textarea class="post-composer-input" id="communInput" placeholder="Quoi de neuf sur le mur commun ?"></textarea>
+            <div class="image-preview-wrap" id="communImgPreview">
+                <img id="communImgPreviewImg" src="" alt="Aperçu">
+                <button class="image-preview-remove" onclick="removeCommunImage()">×</button>
+            </div>
+            <div class="post-composer-actions">
+                <label class="photo-btn-label" title="Ajouter une photo">
+                    📷<input type="file" id="communImgInput" accept="image/*">
+                </label>
+                <button class="btn btn-primary" id="communPublishBtn" onclick="publishCommunPost()" style="flex:1">📤 Publier</button>
+            </div>
+            <div class="publish-error" id="communError"></div>
+        </div>
+        <div id="communPostsContainer"></div>
+    </div>
+</div>
 
+<!-- PAGE MURS PERSOS -->
+<div id="persoWallsPage">
+    <div class="profiles-grid" id="profilesGrid"></div>
+</div>
+
+<!-- MODALE MUR PERSO -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <div class="modal-header">
             <div class="modal-header-avatar" id="modalAvatar">👤</div>
             <div class="modal-header-info">
                 <div class="modal-header-name" id="modalName">Utilisateur</div>
-                <div class="modal-header-status" id="modalStatus">Mur</div>
+                <div class="modal-header-status" id="modalStatus">Mur personnel</div>
             </div>
             <div class="modal-close" onclick="closeModal()">×</div>
         </div>
@@ -399,6 +438,7 @@
         localStorage.setItem('browserFingerprint', fingerprint);
     }
     const currentUniqueId = currentUserPrenom + '_' + fingerprint;
+
     let currentView       = 'commun';
     let currentModalUser  = null;
 
@@ -415,8 +455,7 @@
     // ── ARRIÈRE-FOND ─────────────────────────────────────
     async function loadGlobalBg() {
         try {
-            const { data } = await supabase
-                .from('wall_settings').select('bg_value,bg_type')
+            const { data } = await supabase.from('wall_settings').select('bg_value,bg_type')
                 .eq('key','global_bg').maybeSingle();
             if (data) applyBg(data.bg_type, data.bg_value, false);
         } catch(e) {}
@@ -455,22 +494,133 @@
     document.getElementById('tabCommun').addEventListener('click', function() {
         currentView = 'commun';
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        this.classList.add('active'); loadProfiles();
+        this.classList.add('active');
+        document.getElementById('communWallPage').classList.add('active');
+        document.getElementById('persoWallsPage').classList.remove('active');
+        loadCommunWall();
     });
     document.getElementById('tabPerso').addEventListener('click', function() {
         currentView = 'perso';
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        this.classList.add('active'); loadProfiles();
+        this.classList.add('active');
+        document.getElementById('communWallPage').classList.remove('active');
+        document.getElementById('persoWallsPage').classList.add('active');
+        loadPersoProfiles();
     });
 
-    // ── PROFILS ───────────────────────────────────────────
-    async function loadProfiles() {
+    // ── MUR COMMUN (tous postent ensemble, wall_owner_id = 'COMMUN') ───
+    async function loadCommunWall() {
+        const container = document.getElementById('communPostsContainer');
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">Chargement...</div></div>';
+        try {
+            const { data: posts, error } = await supabase.from('wall_posts').select('*')
+                .eq('wall_owner_id', 'COMMUN')
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            if (!posts || posts.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-text">Soyez le premier à publier !</div></div>';
+                return;
+            }
+            const postIds = posts.map(p => p.id);
+            const [{ data: allLikes }, { data: allComments }] = await Promise.all([
+                supabase.from('wall_likes').select('*').in('post_id', postIds),
+                supabase.from('wall_comments').select('*').in('post_id', postIds)
+            ]);
+            container.innerHTML = '';
+            posts.forEach(post => {
+                const likes    = (allLikes   ||[]).filter(l => l.post_id === post.id);
+                const comments = (allComments||[]).filter(c => c.post_id === post.id);
+                container.appendChild(renderPost(post, likes, comments, 'commun'));
+            });
+        } catch(err) {
+            console.error(err);
+            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Erreur<br><small>${esc(err.message)}</small></div></div>`;
+        }
+    }
+
+    // Preview photo mur commun
+    document.getElementById('communImgInput').addEventListener('change', function() {
+        const file = this.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('communImgPreviewImg').src = e.target.result;
+            document.getElementById('communImgPreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    });
+
+    window.removeCommunImage = function() {
+        document.getElementById('communImgInput').value = '';
+        document.getElementById('communImgPreviewImg').src = '';
+        document.getElementById('communImgPreview').style.display = 'none';
+    };
+
+    window.publishCommunPost = async function() {
+        const input      = document.getElementById('communInput');
+        const content    = input ? input.value.trim() : '';
+        const imageInput = document.getElementById('communImgInput');
+        const errorDiv   = document.getElementById('communError');
+        const publishBtn = document.getElementById('communPublishBtn');
+
+        if (errorDiv) errorDiv.style.display = 'none';
+        if (!content) { alert('Écrivez quelque chose !'); return; }
+        if (publishBtn) { publishBtn.disabled = true; publishBtn.textContent = '⏳ Publication…'; }
+
+        try {
+            let imageUrl = null;
+
+            // Upload image si présente
+            if (imageInput && imageInput.files && imageInput.files[0]) {
+                const file = imageInput.files[0];
+                const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
+                const fn   = `commun_${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+
+                // Upload vers Supabase Storage
+                const { data: upData, error: upErr } = await supabase.storage
+                    .from('chat-files')
+                    .upload(fn, file, { contentType: file.type, upsert: false });
+
+                if (!upErr) {
+                    const { data: urlData } = supabase.storage.from('chat-files').getPublicUrl(fn);
+                    imageUrl = urlData.publicUrl;
+                    console.log('✅ Image uploadée:', imageUrl);
+                } else {
+                    console.warn('⚠️ Upload image:', upErr.message);
+                }
+            }
+
+            const { error: insertErr } = await supabase.from('wall_posts').insert({
+                author_id:     currentUniqueId,
+                wall_owner_id: 'COMMUN',
+                author_name:   currentUserPrenom,
+                author_photo:  currentUserPhoto || null,
+                content,
+                image_url:     imageUrl,
+                is_public:     true
+            });
+            if (insertErr) throw insertErr;
+
+            input.value = '';
+            window.removeCommunImage();
+            await loadCommunWall();
+
+        } catch(err) {
+            console.error('Erreur publication:', err);
+            if (errorDiv) {
+                errorDiv.textContent = '❌ ' + (err.message||'Erreur');
+                errorDiv.style.display = 'block';
+            }
+        } finally {
+            if (publishBtn) { publishBtn.disabled = false; publishBtn.innerHTML = '📤 Publier'; }
+        }
+    };
+
+    // ── MURS PERSOS (chacun a son propre mur) ────────────
+    async function loadPersoProfiles() {
         const grid = document.getElementById('profilesGrid');
         grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">Chargement...</div></div>';
         try {
-            const { data: profiles, error } = await supabase
-                .from('profiles').select('unique_id,prenom,photo_url,is_online')
-                .neq('unique_id', currentUniqueId)
+            const { data: profiles, error } = await supabase.from('profiles').select('unique_id,prenom,photo_url,is_online')
                 .order('is_online',{ascending:false}).order('prenom',{ascending:true});
             if (error) throw error;
             if (!profiles || profiles.length === 0) {
@@ -479,7 +629,7 @@
             }
             const ids = profiles.map(p => p.unique_id);
             const { data: postsRows } = await supabase.from('wall_posts').select('wall_owner_id')
-                .in('wall_owner_id', ids).eq('is_public', currentView === 'commun');
+                .in('wall_owner_id', ids).eq('is_public', false);
             const countsMap = {};
             (postsRows||[]).forEach(r => { countsMap[r.wall_owner_id] = (countsMap[r.wall_owner_id]||0)+1; });
             grid.innerHTML = '';
@@ -487,7 +637,7 @@
                 const count = countsMap[p.unique_id] || 0;
                 const card  = document.createElement('div');
                 card.className = 'profile-card';
-                card.onclick   = () => openModal(p);
+                card.onclick   = () => openPersoModal(p);
                 const av = p.photo_url ? `<img src="${esc(p.photo_url)}" alt="${esc(p.prenom)}">` : esc(p.prenom[0].toUpperCase());
                 card.innerHTML = `
                     <div class="profile-avatar">${av}<div class="status-dot ${p.is_online?'online':'offline'}"></div></div>
@@ -501,61 +651,154 @@
         }
     }
 
-    // ── MODAL ────────────────────────────────────────────
-    async function openModal(user) {
+    // ── MODAL MUR PERSO ──────────────────────────────────
+    async function openPersoModal(user) {
         currentModalUser = user;
-        const isPerso = currentView === 'perso';
-        const isMe    = user.unique_id === currentUniqueId;
+        const isMe = user.unique_id === currentUniqueId;
 
         const av = user.photo_url ? `<img src="${esc(user.photo_url)}" alt="${esc(user.prenom)}">` : esc(user.prenom[0].toUpperCase());
         document.getElementById('modalAvatar').innerHTML   = av;
         document.getElementById('modalName').textContent   = user.prenom;
-        document.getElementById('modalStatus').textContent = isPerso ? 'Mur personnel' : 'Mur commun';
+        document.getElementById('modalStatus').textContent = 'Mur personnel';
 
-        // Panneau fond : seulement sur mur perso ET si c'est son propre profil
-        const bgHTML = (isPerso && isMe) ? buildBgPanel() : '';
+        // Panneau fond : seulement si c'est mon propre mur
+        const bgHTML = isMe ? buildBgPanel() : '';
 
-        // Composer : seulement sur mur commun
-        const composerHTML = !isPerso ? `
+        // Composer : seulement si c'est mon propre mur
+        const composerHTML = isMe ? `
             <div class="post-composer">
-                <textarea class="post-composer-input" id="postInput" placeholder="Écrire sur le mur de ${esc(user.prenom)}…"></textarea>
-                <div class="image-preview-wrap" id="imagePreviewWrap">
-                    <img id="imagePreviewImg" src="" alt="Aperçu">
-                    <button class="image-preview-remove" onclick="window.removeImage()">×</button>
+                <textarea class="post-composer-input" id="persoInput" placeholder="Écrire sur votre mur…"></textarea>
+                <div class="image-preview-wrap" id="persoImgPreview">
+                    <img id="persoImgPreviewImg" src="" alt="Aperçu">
+                    <button class="image-preview-remove" onclick="window.removePersoImage()">×</button>
                 </div>
                 <div class="post-composer-actions">
                     <label class="photo-btn-label" title="Ajouter une photo">
-                        📷<input type="file" id="postImageInput" accept="image/*">
+                        📷<input type="file" id="persoImgInput" accept="image/*">
                     </label>
-                    <button class="btn btn-primary" id="publishBtn" onclick="window.publishPost()" style="flex:1">📤 Publier</button>
+                    <button class="btn btn-primary" id="persoPublishBtn" onclick="window.publishPersoPost()" style="flex:1">📤 Publier</button>
                 </div>
-                <div class="publish-error" id="publishError"></div>
+                <div class="publish-error" id="persoError"></div>
             </div>` : '';
 
         document.getElementById('modalContent').innerHTML = bgHTML + composerHTML +
-            '<div id="postsContainer"><div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">Chargement…</div></div></div>';
+            '<div id="persoPostsContainer"><div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">Chargement…</div></div></div>';
 
         // Preview photo
-        const imgInput = document.getElementById('postImageInput');
-        if (imgInput) {
-            imgInput.addEventListener('change', function() {
+        if (isMe) {
+            document.getElementById('persoImgInput').addEventListener('change', function() {
                 const file = this.files[0]; if (!file) return;
                 const reader = new FileReader();
                 reader.onload = e => {
-                    document.getElementById('imagePreviewImg').src = e.target.result;
-                    document.getElementById('imagePreviewWrap').style.display = 'block';
+                    document.getElementById('persoImgPreviewImg').src = e.target.result;
+                    document.getElementById('persoImgPreview').style.display = 'block';
                 };
                 reader.readAsDataURL(file);
             });
         }
 
         // Setup panneau fond
-        if (isPerso && isMe) setupBgPanel();
+        if (isMe) setupBgPanel();
 
         document.getElementById('modalOverlay').classList.add('open');
         document.body.style.overflow = 'hidden';
-        await loadPosts(user.unique_id);
+        await loadPersoWall(user.unique_id);
     }
+
+    async function loadPersoWall(ownerId) {
+        const container = document.getElementById('persoPostsContainer');
+        if (!container) return;
+        try {
+            const { data: posts, error } = await supabase.from('wall_posts').select('*')
+                .eq('wall_owner_id', ownerId)
+                .eq('is_public', false)
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            if (!posts || posts.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-text">Aucune publication</div></div>';
+                return;
+            }
+            const postIds = posts.map(p => p.id);
+            const [{ data: allLikes }, { data: allComments }] = await Promise.all([
+                supabase.from('wall_likes').select('*').in('post_id', postIds),
+                supabase.from('wall_comments').select('*').in('post_id', postIds)
+            ]);
+            container.innerHTML = '';
+            posts.forEach(post => {
+                const likes    = (allLikes   ||[]).filter(l => l.post_id === post.id);
+                const comments = (allComments||[]).filter(c => c.post_id === post.id);
+                container.appendChild(renderPost(post, likes, comments, 'perso'));
+            });
+        } catch(err) {
+            console.error(err);
+            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Erreur<br><small>${esc(err.message)}</small></div></div>`;
+        }
+    }
+
+    window.removePersoImage = function() {
+        document.getElementById('persoImgInput').value = '';
+        document.getElementById('persoImgPreviewImg').src = '';
+        document.getElementById('persoImgPreview').style.display = 'none';
+    };
+
+    window.publishPersoPost = async function() {
+        const input      = document.getElementById('persoInput');
+        const content    = input ? input.value.trim() : '';
+        const imageInput = document.getElementById('persoImgInput');
+        const errorDiv   = document.getElementById('persoError');
+        const publishBtn = document.getElementById('persoPublishBtn');
+
+        if (errorDiv) errorDiv.style.display = 'none';
+        if (!content) { alert('Écrivez quelque chose !'); return; }
+        if (!currentModalUser) return;
+        if (publishBtn) { publishBtn.disabled = true; publishBtn.textContent = '⏳ Publication…'; }
+
+        try {
+            let imageUrl = null;
+
+            if (imageInput && imageInput.files && imageInput.files[0]) {
+                const file = imageInput.files[0];
+                const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
+                const fn   = `perso_${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+
+                const { error: upErr } = await supabase.storage
+                    .from('chat-files')
+                    .upload(fn, file, { contentType: file.type, upsert: false });
+
+                if (!upErr) {
+                    const { data: urlData } = supabase.storage.from('chat-files').getPublicUrl(fn);
+                    imageUrl = urlData.publicUrl;
+                    console.log('✅ Image uploadée:', imageUrl);
+                } else {
+                    console.warn('⚠️ Upload image:', upErr.message);
+                }
+            }
+
+            const { error: insertErr } = await supabase.from('wall_posts').insert({
+                author_id:     currentUniqueId,
+                wall_owner_id: currentModalUser.unique_id,
+                author_name:   currentUserPrenom,
+                author_photo:  currentUserPhoto || null,
+                content,
+                image_url:     imageUrl,
+                is_public:     false
+            });
+            if (insertErr) throw insertErr;
+
+            input.value = '';
+            window.removePersoImage();
+            await loadPersoWall(currentModalUser.unique_id);
+
+        } catch(err) {
+            console.error('Erreur publication:', err);
+            if (errorDiv) {
+                errorDiv.textContent = '❌ ' + (err.message||'Erreur');
+                errorDiv.style.display = 'block';
+            }
+        } finally {
+            if (publishBtn) { publishBtn.disabled = false; publishBtn.innerHTML = '📤 Publier'; }
+        }
+    };
 
     function buildBgPanel() {
         const presetsHTML = BG_PRESETS.map(p =>
@@ -599,44 +842,19 @@
         window.location.href = 'chat.html';
     };
 
-    // ── POSTS ────────────────────────────────────────────
-    async function loadPosts(ownerId) {
-        const container = document.getElementById('postsContainer');
-        if (!container) return;
-        try {
-            const { data: posts, error } = await supabase.from('wall_posts').select('*')
-                .eq('wall_owner_id', ownerId)
-                .eq('is_public', currentView === 'commun')
-                .order('created_at', { ascending: false });
-            if (error) throw error;
-            if (!posts || posts.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-text">Aucune publication</div></div>';
-                return;
-            }
-            const postIds = posts.map(p => p.id);
-            const [{ data: allLikes }, { data: allComments }] = await Promise.all([
-                supabase.from('wall_likes').select('*').in('post_id', postIds),
-                supabase.from('wall_comments').select('*').in('post_id', postIds)
-            ]);
-            container.innerHTML = '';
-            posts.forEach(post => {
-                const likes    = (allLikes   ||[]).filter(l => l.post_id === post.id);
-                const comments = (allComments||[]).filter(c => c.post_id === post.id);
-                container.appendChild(renderPost(post, likes, comments));
-            });
-        } catch(err) {
-            console.error(err);
-            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Erreur<br><small>${esc(err.message)}</small></div></div>`;
-        }
-    }
-
-    function renderPost(post, likes, comments) {
+    // ── RENDER POST ──────────────────────────────────────
+    function renderPost(post, likes, comments, context) {
         const el = document.createElement('div');
         el.className = 'post';
         el.dataset.postId = post.id;
         const av = post.author_photo ? `<img src="${esc(post.author_photo)}" alt="${esc(post.author_name)}">` : esc((post.author_name||'?')[0].toUpperCase());
         const imgHTML = post.image_url ? `<img src="${esc(post.image_url)}" alt="Image" class="post-image" onerror="this.style.display='none'">` : '';
         const isLiked = likes.some(l => l.user_id === currentUniqueId);
+
+        // Liste des prénoms des likes
+        const likersNames = likes.map(l => l.user_name).join(', ');
+        const likesListHTML = likes.length > 0 ? `<div class="likes-list">Aimé par : ${esc(likersNames)}</div>` : '';
+
         el.innerHTML = `
             <div class="post-header">
                 <div class="post-avatar">${av}</div>
@@ -645,98 +863,35 @@
             <div class="post-content">${esc(post.content)}</div>
             ${imgHTML}
             <div class="post-actions">
-                <div class="post-action ${isLiked?'liked':''}" onclick="window.toggleLike(${post.id})">
+                <div class="post-action ${isLiked?'liked':''}" onclick="window.toggleLike(${post.id},'${context}')">
                     <span>${isLiked?'❤️':'🤍'}</span><span id="lk-${post.id}">${likes.length}</span>
                 </div>
                 <div class="post-action" onclick="window.toggleComments(${post.id})">
                     <span>💬</span><span id="cm-${post.id}">${comments.length}</span>
                 </div>
             </div>
+            ${likesListHTML}
             <div class="comments-section" id="comments-${post.id}" style="display:none;">
                 <div id="commentsList-${post.id}"></div>
                 <div class="comment-composer">
                     <input type="text" class="comment-input" id="ci-${post.id}" placeholder="Écrire un commentaire…"
-                        onkeypress="if(event.key==='Enter') window.postComment(${post.id})">
-                    <button class="comment-send-btn" id="cb-${post.id}" onclick="window.postComment(${post.id})">➤</button>
+                        onkeypress="if(event.key==='Enter') window.postComment(${post.id},'${context}')">
+                    <button class="comment-send-btn" id="cb-${post.id}" onclick="window.postComment(${post.id},'${context}')">➤</button>
                 </div>
             </div>`;
         return el;
     }
 
-    // ── PUBLIER ──────────────────────────────────────────
-    window.publishPost = async function() {
-        const input      = document.getElementById('postInput');
-        const content    = input ? input.value.trim() : '';
-        const imageInput = document.getElementById('postImageInput');
-        const errorDiv   = document.getElementById('publishError');
-        const publishBtn = document.getElementById('publishBtn');
-
-        if (errorDiv) { errorDiv.style.display = 'none'; }
-        if (!content) { alert('Écrivez quelque chose !'); return; }
-        if (!currentModalUser) return;
-        if (publishBtn) { publishBtn.disabled = true; publishBtn.textContent = '⏳ Publication…'; }
-
-        try {
-            let imageUrl = null;
-
-            // FIX PHOTO : upload binaire direct depuis le File object
-            if (imageInput && imageInput.files && imageInput.files[0]) {
-                const file = imageInput.files[0];
-                const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
-                const fn   = `wall_${Date.now()}.${ext}`;
-
-                const { error: upErr } = await supabase.storage
-                    .from('chat-files')
-                    .upload(fn, file, { contentType: file.type, upsert: false });
-
-                if (upErr) {
-                    console.warn('Upload photo échoué:', upErr.message);
-                } else {
-                    const { data: urlData } = supabase.storage.from('chat-files').getPublicUrl(fn);
-                    imageUrl = urlData.publicUrl;
-                }
-            }
-
-            const { error: insertErr } = await supabase.from('wall_posts').insert({
-                author_id:     currentUniqueId,
-                wall_owner_id: currentModalUser.unique_id,
-                author_name:   currentUserPrenom,
-                author_photo:  currentUserPhoto || null,
-                content,
-                image_url:     imageUrl,
-                is_public:     currentView === 'commun'
-            });
-            if (insertErr) throw insertErr;
-
-            input.value = '';
-            window.removeImage();
-            await loadPosts(currentModalUser.unique_id);
-
-        } catch(err) {
-            console.error(err);
-            if (errorDiv) { errorDiv.textContent = '❌ ' + (err.message||'Erreur'); errorDiv.style.display = 'block'; }
-        } finally {
-            if (publishBtn) { publishBtn.disabled = false; publishBtn.innerHTML = '📤 Publier'; }
-        }
-    };
-
-    window.removeImage = function() {
-        const inp  = document.getElementById('postImageInput');
-        const wrap = document.getElementById('imagePreviewWrap');
-        const img  = document.getElementById('imagePreviewImg');
-        if (inp)  inp.value = '';
-        if (img)  img.src   = '';
-        if (wrap) wrap.style.display = 'none';
-    };
-
     // ── LIKE ─────────────────────────────────────────────
-    window.toggleLike = async function(postId) {
+    window.toggleLike = async function(postId, context) {
         try {
             const { data: ex } = await supabase.from('wall_likes').select('id')
                 .eq('post_id',postId).eq('user_id',currentUniqueId).maybeSingle();
             if (ex) { await supabase.from('wall_likes').delete().eq('id',ex.id); }
             else    { await supabase.from('wall_likes').insert({ post_id:postId, user_id:currentUniqueId, user_name:currentUserPrenom }); }
-            if (currentModalUser) await loadPosts(currentModalUser.unique_id);
+
+            if (context === 'commun') await loadCommunWall();
+            else if (currentModalUser) await loadPersoWall(currentModalUser.unique_id);
         } catch(err) { console.error(err); }
     };
 
@@ -772,7 +927,7 @@
         } catch(err) { console.error(err); }
     }
 
-    window.postComment = async function(postId) {
+    window.postComment = async function(postId, context) {
         const input   = document.getElementById('ci-'+postId);
         const btn     = document.getElementById('cb-'+postId);
         const content = input ? input.value.trim() : '';
@@ -809,7 +964,8 @@
 
     // ── INIT ─────────────────────────────────────────────
     loadGlobalBg();
-    loadProfiles();
+    loadCommunWall();
+
     document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target===e.currentTarget) window.closeModal(); });
     document.addEventListener('keydown', e => { if (e.key==='Escape') window.closeModal(); });
 </script>
