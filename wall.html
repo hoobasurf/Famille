@@ -12,7 +12,6 @@
     :root {
         --neon-pink: #ff6b9d;
         --neon-purple: #c06fff;
-        --neon-glow: 0 0 8px #ff6b9d, 0 0 20px #c06fff, 0 0 40px rgba(192,111,255,.4);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -32,11 +31,9 @@
     #bgLayer.has-image {
         background-size: cover !important;
         background-position: center !important;
-        background-repeat: no-repeat !important;
     }
     #bgLayer::after {
-        content: '';
-        position: absolute; inset: 0;
+        content: ''; position: absolute; inset: 0;
         background: rgba(0,0,0,0.3);
     }
 
@@ -48,8 +45,8 @@
         display: flex; justify-content: space-between; align-items: center;
         flex-wrap: wrap; gap: 14px;
     }
-    .header-title { color: white; font-size: 26px; font-weight: 900; letter-spacing: -.5px; }
-    .header-actions { display: flex; gap: 10px; align-items: center; }
+    .header-title { color: white; font-size: 26px; font-weight: 900; }
+    .header-actions { display: flex; gap: 10px; }
 
     .btn {
         padding: 10px 22px; border-radius: 12px; border: none;
@@ -61,47 +58,43 @@
         background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
         color: white; box-shadow: 0 4px 15px rgba(192,111,255,.4);
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--neon-glow); }
-    .btn-primary:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-primary:hover { transform: translateY(-2px); }
+    .btn-primary:disabled { opacity: .55; cursor: not-allowed; transform: none; }
     .btn-secondary { background: rgba(255,255,255,.1); color: white; border: 2px solid rgba(255,255,255,.2); }
-    .btn-secondary:hover { background: rgba(255,255,255,.2); transform: translateY(-2px); }
-    .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 10px; }
+    .btn-secondary:hover { background: rgba(255,255,255,.2); }
+    .btn-sm { padding: 7px 14px; font-size: 13px; }
 
     .tabs { display: flex; gap: 12px; margin-bottom: 28px; }
     .tab {
         padding: 12px 28px; background: rgba(255,255,255,.08);
         border: 2px solid rgba(255,255,255,.12); border-radius: 14px;
         color: white; font-weight: 700; cursor: pointer; transition: all .3s;
-        font-size: 15px; font-family: 'Outfit', sans-serif;
     }
-    .tab:hover { background: rgba(255,255,255,.15); transform: translateY(-2px); }
+    .tab:hover { background: rgba(255,255,255,.15); }
     .tab.active {
         background: linear-gradient(135deg, rgba(255,107,157,.25), rgba(192,111,255,.25));
         border-color: var(--neon-pink);
-        box-shadow: 0 0 16px rgba(255,107,157,.5), inset 0 0 20px rgba(255,107,157,.08);
+        box-shadow: 0 0 16px rgba(255,107,157,.5);
     }
 
-    /* Page mur commun : pas de grille, juste le flux */
     #communWallPage { display: none; }
     #communWallPage.active { display: block; }
-
-    /* Page murs persos : grille de profils */
     #persoWallsPage { display: none; }
     #persoWallsPage.active { display: block; }
 
     .profiles-grid {
         display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-        gap: 22px; margin-bottom: 36px;
+        gap: 22px;
     }
     .profile-card {
         background: rgba(255,255,255,.06); backdrop-filter: blur(12px);
         border-radius: 20px; padding: 22px; border: 2px solid rgba(255,255,255,.1);
-        cursor: pointer; transition: all .4s cubic-bezier(.34,1.56,.64,1);
-        position: relative; overflow: hidden; text-align: center;
+        cursor: pointer; transition: all .4s; text-align: center;
     }
     .profile-card:hover {
-        transform: translateY(-8px) scale(1.02); border-color: var(--neon-pink);
-        box-shadow: var(--neon-glow), 0 12px 40px rgba(0,0,0,.4);
+        transform: translateY(-8px) scale(1.02);
+        border-color: var(--neon-pink);
+        box-shadow: 0 0 20px var(--neon-pink);
     }
     .profile-avatar {
         width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 14px;
@@ -122,12 +115,8 @@
     .profile-name { color: white; font-weight: 700; font-size: 17px; margin-bottom: 6px; }
     .profile-count { color: rgba(255,255,255,.55); font-size: 13px; }
 
-    /* POSTS CONTAINER (commun ou modal) */
-    .posts-container {
-        max-width: 680px; margin: 0 auto;
-    }
+    .posts-container { max-width: 680px; margin: 0 auto; }
 
-    /* COMPOSER */
     .post-composer {
         background: rgba(255,255,255,.04); border-radius: 18px;
         padding: 18px 20px; margin-bottom: 22px;
@@ -138,23 +127,21 @@
         border: 1.5px solid rgba(255,255,255,.12); border-radius: 14px;
         padding: 13px 16px; color: white; font-size: 15px;
         resize: vertical; min-height: 78px; font-family: 'Outfit', sans-serif;
-        margin-bottom: 12px; transition: border-color .2s;
+        margin-bottom: 12px;
     }
-    .post-composer-input:focus { outline: none; border-color: var(--neon-pink); background: rgba(255,255,255,.1); }
+    .post-composer-input:focus { outline: none; border-color: var(--neon-pink); }
     .post-composer-input::placeholder { color: rgba(255,255,255,.4); }
 
     .image-preview-wrap { position: relative; margin-bottom: 12px; display: none; }
     .image-preview-wrap img {
         width: 100%; max-height: 180px; object-fit: cover;
         border-radius: 12px; border: 2px solid var(--neon-pink);
-        box-shadow: 0 0 12px rgba(255,107,157,.4);
     }
     .image-preview-remove {
         position: absolute; top: 8px; right: 8px;
         width: 28px; height: 28px; border-radius: 50%;
         background: rgba(0,0,0,.75); color: white; border: none;
-        font-size: 15px; cursor: pointer; display: flex;
-        align-items: center; justify-content: center; transition: background .2s;
+        font-size: 15px; cursor: pointer;
     }
     .image-preview-remove:hover { background: var(--neon-pink); }
 
@@ -163,35 +150,25 @@
         display: inline-flex; align-items: center; justify-content: center;
         width: 42px; height: 42px; border-radius: 50%;
         background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.2);
-        cursor: pointer; font-size: 18px; transition: all .3s; flex-shrink: 0;
+        cursor: pointer; font-size: 18px; transition: all .3s;
     }
-    .photo-btn-label:hover { background: rgba(255,107,157,.25); border-color: var(--neon-pink); transform: scale(1.1); }
+    .photo-btn-label:hover { background: rgba(255,107,157,.25); transform: scale(1.1); }
     .photo-btn-label input[type=file] { display: none; }
     .publish-error {
         color: var(--neon-pink); font-size: 13px; margin-top: 8px;
         padding: 8px 12px; background: rgba(255,107,157,.1);
-        border-radius: 8px; border: 1px solid rgba(255,107,157,.3); display: none;
+        border-radius: 8px; display: none;
     }
 
-    /* POST avec NÉON */
     .post {
         border-radius: 18px; padding: 20px 22px; margin-bottom: 22px;
-        position: relative;
         background: rgba(15,15,25,.88); backdrop-filter: blur(10px);
         animation: slideIn .35s ease, neonPulse 3s ease-in-out infinite;
-        box-shadow:
-            0 0 0 2px var(--neon-pink),
-            0 0 10px var(--neon-pink),
-            0 0 25px rgba(192,111,255,.5),
-            0 0 50px rgba(192,111,255,.2);
+        box-shadow: 0 0 0 2px var(--neon-pink), 0 0 10px var(--neon-pink), 0 0 25px rgba(192,111,255,.5);
     }
     @keyframes neonPulse {
-        0%,100% {
-            box-shadow: 0 0 0 2px var(--neon-pink), 0 0 8px var(--neon-pink), 0 0 20px rgba(192,111,255,.4), 0 0 40px rgba(192,111,255,.15);
-        }
-        50% {
-            box-shadow: 0 0 0 2px var(--neon-purple), 0 0 14px var(--neon-purple), 0 0 35px rgba(255,107,157,.6), 0 0 60px rgba(255,107,157,.25);
-        }
+        0%,100% { box-shadow: 0 0 0 2px var(--neon-pink), 0 0 8px var(--neon-pink), 0 0 20px rgba(192,111,255,.4); }
+        50% { box-shadow: 0 0 0 2px var(--neon-purple), 0 0 14px var(--neon-purple), 0 0 35px rgba(255,107,157,.6); }
     }
     @keyframes slideIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
 
@@ -201,7 +178,7 @@
         background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
         overflow: hidden; border: 2px solid rgba(255,255,255,.2);
         display: flex; align-items: center; justify-content: center;
-        font-size: 18px; color: white; font-weight: 700; flex-shrink: 0;
+        font-size: 18px; color: white; font-weight: 700;
     }
     .post-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .post-author-name { color: white; font-weight: 700; font-size: 15px; }
@@ -219,12 +196,8 @@
     }
     .post-action:hover { background: rgba(255,255,255,.08); color: white; }
     .post-action.liked { color: var(--neon-pink); }
-    .likes-list {
-        color: rgba(255,255,255,.5); font-size: 12px; margin-top: 6px;
-        padding-left: 32px;
-    }
+    .likes-list { color: rgba(255,255,255,.5); font-size: 12px; margin-top: 6px; padding-left: 32px; }
 
-    /* COMMENTS */
     .comments-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.07); }
     .comment { display: flex; gap: 10px; margin-bottom: 12px; }
     .comment-avatar {
@@ -232,72 +205,63 @@
         background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
         overflow: hidden; border: 2px solid rgba(255,255,255,.2);
         display: flex; align-items: center; justify-content: center;
-        font-size: 13px; color: white; font-weight: 700; flex-shrink: 0;
+        font-size: 13px; color: white; font-weight: 700;
     }
     .comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .comment-content { flex: 1; background: rgba(255,255,255,.07); border-radius: 12px; padding: 9px 13px; }
     .comment-author { color: white; font-weight: 700; font-size: 13px; margin-bottom: 3px; }
     .comment-text { color: rgba(255,255,255,.85); font-size: 13px; line-height: 1.5; }
     .comment-time { color: rgba(255,255,255,.35); font-size: 11px; margin-top: 4px; }
-    .comment-composer { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+    .comment-composer { display: flex; gap: 8px; margin-top: 10px; }
     .comment-input {
         flex: 1; background: rgba(255,255,255,.07);
         border: 1.5px solid rgba(255,255,255,.12); border-radius: 20px;
         padding: 9px 15px; color: white; font-size: 13px; font-family: 'Outfit', sans-serif;
-        transition: border-color .2s;
     }
     .comment-input:focus { outline: none; border-color: var(--neon-pink); }
     .comment-input::placeholder { color: rgba(255,255,255,.4); }
     .comment-send-btn {
-        width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+        width: 36px; height: 36px; border-radius: 50%;
         background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
         border: none; color: white; font-size: 15px; cursor: pointer;
         display: flex; align-items: center; justify-content: center;
-        transition: all .25s; box-shadow: 0 2px 10px rgba(192,111,255,.4);
     }
-    .comment-send-btn:hover { transform: scale(1.12); box-shadow: var(--neon-glow); }
-    .comment-send-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .comment-send-btn:hover { transform: scale(1.12); }
+    .comment-send-btn:disabled { opacity: .45; cursor: not-allowed; }
 
-    /* PANNEAU FOND */
     .bg-panel {
         background: rgba(255,255,255,.05); border-radius: 16px;
         padding: 16px 18px; margin-bottom: 22px;
         border: 1px solid rgba(255,255,255,.12);
     }
-    .bg-panel-title {
-        color: white; font-weight: 700; font-size: 14px; margin-bottom: 12px;
-        display: flex; align-items: center; gap: 8px;
-    }
+    .bg-panel-title { color: white; font-weight: 700; font-size: 14px; margin-bottom: 12px; }
     .bg-options { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
     .bg-preset {
         width: 36px; height: 36px; border-radius: 10px; cursor: pointer;
-        border: 2px solid transparent; transition: all .25s; flex-shrink: 0;
+        border: 2px solid transparent; transition: all .25s;
     }
     .bg-preset:hover { transform: scale(1.2); border-color: white; }
-    .bg-preset.selected { border-color: var(--neon-pink); box-shadow: 0 0 10px rgba(255,107,157,.6); }
+    .bg-preset.selected { border-color: var(--neon-pink); }
     .bg-sep { width: 1px; height: 32px; background: rgba(255,255,255,.15); }
     input[type=color] {
         width: 36px; height: 36px; border-radius: 10px;
-        border: 2px solid rgba(255,255,255,.2); background: none;
-        cursor: pointer; padding: 2px;
+        border: 2px solid rgba(255,255,255,.2); cursor: pointer; padding: 2px;
     }
     .bg-photo-label {
-        display: inline-flex; align-items: center; gap: 6px;
         padding: 7px 12px; border-radius: 10px;
         background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.2);
-        color: white; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .25s;
+        color: white; font-size: 13px; font-weight: 600; cursor: pointer;
     }
-    .bg-photo-label:hover { background: rgba(255,107,157,.2); border-color: var(--neon-pink); }
+    .bg-photo-label:hover { background: rgba(255,107,157,.2); }
     .bg-photo-label input[type=file] { display: none; }
     .bg-reset-btn {
         padding: 7px 12px; border-radius: 10px;
         background: rgba(255,255,255,.07); border: 1.5px solid rgba(255,255,255,.15);
         color: rgba(255,255,255,.7); font-size: 13px; font-weight: 600;
-        cursor: pointer; transition: all .25s; font-family: 'Outfit', sans-serif;
+        cursor: pointer; font-family: 'Outfit', sans-serif;
     }
-    .bg-reset-btn:hover { background: rgba(255,255,255,.15); color: white; }
+    .bg-reset-btn:hover { background: rgba(255,255,255,.15); }
 
-    /* MODAL */
     .modal-overlay {
         position: fixed; inset: 0; background: rgba(0,0,0,.8);
         backdrop-filter: blur(10px); z-index: 9999;
@@ -309,13 +273,11 @@
         background: rgba(15,15,25,.97); border-radius: 24px; width: 100%;
         max-width: 680px; max-height: 90vh; display: flex; flex-direction: column;
         border: 2px solid rgba(255,107,157,.3);
-        box-shadow: 0 0 60px rgba(192,111,255,.2), 0 30px 80px rgba(0,0,0,.8);
-        animation: slideUp .35s cubic-bezier(.34,1.56,.64,1);
+        box-shadow: 0 0 60px rgba(192,111,255,.2);
     }
-    @keyframes slideUp { from{opacity:0;transform:translateY(40px) scale(.92)} to{opacity:1;transform:none} }
     .modal-header {
         padding: 22px 26px; border-bottom: 1px solid rgba(255,255,255,.08);
-        display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+        display: flex; align-items: center; gap: 16px;
     }
     .modal-header-avatar {
         width: 54px; height: 54px; border-radius: 50%;
@@ -327,33 +289,26 @@
     .modal-header-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .modal-header-info { flex: 1; }
     .modal-header-name { color: white; font-weight: 700; font-size: 20px; }
-    .modal-header-status { color: rgba(255,255,255,.5); font-size: 13px; margin-top: 2px; }
+    .modal-header-status { color: rgba(255,255,255,.5); font-size: 13px; }
     .modal-close {
         width: 38px; height: 38px; border-radius: 50%;
-        background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
-        color: white; font-size: 22px; display: flex; align-items: center;
-        justify-content: center; cursor: pointer; transition: all .3s;
+        background: rgba(255,255,255,.08); color: white; font-size: 22px;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
-    .modal-close:hover { background: rgba(255,107,157,.3); transform: rotate(90deg); }
+    .modal-close:hover { background: rgba(255,107,157,.3); }
     .modal-content { flex: 1; overflow-y: auto; padding: 22px 26px; }
     .modal-content::-webkit-scrollbar { width: 6px; }
-    .modal-content::-webkit-scrollbar-track { background: transparent; }
     .modal-content::-webkit-scrollbar-thumb { background: linear-gradient(135deg,var(--neon-pink),var(--neon-purple)); border-radius: 10px; }
-    .modal-footer {
-        padding: 18px 26px; border-top: 1px solid rgba(255,255,255,.08);
-        display: flex; gap: 10px; flex-shrink: 0;
-    }
+    .modal-footer { padding: 18px 26px; border-top: 1px solid rgba(255,255,255,.08); display: flex; gap: 10px; }
 
     .empty-state { text-align: center; padding: 50px 20px; color: rgba(255,255,255,.45); }
     .empty-state-icon { font-size: 54px; margin-bottom: 14px; }
-    .empty-state-text { font-size: 15px; line-height: 1.6; }
+    .empty-state-text { font-size: 15px; }
 
     @media (max-width: 680px) {
         body { padding: 10px; }
-        .profiles-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
-        .profile-avatar { width: 78px; height: 78px; font-size: 30px; }
-        .modal { border-radius: 20px 20px 0 0; max-height: 88vh; }
-        .modal-header, .modal-content, .modal-footer { padding: 14px 16px; }
+        .profiles-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+        .modal { max-height: 88vh; }
     }
 </style>
 ```
@@ -377,19 +332,16 @@
     <div class="tab"        id="tabPerso" >👤 Murs personnels</div>
 </div>
 
-<!-- PAGE MUR COMMUN -->
 <div id="communWallPage" class="active">
     <div class="posts-container">
         <div class="post-composer">
-            <textarea class="post-composer-input" id="communInput" placeholder="Quoi de neuf sur le mur commun ?"></textarea>
+            <textarea class="post-composer-input" id="communInput" placeholder="Quoi de neuf ?"></textarea>
             <div class="image-preview-wrap" id="communImgPreview">
                 <img id="communImgPreviewImg" src="" alt="Aperçu">
                 <button class="image-preview-remove" onclick="removeCommunImage()">×</button>
             </div>
             <div class="post-composer-actions">
-                <label class="photo-btn-label" title="Ajouter une photo">
-                    📷<input type="file" id="communImgInput" accept="image/*">
-                </label>
+                <label class="photo-btn-label">📷<input type="file" id="communImgInput" accept="image/*"></label>
                 <button class="btn btn-primary" id="communPublishBtn" onclick="publishCommunPost()" style="flex:1">📤 Publier</button>
             </div>
             <div class="publish-error" id="communError"></div>
@@ -398,12 +350,10 @@
     </div>
 </div>
 
-<!-- PAGE MURS PERSOS -->
 <div id="persoWallsPage">
     <div class="profiles-grid" id="profilesGrid"></div>
 </div>
 
-<!-- MODALE MUR PERSO -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <div class="modal-header">
@@ -416,7 +366,7 @@
         </div>
         <div class="modal-content" id="modalContent"></div>
         <div class="modal-footer">
-            <button class="btn btn-primary" style="flex:1" onclick="goToChat()">💬 Envoyer un message</button>
+            <button class="btn btn-primary" style="flex:1" onclick="goToChat()">💬 Message</button>
             <button class="btn btn-secondary" onclick="closeModal()">Fermer</button>
         </div>
     </div>
@@ -438,21 +388,20 @@
         localStorage.setItem('browserFingerprint', fingerprint);
     }
     const currentUniqueId = currentUserPrenom + '_' + fingerprint;
+    let currentView = 'commun';
+    let currentModalUser = null;
 
-    let currentView       = 'commun';
-    let currentModalUser  = null;
-
-    // Présets de fond
+    // BG presets
     const BG_PRESETS = [
         { id:'default', style:'linear-gradient(135deg,#667eea,#764ba2)' },
-        { id:'dark',    style:'linear-gradient(135deg,#0f0f1a,#1a1a2e)' },
-        { id:'light',   style:'linear-gradient(135deg,#e8eaf6,#fce4ec)' },
-        { id:'sunset',  style:'linear-gradient(135deg,#ff6b6b,#feca57)' },
-        { id:'ocean',   style:'linear-gradient(135deg,#00b4d8,#0077b6)' },
-        { id:'forest',  style:'linear-gradient(135deg,#2d6a4f,#1b4332)' },
+        { id:'dark', style:'linear-gradient(135deg,#0f0f1a,#1a1a2e)' },
+        { id:'light', style:'linear-gradient(135deg,#e8eaf6,#fce4ec)' },
+        { id:'sunset', style:'linear-gradient(135deg,#ff6b6b,#feca57)' },
+        { id:'ocean', style:'linear-gradient(135deg,#00b4d8,#0077b6)' },
+        { id:'forest', style:'linear-gradient(135deg,#2d6a4f,#1b4332)' },
     ];
 
-    // ── ARRIÈRE-FOND ─────────────────────────────────────
+    // ── BG ───────────────────────────────────────────────
     async function loadGlobalBg() {
         try {
             const { data } = await supabase.from('wall_settings').select('bg_value,bg_type')
@@ -460,16 +409,14 @@
             if (data) applyBg(data.bg_type, data.bg_value, false);
         } catch(e) {}
     }
-
     async function saveGlobalBg(type, value) {
         try {
             await supabase.from('wall_settings').upsert(
                 { key:'global_bg', bg_type:type, bg_value:value, updated_by:currentUniqueId },
                 { onConflict:'key' }
             );
-        } catch(e) { console.warn('wall_settings:', e.message); }
+        } catch(e) {}
     }
-
     function applyBg(type, value, save=true) {
         const layer = document.getElementById('bgLayer');
         if (type === 'image') {
@@ -481,7 +428,6 @@
         }
         if (save) saveGlobalBg(type, value);
     }
-
     window.selectPreset = function(id, style) {
         document.querySelectorAll('.bg-preset').forEach(e => e.classList.remove('selected'));
         const el = document.querySelector(`[data-bg-id="${id}"]`);
@@ -508,17 +454,16 @@
         loadPersoProfiles();
     });
 
-    // ── MUR COMMUN (tous postent ensemble, wall_owner_id = 'COMMUN') ───
+    // ── MUR COMMUN ───────────────────────────────────────
     async function loadCommunWall() {
         const container = document.getElementById('communPostsContainer');
         container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">Chargement...</div></div>';
         try {
             const { data: posts, error } = await supabase.from('wall_posts').select('*')
-                .eq('wall_owner_id', 'COMMUN')
-                .order('created_at', { ascending: false });
+                .eq('wall_owner_id', 'COMMUN').order('created_at', { ascending: false });
             if (error) throw error;
             if (!posts || posts.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-text">Soyez le premier à publier !</div></div>';
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-text">Soyez le premier !</div></div>';
                 return;
             }
             const postIds = posts.map(p => p.id);
@@ -528,17 +473,17 @@
             ]);
             container.innerHTML = '';
             posts.forEach(post => {
-                const likes    = (allLikes   ||[]).filter(l => l.post_id === post.id);
+                const likes = (allLikes||[]).filter(l => l.post_id === post.id);
                 const comments = (allComments||[]).filter(c => c.post_id === post.id);
                 container.appendChild(renderPost(post, likes, comments, 'commun'));
             });
         } catch(err) {
             console.error(err);
-            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Erreur<br><small>${esc(err.message)}</small></div></div>`;
+            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Erreur</div></div>`;
         }
     }
 
-    // Preview photo mur commun
+    // Preview photo commun
     document.getElementById('communImgInput').addEventListener('change', function() {
         const file = this.files[0]; if (!file) return;
         const reader = new FileReader();
@@ -555,48 +500,61 @@
         document.getElementById('communImgPreview').style.display = 'none';
     };
 
+    // ── PUBLISH COMMUN (avec base64 au lieu de File direct) ─
     window.publishCommunPost = async function() {
-        const input      = document.getElementById('communInput');
-        const content    = input ? input.value.trim() : '';
+        const input = document.getElementById('communInput');
+        const content = input ? input.value.trim() : '';
         const imageInput = document.getElementById('communImgInput');
-        const errorDiv   = document.getElementById('communError');
+        const errorDiv = document.getElementById('communError');
         const publishBtn = document.getElementById('communPublishBtn');
 
         if (errorDiv) errorDiv.style.display = 'none';
         if (!content) { alert('Écrivez quelque chose !'); return; }
-        if (publishBtn) { publishBtn.disabled = true; publishBtn.textContent = '⏳ Publication…'; }
+        if (publishBtn) { publishBtn.disabled = true; publishBtn.textContent = '⏳ Envoi…'; }
 
         try {
             let imageUrl = null;
 
-            // Upload image si présente
+            // FIX IPHONE : conversion en base64 puis blob upload
             if (imageInput && imageInput.files && imageInput.files[0]) {
                 const file = imageInput.files[0];
-                const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
-                const fn   = `commun_${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+                
+                // Lire en base64
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
 
-                // Upload vers Supabase Storage
-                const { data: upData, error: upErr } = await supabase.storage
+                // Convertir base64 en Blob
+                const response = await fetch(base64);
+                const blob = await response.blob();
+
+                const ext = file.type.split('/')[1] || 'jpg';
+                const fn = `commun_${Date.now()}.${ext}`;
+
+                const { error: upErr } = await supabase.storage
                     .from('chat-files')
-                    .upload(fn, file, { contentType: file.type, upsert: false });
+                    .upload(fn, blob, { contentType: file.type });
 
                 if (!upErr) {
                     const { data: urlData } = supabase.storage.from('chat-files').getPublicUrl(fn);
                     imageUrl = urlData.publicUrl;
                     console.log('✅ Image uploadée:', imageUrl);
                 } else {
-                    console.warn('⚠️ Upload image:', upErr.message);
+                    console.warn('⚠️ Upload:', upErr.message);
                 }
             }
 
             const { error: insertErr } = await supabase.from('wall_posts').insert({
-                author_id:     currentUniqueId,
+                author_id: currentUniqueId,
                 wall_owner_id: 'COMMUN',
-                author_name:   currentUserPrenom,
-                author_photo:  currentUserPhoto || null,
+                author_name: currentUserPrenom,
+                author_photo: currentUserPhoto || null,
                 content,
-                image_url:     imageUrl,
-                is_public:     true
+                image_url: imageUrl,
+                is_public: true
             });
             if (insertErr) throw insertErr;
 
@@ -605,7 +563,7 @@
             await loadCommunWall();
 
         } catch(err) {
-            console.error('Erreur publication:', err);
+            console.error('Erreur:', err);
             if (errorDiv) {
                 errorDiv.textContent = '❌ ' + (err.message||'Erreur');
                 errorDiv.style.display = 'block';
@@ -615,16 +573,16 @@
         }
     };
 
-    // ── MURS PERSOS (chacun a son propre mur) ────────────
+    // ── MURS PERSOS ──────────────────────────────────────
     async function loadPersoProfiles() {
         const grid = document.getElementById('profilesGrid');
-        grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">Chargement...</div></div>';
+        grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div></div>';
         try {
-            const { data: profiles, error } = await supabase.from('profiles').select('unique_id,prenom,photo_url,is_online')
+            const { data: profiles, error } = await supabase.from('profiles').select('*')
                 .order('is_online',{ascending:false}).order('prenom',{ascending:true});
             if (error) throw error;
             if (!profiles || profiles.length === 0) {
-                grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">Aucun utilisateur trouvé</div></div>';
+                grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">Aucun utilisateur</div></div>';
                 return;
             }
             const ids = profiles.map(p => p.unique_id);
@@ -635,10 +593,10 @@
             grid.innerHTML = '';
             profiles.forEach(p => {
                 const count = countsMap[p.unique_id] || 0;
-                const card  = document.createElement('div');
+                const card = document.createElement('div');
                 card.className = 'profile-card';
-                card.onclick   = () => openPersoModal(p);
-                const av = p.photo_url ? `<img src="${esc(p.photo_url)}" alt="${esc(p.prenom)}">` : esc(p.prenom[0].toUpperCase());
+                card.onclick = () => openPersoModal(p);
+                const av = p.photo_url ? `<img src="${esc(p.photo_url)}">` : esc(p.prenom[0].toUpperCase());
                 card.innerHTML = `
                     <div class="profile-avatar">${av}<div class="status-dot ${p.is_online?'online':'offline'}"></div></div>
                     <div class="profile-name">${esc(p.prenom)}</div>
@@ -647,44 +605,38 @@
             });
         } catch(err) {
             console.error(err);
-            grid.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Erreur<br><small>${esc(err.message)}</small></div></div>`;
+            grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div></div>';
         }
     }
 
-    // ── MODAL MUR PERSO ──────────────────────────────────
+    // ── MODAL PERSO ──────────────────────────────────────
     async function openPersoModal(user) {
         currentModalUser = user;
         const isMe = user.unique_id === currentUniqueId;
 
-        const av = user.photo_url ? `<img src="${esc(user.photo_url)}" alt="${esc(user.prenom)}">` : esc(user.prenom[0].toUpperCase());
-        document.getElementById('modalAvatar').innerHTML   = av;
-        document.getElementById('modalName').textContent   = user.prenom;
+        const av = user.photo_url ? `<img src="${esc(user.photo_url)}">` : esc(user.prenom[0].toUpperCase());
+        document.getElementById('modalAvatar').innerHTML = av;
+        document.getElementById('modalName').textContent = user.prenom;
         document.getElementById('modalStatus').textContent = 'Mur personnel';
 
-        // Panneau fond : seulement si c'est mon propre mur
         const bgHTML = isMe ? buildBgPanel() : '';
-
-        // Composer : seulement si c'est mon propre mur
         const composerHTML = isMe ? `
             <div class="post-composer">
-                <textarea class="post-composer-input" id="persoInput" placeholder="Écrire sur votre mur…"></textarea>
+                <textarea class="post-composer-input" id="persoInput" placeholder="Votre mur…"></textarea>
                 <div class="image-preview-wrap" id="persoImgPreview">
-                    <img id="persoImgPreviewImg" src="" alt="Aperçu">
+                    <img id="persoImgPreviewImg" src="">
                     <button class="image-preview-remove" onclick="window.removePersoImage()">×</button>
                 </div>
                 <div class="post-composer-actions">
-                    <label class="photo-btn-label" title="Ajouter une photo">
-                        📷<input type="file" id="persoImgInput" accept="image/*">
-                    </label>
+                    <label class="photo-btn-label">📷<input type="file" id="persoImgInput" accept="image/*"></label>
                     <button class="btn btn-primary" id="persoPublishBtn" onclick="window.publishPersoPost()" style="flex:1">📤 Publier</button>
                 </div>
                 <div class="publish-error" id="persoError"></div>
             </div>` : '';
 
         document.getElementById('modalContent').innerHTML = bgHTML + composerHTML +
-            '<div id="persoPostsContainer"><div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">Chargement…</div></div></div>';
+            '<div id="persoPostsContainer"><div class="empty-state"><div class="empty-state-icon">⏳</div></div></div>';
 
-        // Preview photo
         if (isMe) {
             document.getElementById('persoImgInput').addEventListener('change', function() {
                 const file = this.files[0]; if (!file) return;
@@ -695,10 +647,8 @@
                 };
                 reader.readAsDataURL(file);
             });
+            setupBgPanel();
         }
-
-        // Setup panneau fond
-        if (isMe) setupBgPanel();
 
         document.getElementById('modalOverlay').classList.add('open');
         document.body.style.overflow = 'hidden';
@@ -710,8 +660,7 @@
         if (!container) return;
         try {
             const { data: posts, error } = await supabase.from('wall_posts').select('*')
-                .eq('wall_owner_id', ownerId)
-                .eq('is_public', false)
+                .eq('wall_owner_id', ownerId).eq('is_public', false)
                 .order('created_at', { ascending: false });
             if (error) throw error;
             if (!posts || posts.length === 0) {
@@ -725,13 +674,13 @@
             ]);
             container.innerHTML = '';
             posts.forEach(post => {
-                const likes    = (allLikes   ||[]).filter(l => l.post_id === post.id);
+                const likes = (allLikes||[]).filter(l => l.post_id === post.id);
                 const comments = (allComments||[]).filter(c => c.post_id === post.id);
                 container.appendChild(renderPost(post, likes, comments, 'perso'));
             });
         } catch(err) {
             console.error(err);
-            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Erreur<br><small>${esc(err.message)}</small></div></div>`;
+            container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div></div>';
         }
     }
 
@@ -742,46 +691,54 @@
     };
 
     window.publishPersoPost = async function() {
-        const input      = document.getElementById('persoInput');
-        const content    = input ? input.value.trim() : '';
+        const input = document.getElementById('persoInput');
+        const content = input ? input.value.trim() : '';
         const imageInput = document.getElementById('persoImgInput');
-        const errorDiv   = document.getElementById('persoError');
+        const errorDiv = document.getElementById('persoError');
         const publishBtn = document.getElementById('persoPublishBtn');
 
         if (errorDiv) errorDiv.style.display = 'none';
         if (!content) { alert('Écrivez quelque chose !'); return; }
         if (!currentModalUser) return;
-        if (publishBtn) { publishBtn.disabled = true; publishBtn.textContent = '⏳ Publication…'; }
+        if (publishBtn) { publishBtn.disabled = true; publishBtn.textContent = '⏳ Envoi…'; }
 
         try {
             let imageUrl = null;
 
             if (imageInput && imageInput.files && imageInput.files[0]) {
                 const file = imageInput.files[0];
-                const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
-                const fn   = `perso_${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+                const response = await fetch(base64);
+                const blob = await response.blob();
+                const ext = file.type.split('/')[1] || 'jpg';
+                const fn = `perso_${Date.now()}.${ext}`;
 
                 const { error: upErr } = await supabase.storage
                     .from('chat-files')
-                    .upload(fn, file, { contentType: file.type, upsert: false });
+                    .upload(fn, blob, { contentType: file.type });
 
                 if (!upErr) {
                     const { data: urlData } = supabase.storage.from('chat-files').getPublicUrl(fn);
                     imageUrl = urlData.publicUrl;
-                    console.log('✅ Image uploadée:', imageUrl);
+                    console.log('✅ Image:', imageUrl);
                 } else {
-                    console.warn('⚠️ Upload image:', upErr.message);
+                    console.warn('⚠️ Upload:', upErr.message);
                 }
             }
 
             const { error: insertErr } = await supabase.from('wall_posts').insert({
-                author_id:     currentUniqueId,
+                author_id: currentUniqueId,
                 wall_owner_id: currentModalUser.unique_id,
-                author_name:   currentUserPrenom,
-                author_photo:  currentUserPhoto || null,
+                author_name: currentUserPrenom,
+                author_photo: currentUserPhoto || null,
                 content,
-                image_url:     imageUrl,
-                is_public:     false
+                image_url: imageUrl,
+                is_public: false
             });
             if (insertErr) throw insertErr;
 
@@ -790,7 +747,7 @@
             await loadPersoWall(currentModalUser.unique_id);
 
         } catch(err) {
-            console.error('Erreur publication:', err);
+            console.error(err);
             if (errorDiv) {
                 errorDiv.textContent = '❌ ' + (err.message||'Erreur');
                 errorDiv.style.display = 'block';
@@ -802,14 +759,14 @@
 
     function buildBgPanel() {
         const presetsHTML = BG_PRESETS.map(p =>
-            `<div class="bg-preset" title="${p.id}" data-bg-id="${p.id}" style="background:${p.style}" onclick="window.selectPreset('${p.id}','${p.style}')"></div>`
+            `<div class="bg-preset" data-bg-id="${p.id}" style="background:${p.style}" onclick="window.selectPreset('${p.id}','${p.style}')"></div>`
         ).join('');
         return `<div class="bg-panel">
-            <div class="bg-panel-title">🎨 Arrière-fond <span style="font-size:11px;opacity:.55;font-weight:400">(visible par tous)</span></div>
+            <div class="bg-panel-title">🎨 Arrière-fond</div>
             <div class="bg-options">
                 ${presetsHTML}
                 <div class="bg-sep"></div>
-                <input type="color" id="bgColorPicker" value="#667eea" title="Couleur personnalisée">
+                <input type="color" id="bgColorPicker" value="#667eea">
                 <label class="bg-photo-label">🖼️ Photo<input type="file" id="bgPhotoInput" accept="image/*"></label>
                 <button class="bg-reset-btn" onclick="window.resetBg()">↺ Défaut</button>
             </div>
@@ -822,8 +779,15 @@
         const pp = document.getElementById('bgPhotoInput');
         if (pp) pp.addEventListener('change', async function() {
             const file = this.files[0]; if (!file) return;
-            const fn = `bg_${Date.now()}.${file.name.split('.').pop()}`;
-            const { error } = await supabase.storage.from('chat-files').upload(fn, file, { contentType: file.type });
+            const base64 = await new Promise(r => {
+                const reader = new FileReader();
+                reader.onload = () => r(reader.result);
+                reader.readAsDataURL(file);
+            });
+            const response = await fetch(base64);
+            const blob = await response.blob();
+            const fn = `bg_${Date.now()}.jpg`;
+            const { error } = await supabase.storage.from('chat-files').upload(fn, blob);
             if (!error) {
                 const { data: u } = supabase.storage.from('chat-files').getPublicUrl(fn);
                 applyBg('image', u.publicUrl);
@@ -846,12 +810,9 @@
     function renderPost(post, likes, comments, context) {
         const el = document.createElement('div');
         el.className = 'post';
-        el.dataset.postId = post.id;
-        const av = post.author_photo ? `<img src="${esc(post.author_photo)}" alt="${esc(post.author_name)}">` : esc((post.author_name||'?')[0].toUpperCase());
-        const imgHTML = post.image_url ? `<img src="${esc(post.image_url)}" alt="Image" class="post-image" onerror="this.style.display='none'">` : '';
+        const av = post.author_photo ? `<img src="${esc(post.author_photo)}">` : esc((post.author_name||'?')[0].toUpperCase());
+        const imgHTML = post.image_url ? `<img src="${esc(post.image_url)}" class="post-image" onerror="this.style.display='none'">` : '';
         const isLiked = likes.some(l => l.user_id === currentUniqueId);
-
-        // Liste des prénoms des likes
         const likersNames = likes.map(l => l.user_name).join(', ');
         const likesListHTML = likes.length > 0 ? `<div class="likes-list">Aimé par : ${esc(likersNames)}</div>` : '';
 
@@ -874,7 +835,7 @@
             <div class="comments-section" id="comments-${post.id}" style="display:none;">
                 <div id="commentsList-${post.id}"></div>
                 <div class="comment-composer">
-                    <input type="text" class="comment-input" id="ci-${post.id}" placeholder="Écrire un commentaire…"
+                    <input type="text" class="comment-input" id="ci-${post.id}" placeholder="Commenter…"
                         onkeypress="if(event.key==='Enter') window.postComment(${post.id},'${context}')">
                     <button class="comment-send-btn" id="cb-${post.id}" onclick="window.postComment(${post.id},'${context}')">➤</button>
                 </div>
@@ -888,14 +849,13 @@
             const { data: ex } = await supabase.from('wall_likes').select('id')
                 .eq('post_id',postId).eq('user_id',currentUniqueId).maybeSingle();
             if (ex) { await supabase.from('wall_likes').delete().eq('id',ex.id); }
-            else    { await supabase.from('wall_likes').insert({ post_id:postId, user_id:currentUniqueId, user_name:currentUserPrenom }); }
-
+            else { await supabase.from('wall_likes').insert({ post_id:postId, user_id:currentUniqueId, user_name:currentUserPrenom }); }
             if (context === 'commun') await loadCommunWall();
             else if (currentModalUser) await loadPersoWall(currentModalUser.unique_id);
         } catch(err) { console.error(err); }
     };
 
-    // ── COMMENTAIRES ─────────────────────────────────────
+    // ── COMMENTS ─────────────────────────────────────────
     window.toggleComments = async function(postId) {
         const sec = document.getElementById('comments-'+postId);
         const vis = sec.style.display !== 'none';
@@ -914,7 +874,7 @@
             (comments||[]).forEach(c => {
                 const el = document.createElement('div');
                 el.className = 'comment';
-                const av = c.author_photo ? `<img src="${esc(c.author_photo)}" alt="${esc(c.author_name)}">` : esc((c.author_name||'?')[0].toUpperCase());
+                const av = c.author_photo ? `<img src="${esc(c.author_photo)}">` : esc((c.author_name||'?')[0].toUpperCase());
                 el.innerHTML = `
                     <div class="comment-avatar">${av}</div>
                     <div class="comment-content">
@@ -928,8 +888,8 @@
     }
 
     window.postComment = async function(postId, context) {
-        const input   = document.getElementById('ci-'+postId);
-        const btn     = document.getElementById('cb-'+postId);
+        const input = document.getElementById('ci-'+postId);
+        const btn = document.getElementById('cb-'+postId);
         const content = input ? input.value.trim() : '';
         if (!content) return;
         if (btn) btn.disabled = true;
@@ -947,7 +907,6 @@
         finally { if (btn) btn.disabled = false; }
     };
 
-    // ── UTILS ────────────────────────────────────────────
     function esc(str) {
         return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
@@ -955,17 +914,15 @@
         if (!iso) return '';
         const d=new Date(iso), diff=Date.now()-d;
         const m=Math.floor(diff/60000), h=Math.floor(diff/3600000), j=Math.floor(diff/86400000);
-        if (m<1)  return 'À l\'instant';
+        if (m<1) return 'À l\'instant';
         if (m<60) return m+' min';
         if (h<24) return h+' h';
-        if (j<7)  return j+' j';
+        if (j<7) return j+' j';
         return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
     }
 
-    // ── INIT ─────────────────────────────────────────────
     loadGlobalBg();
     loadCommunWall();
-
     document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target===e.currentTarget) window.closeModal(); });
     document.addEventListener('keydown', e => { if (e.key==='Escape') window.closeModal(); });
 </script>
