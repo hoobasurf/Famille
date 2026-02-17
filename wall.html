@@ -6,274 +6,340 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mur — BubbleChat</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: linear-gradient(135deg, #667eea, #764ba2); 
-            min-height: 100vh; 
-            padding: 20px;
-            overflow-x: hidden;
-        }
-        .header {
-            background: rgba(255,255,255,.05);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px 30px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(255,255,255,.15);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .header-title { color: white; font-size: 28px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
-        .header-actions { display: flex; gap: 12px; align-items: center; }
-        .btn {
-            padding: 12px 24px; border-radius: 12px; border: none;
-            font-weight: 700; cursor: pointer; transition: all .3s;
-            font-size: 14px; display: flex; align-items: center; gap: 8px;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #ff6b9d, #c06fff);
-            color: white; box-shadow: 0 4px 15px rgba(192,111,255,.4);
-        }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(192,111,255,.6); }
-        .btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; }
-        .btn-secondary { background: rgba(255,255,255,.1); color: white; border: 2px solid rgba(255,255,255,.2); }
-        .btn-secondary:hover { background: rgba(255,255,255,.2); transform: translateY(-2px); }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap');
 
 ```
-    .tabs { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+    :root {
+        --neon-pink: #ff6b9d;
+        --neon-purple: #c06fff;
+        --neon-glow: 0 0 8px #ff6b9d, 0 0 20px #c06fff, 0 0 40px rgba(192,111,255,.4);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: 'Outfit', sans-serif;
+        min-height: 100vh;
+        padding: 20px;
+        overflow-x: hidden;
+    }
+
+    #bgLayer {
+        position: fixed; inset: 0; z-index: -1;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        transition: background 0.5s ease;
+    }
+    #bgLayer.has-image {
+        background-size: cover !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+    }
+    #bgLayer::after {
+        content: '';
+        position: absolute; inset: 0;
+        background: rgba(0,0,0,0.3);
+    }
+
+    .header {
+        background: rgba(255,255,255,.06);
+        backdrop-filter: blur(14px);
+        border-radius: 20px; padding: 18px 28px; margin-bottom: 28px;
+        border: 1px solid rgba(255,255,255,.15);
+        display: flex; justify-content: space-between; align-items: center;
+        flex-wrap: wrap; gap: 14px;
+    }
+    .header-title { color: white; font-size: 26px; font-weight: 900; letter-spacing: -.5px; }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+
+    .btn {
+        padding: 10px 22px; border-radius: 12px; border: none;
+        font-weight: 700; cursor: pointer; transition: all .3s;
+        font-size: 14px; display: flex; align-items: center; gap: 8px;
+        font-family: 'Outfit', sans-serif;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+        color: white; box-shadow: 0 4px 15px rgba(192,111,255,.4);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--neon-glow); }
+    .btn-primary:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-secondary { background: rgba(255,255,255,.1); color: white; border: 2px solid rgba(255,255,255,.2); }
+    .btn-secondary:hover { background: rgba(255,255,255,.2); transform: translateY(-2px); }
+    .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 10px; }
+
+    .tabs { display: flex; gap: 12px; margin-bottom: 28px; }
     .tab {
-        padding: 14px 28px; background: rgba(255,255,255,.08);
-        border: 2px solid rgba(255,255,255,.15); border-radius: 14px;
-        color: white; font-weight: 600; cursor: pointer; transition: all .3s; font-size: 15px;
+        padding: 12px 28px; background: rgba(255,255,255,.08);
+        border: 2px solid rgba(255,255,255,.12); border-radius: 14px;
+        color: white; font-weight: 700; cursor: pointer; transition: all .3s;
+        font-size: 15px; font-family: 'Outfit', sans-serif;
     }
     .tab:hover { background: rgba(255,255,255,.15); transform: translateY(-2px); }
     .tab.active {
-        background: linear-gradient(135deg, rgba(255,107,157,.3), rgba(192,111,255,.3));
-        border-color: rgba(255,107,157,.6); box-shadow: 0 0 20px rgba(255,107,157,.4);
+        background: linear-gradient(135deg, rgba(255,107,157,.25), rgba(192,111,255,.25));
+        border-color: var(--neon-pink);
+        box-shadow: 0 0 16px rgba(255,107,157,.5), inset 0 0 20px rgba(255,107,157,.08);
     }
 
     .profiles-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 24px; margin-bottom: 40px;
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        gap: 22px; margin-bottom: 36px;
     }
     .profile-card {
-        background: rgba(255,255,255,.05); backdrop-filter: blur(10px);
-        border-radius: 18px; padding: 20px; border: 3px solid transparent;
+        background: rgba(255,255,255,.06); backdrop-filter: blur(12px);
+        border-radius: 20px; padding: 22px; border: 2px solid rgba(255,255,255,.1);
         cursor: pointer; transition: all .4s cubic-bezier(.34,1.56,.64,1);
-        position: relative; overflow: hidden;
+        position: relative; overflow: hidden; text-align: center;
     }
     .profile-card:hover {
-        transform: translateY(-8px) scale(1.02); border-color: rgba(255,107,157,.8);
-        box-shadow: 0 0 30px rgba(255,107,157,.6), 0 10px 40px rgba(0,0,0,.4);
+        transform: translateY(-8px) scale(1.02); border-color: var(--neon-pink);
+        box-shadow: var(--neon-glow), 0 12px 40px rgba(0,0,0,.4);
     }
-    .profile-card::before {
-        content: ''; position: absolute; inset: -2px; border-radius: 18px; padding: 3px;
-        background: linear-gradient(135deg, #ff6b9d, #c06fff, #64b5f6);
-        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0; transition: opacity .4s;
-    }
-    .profile-card:hover::before { opacity: 1; animation: neonPulse 2s ease-in-out infinite; }
-    @keyframes neonPulse { 0%,100%{opacity:.6} 50%{opacity:1} }
-
     .profile-avatar {
-        width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 16px;
-        background: linear-gradient(135deg, #ff6b9d, #c06fff);
-        border: 4px solid rgba(255,255,255,.3); overflow: hidden;
+        width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 14px;
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+        border: 3px solid rgba(255,255,255,.25); overflow: hidden;
         display: flex; align-items: center; justify-content: center;
-        font-size: 48px; color: white; font-weight: 700; position: relative;
+        font-size: 40px; color: white; font-weight: 900; position: relative;
     }
     .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .status-indicator {
-        position: absolute; bottom: 5px; right: 5px;
-        width: 20px; height: 20px; border-radius: 50%; border: 3px solid rgba(255,255,255,.9);
+    .status-dot {
+        position: absolute; bottom: 4px; right: 4px;
+        width: 18px; height: 18px; border-radius: 50%;
+        border: 3px solid rgba(15,15,25,.9);
     }
-    .status-indicator.online { background: #4caf50; animation: pulse 2s infinite; }
-    .status-indicator.offline { background: #999; }
-    @keyframes pulse { 0%,100%{box-shadow:0 0 8px #4caf50} 50%{box-shadow:0 0 18px #4caf50} }
-    .profile-name { color: white; font-weight: 700; font-size: 18px; text-align: center; margin-bottom: 8px; }
-    .profile-posts-count { color: rgba(255,255,255,.6); font-size: 14px; text-align: center; }
+    .status-dot.online { background: #4caf50; animation: pulseDot 2s infinite; }
+    .status-dot.offline { background: #555; }
+    @keyframes pulseDot { 0%,100%{box-shadow:0 0 4px #4caf50} 50%{box-shadow:0 0 14px #4caf50} }
+    .profile-name { color: white; font-weight: 700; font-size: 17px; margin-bottom: 6px; }
+    .profile-count { color: rgba(255,255,255,.55); font-size: 13px; }
 
     /* MODAL */
     .modal-overlay {
-        position: fixed; inset: 0; background: rgba(0,0,0,.85);
-        backdrop-filter: blur(8px); z-index: 9999;
+        position: fixed; inset: 0; background: rgba(0,0,0,.8);
+        backdrop-filter: blur(10px); z-index: 9999;
         display: none; align-items: center; justify-content: center; padding: 20px;
     }
-    .modal-overlay.open { display: flex; animation: fadeIn .3s; }
+    .modal-overlay.open { display: flex; animation: fadeIn .25s; }
     @keyframes fadeIn { from{opacity:0} to{opacity:1} }
     .modal {
-        background: rgba(20,20,30,.98); border-radius: 24px; width: 100%;
-        max-width: 700px; max-height: 90vh; display: flex; flex-direction: column;
-        border: 2px solid rgba(255,107,157,.3); box-shadow: 0 25px 80px rgba(0,0,0,.8);
-        animation: slideUp .4s cubic-bezier(.34,1.56,.64,1);
+        background: rgba(15,15,25,.97); border-radius: 24px; width: 100%;
+        max-width: 680px; max-height: 90vh; display: flex; flex-direction: column;
+        border: 2px solid rgba(255,107,157,.3);
+        box-shadow: 0 0 60px rgba(192,111,255,.2), 0 30px 80px rgba(0,0,0,.8);
+        animation: slideUp .35s cubic-bezier(.34,1.56,.64,1);
     }
-    @keyframes slideUp { from{opacity:0;transform:translateY(50px) scale(.9)} to{opacity:1;transform:translateY(0) scale(1)} }
+    @keyframes slideUp { from{opacity:0;transform:translateY(40px) scale(.92)} to{opacity:1;transform:none} }
     .modal-header {
-        padding: 24px 28px; border-bottom: 2px solid rgba(255,255,255,.1);
-        display: flex; align-items: center; gap: 18px; flex-shrink: 0;
+        padding: 22px 26px; border-bottom: 1px solid rgba(255,255,255,.08);
+        display: flex; align-items: center; gap: 16px; flex-shrink: 0;
     }
     .modal-header-avatar {
-        width: 60px; height: 60px; border-radius: 50%;
-        background: linear-gradient(135deg, #ff6b9d, #c06fff);
-        overflow: hidden; border: 3px solid rgba(255,255,255,.3);
+        width: 54px; height: 54px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+        overflow: hidden; border: 2px solid rgba(255,255,255,.25);
         display: flex; align-items: center; justify-content: center;
-        font-size: 26px; color: white; font-weight: 700;
+        font-size: 22px; color: white; font-weight: 900;
     }
     .modal-header-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .modal-header-info { flex: 1; }
-    .modal-header-name { color: white; font-weight: 700; font-size: 22px; margin-bottom: 4px; }
-    .modal-header-status { color: rgba(255,255,255,.6); font-size: 14px; }
+    .modal-header-name { color: white; font-weight: 700; font-size: 20px; }
+    .modal-header-status { color: rgba(255,255,255,.5); font-size: 13px; margin-top: 2px; }
     .modal-close {
-        width: 40px; height: 40px; border-radius: 50%;
-        background: rgba(255,255,255,.1); border: 2px solid rgba(255,255,255,.2);
-        color: white; font-size: 24px; display: flex; align-items: center;
+        width: 38px; height: 38px; border-radius: 50%;
+        background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+        color: white; font-size: 22px; display: flex; align-items: center;
         justify-content: center; cursor: pointer; transition: all .3s;
     }
-    .modal-close:hover { background: rgba(255,255,255,.2); transform: rotate(90deg); }
-    .modal-content { flex: 1; overflow-y: auto; padding: 24px 28px; }
-    .modal-content::-webkit-scrollbar { width: 8px; }
-    .modal-content::-webkit-scrollbar-track { background: rgba(255,255,255,.05); border-radius: 10px; }
-    .modal-content::-webkit-scrollbar-thumb { background: linear-gradient(135deg,#ff6b9d,#c06fff); border-radius: 10px; }
+    .modal-close:hover { background: rgba(255,107,157,.3); transform: rotate(90deg); }
+    .modal-content { flex: 1; overflow-y: auto; padding: 22px 26px; }
+    .modal-content::-webkit-scrollbar { width: 6px; }
+    .modal-content::-webkit-scrollbar-track { background: transparent; }
+    .modal-content::-webkit-scrollbar-thumb { background: linear-gradient(135deg,var(--neon-pink),var(--neon-purple)); border-radius: 10px; }
     .modal-footer {
-        padding: 20px 28px; border-top: 2px solid rgba(255,255,255,.1);
-        display: flex; gap: 12px; flex-shrink: 0;
+        padding: 18px 26px; border-top: 1px solid rgba(255,255,255,.08);
+        display: flex; gap: 10px; flex-shrink: 0;
     }
 
     /* COMPOSER */
     .post-composer {
-        background: rgba(255,255,255,.05); backdrop-filter: blur(10px);
-        border-radius: 18px; padding: 20px 24px; margin-bottom: 24px;
-        border: 2px solid rgba(255,255,255,.15);
+        background: rgba(255,255,255,.04); border-radius: 18px;
+        padding: 18px 20px; margin-bottom: 22px;
+        border: 1px solid rgba(255,255,255,.12);
     }
     .post-composer-input {
-        width: 100%; background: rgba(255,255,255,.08);
-        border: 2px solid rgba(255,255,255,.15); border-radius: 14px;
-        padding: 14px 18px; color: white; font-size: 15px;
-        resize: vertical; min-height: 80px; font-family: inherit; margin-bottom: 12px;
+        width: 100%; background: rgba(255,255,255,.07);
+        border: 1.5px solid rgba(255,255,255,.12); border-radius: 14px;
+        padding: 13px 16px; color: white; font-size: 15px;
+        resize: vertical; min-height: 78px; font-family: 'Outfit', sans-serif;
+        margin-bottom: 12px; transition: border-color .2s;
     }
-    .post-composer-input:focus { outline: none; background: rgba(255,255,255,.12); border-color: rgba(255,107,157,.5); }
-    .post-composer-input::placeholder { color: rgba(255,255,255,.5); }
+    .post-composer-input:focus { outline: none; border-color: var(--neon-pink); background: rgba(255,255,255,.1); }
+    .post-composer-input::placeholder { color: rgba(255,255,255,.4); }
 
-    /* FIX PHOTO : bouton label visible + prévisualisation */
-    .photo-btn-label {
-        display: inline-flex; align-items: center; justify-content: center;
-        width: 42px; height: 42px; border-radius: 50%;
-        background: rgba(255,255,255,.1); border: 2px solid rgba(255,255,255,.2);
-        cursor: pointer; font-size: 20px; transition: all .3s; flex-shrink: 0;
-    }
-    .photo-btn-label:hover { background: rgba(255,255,255,.25); transform: scale(1.1); }
-    .photo-btn-label input[type=file] { display: none; }
-
-    .image-preview-wrap {
-        position: relative; margin-bottom: 12px; display: none;
-    }
+    .image-preview-wrap { position: relative; margin-bottom: 12px; display: none; }
     .image-preview-wrap img {
-        width: 100%; max-height: 200px; object-fit: cover;
-        border-radius: 12px; border: 2px solid rgba(255,107,157,.4);
+        width: 100%; max-height: 180px; object-fit: cover;
+        border-radius: 12px; border: 2px solid var(--neon-pink);
+        box-shadow: 0 0 12px rgba(255,107,157,.4);
     }
     .image-preview-remove {
         position: absolute; top: 8px; right: 8px;
         width: 28px; height: 28px; border-radius: 50%;
-        background: rgba(0,0,0,.7); color: white; border: none;
-        font-size: 16px; cursor: pointer; display: flex;
-        align-items: center; justify-content: center;
-        transition: background .2s;
+        background: rgba(0,0,0,.75); color: white; border: none;
+        font-size: 15px; cursor: pointer; display: flex;
+        align-items: center; justify-content: center; transition: background .2s;
     }
-    .image-preview-remove:hover { background: rgba(255,107,157,.8); }
+    .image-preview-remove:hover { background: var(--neon-pink); }
 
     .post-composer-actions { display: flex; gap: 10px; align-items: center; }
+    .photo-btn-label {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 42px; height: 42px; border-radius: 50%;
+        background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.2);
+        cursor: pointer; font-size: 18px; transition: all .3s; flex-shrink: 0;
+    }
+    .photo-btn-label:hover { background: rgba(255,107,157,.25); border-color: var(--neon-pink); transform: scale(1.1); }
+    .photo-btn-label input[type=file] { display: none; }
     .publish-error {
-        color: #ff6b9d; font-size: 13px; margin-top: 8px;
+        color: var(--neon-pink); font-size: 13px; margin-top: 8px;
         padding: 8px 12px; background: rgba(255,107,157,.1);
         border-radius: 8px; border: 1px solid rgba(255,107,157,.3); display: none;
     }
 
-    /* POSTS */
+    /* POST avec NÉON encadré */
     .post {
-        background: rgba(255,255,255,.05); backdrop-filter: blur(10px);
-        border-radius: 18px; padding: 20px 24px; margin-bottom: 20px;
-        border: 2px solid rgba(255,255,255,.1); animation: slideIn .4s;
+        border-radius: 18px; padding: 20px 22px; margin-bottom: 22px;
+        position: relative;
+        background: rgba(15,15,25,.88); backdrop-filter: blur(10px);
+        animation: slideIn .35s ease;
+        /* neon border via box-shadow multicouche */
+        box-shadow:
+            0 0 0 2px var(--neon-pink),
+            0 0 10px var(--neon-pink),
+            0 0 25px rgba(192,111,255,.5),
+            0 0 50px rgba(192,111,255,.2);
     }
-    @keyframes slideIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-    .post-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    /* Animation pulsation néon */
+    .post { animation: slideIn .35s ease, neonPulse 3s ease-in-out infinite; }
+    @keyframes neonPulse {
+        0%,100% {
+            box-shadow: 0 0 0 2px var(--neon-pink), 0 0 8px var(--neon-pink), 0 0 20px rgba(192,111,255,.4), 0 0 40px rgba(192,111,255,.15);
+        }
+        50% {
+            box-shadow: 0 0 0 2px var(--neon-purple), 0 0 14px var(--neon-purple), 0 0 35px rgba(255,107,157,.6), 0 0 60px rgba(255,107,157,.25);
+        }
+    }
+    @keyframes slideIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+
+    .post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
     .post-avatar {
-        width: 48px; height: 48px; border-radius: 50%;
-        background: linear-gradient(135deg, #ff6b9d, #c06fff);
-        overflow: hidden; border: 3px solid rgba(255,255,255,.3);
+        width: 44px; height: 44px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+        overflow: hidden; border: 2px solid rgba(255,255,255,.2);
         display: flex; align-items: center; justify-content: center;
-        font-size: 20px; color: white; font-weight: 700; flex-shrink: 0;
+        font-size: 18px; color: white; font-weight: 700; flex-shrink: 0;
     }
     .post-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .post-author-info { flex: 1; }
-    .post-author-name { color: white; font-weight: 700; font-size: 16px; }
-    .post-time { color: rgba(255,255,255,.5); font-size: 13px; margin-top: 2px; }
-    .post-content { color: white; font-size: 15px; line-height: 1.6; margin-bottom: 14px; white-space: pre-wrap; }
-    .post-image { width: 100%; border-radius: 12px; margin-bottom: 14px; }
-    .post-actions { display: flex; gap: 20px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.1); }
-    .post-action {
-        display: flex; align-items: center; gap: 8px;
-        color: rgba(255,255,255,.7); font-size: 14px; font-weight: 600;
-        cursor: pointer; transition: all .3s; padding: 8px 14px; border-radius: 10px;
+    .post-author-name { color: white; font-weight: 700; font-size: 15px; }
+    .post-time { color: rgba(255,255,255,.45); font-size: 12px; margin-top: 2px; }
+    .post-content { color: rgba(255,255,255,.92); font-size: 15px; line-height: 1.65; margin-bottom: 14px; white-space: pre-wrap; }
+    .post-image { width: 100%; border-radius: 12px; margin-bottom: 14px; display: block; }
+    .post-actions {
+        display: flex; gap: 16px; padding-top: 12px;
+        border-top: 1px solid rgba(255,255,255,.08);
     }
-    .post-action:hover { background: rgba(255,255,255,.1); color: white; }
-    .post-action.liked { color: #ff6b9d; }
-    .post-action-icon { font-size: 18px; }
+    .post-action {
+        display: flex; align-items: center; gap: 7px;
+        color: rgba(255,255,255,.6); font-size: 14px; font-weight: 600;
+        cursor: pointer; transition: all .25s; padding: 7px 12px; border-radius: 10px;
+    }
+    .post-action:hover { background: rgba(255,255,255,.08); color: white; }
+    .post-action.liked { color: var(--neon-pink); }
 
     /* COMMENTS */
-    .comments-section {
-        margin-top: 16px; padding-top: 16px;
-        border-top: 1px solid rgba(255,255,255,.1);
-    }
-    .comment { display: flex; gap: 12px; margin-bottom: 14px; }
+    .comments-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.07); }
+    .comment { display: flex; gap: 10px; margin-bottom: 12px; }
     .comment-avatar {
-        width: 36px; height: 36px; border-radius: 50%;
-        background: linear-gradient(135deg, #ff6b9d, #c06fff);
-        overflow: hidden; border: 2px solid rgba(255,255,255,.3);
+        width: 32px; height: 32px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+        overflow: hidden; border: 2px solid rgba(255,255,255,.2);
         display: flex; align-items: center; justify-content: center;
-        font-size: 16px; color: white; font-weight: 700; flex-shrink: 0;
+        font-size: 13px; color: white; font-weight: 700; flex-shrink: 0;
     }
     .comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .comment-content { flex: 1; background: rgba(255,255,255,.08); border-radius: 12px; padding: 10px 14px; }
-    .comment-author { color: white; font-weight: 700; font-size: 14px; margin-bottom: 4px; }
-    .comment-text { color: rgba(255,255,255,.9); font-size: 14px; line-height: 1.5; }
-    .comment-time { color: rgba(255,255,255,.4); font-size: 12px; margin-top: 4px; }
-
-    /* FIX COMMENTAIRES : champ + bouton envoyer */
-    .comment-composer { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+    .comment-content { flex: 1; background: rgba(255,255,255,.07); border-radius: 12px; padding: 9px 13px; }
+    .comment-author { color: white; font-weight: 700; font-size: 13px; margin-bottom: 3px; }
+    .comment-text { color: rgba(255,255,255,.85); font-size: 13px; line-height: 1.5; }
+    .comment-time { color: rgba(255,255,255,.35); font-size: 11px; margin-top: 4px; }
+    .comment-composer { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
     .comment-input {
-        flex: 1; background: rgba(255,255,255,.08);
-        border: 2px solid rgba(255,255,255,.15); border-radius: 20px;
-        padding: 10px 16px; color: white; font-size: 14px; font-family: inherit;
+        flex: 1; background: rgba(255,255,255,.07);
+        border: 1.5px solid rgba(255,255,255,.12); border-radius: 20px;
+        padding: 9px 15px; color: white; font-size: 13px; font-family: 'Outfit', sans-serif;
+        transition: border-color .2s;
     }
-    .comment-input:focus { outline: none; background: rgba(255,255,255,.12); border-color: rgba(255,107,157,.5); }
-    .comment-input::placeholder { color: rgba(255,255,255,.5); }
+    .comment-input:focus { outline: none; border-color: var(--neon-pink); }
+    .comment-input::placeholder { color: rgba(255,255,255,.4); }
     .comment-send-btn {
-        width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
-        background: linear-gradient(135deg, #ff6b9d, #c06fff);
-        border: none; color: white; font-size: 16px;
-        cursor: pointer; display: flex; align-items: center; justify-content: center;
-        transition: all .3s; box-shadow: 0 2px 10px rgba(192,111,255,.4);
+        width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+        border: none; color: white; font-size: 15px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: all .25s; box-shadow: 0 2px 10px rgba(192,111,255,.4);
     }
-    .comment-send-btn:hover { transform: scale(1.1); box-shadow: 0 4px 15px rgba(192,111,255,.6); }
-    .comment-send-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .comment-send-btn:hover { transform: scale(1.12); box-shadow: var(--neon-glow); }
+    .comment-send-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
-    .empty-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,.5); }
-    .empty-state-icon { font-size: 64px; margin-bottom: 16px; }
-    .empty-state-text { font-size: 16px; line-height: 1.6; }
+    /* PANNEAU FOND */
+    .bg-panel {
+        background: rgba(255,255,255,.05); border-radius: 16px;
+        padding: 16px 18px; margin-bottom: 22px;
+        border: 1px solid rgba(255,255,255,.12);
+    }
+    .bg-panel-title {
+        color: white; font-weight: 700; font-size: 14px; margin-bottom: 12px;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .bg-options { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .bg-preset {
+        width: 36px; height: 36px; border-radius: 10px; cursor: pointer;
+        border: 2px solid transparent; transition: all .25s; flex-shrink: 0;
+    }
+    .bg-preset:hover { transform: scale(1.2); border-color: white; }
+    .bg-preset.selected { border-color: var(--neon-pink); box-shadow: 0 0 10px rgba(255,107,157,.6); }
+    .bg-sep { width: 1px; height: 32px; background: rgba(255,255,255,.15); }
+    input[type=color] {
+        width: 36px; height: 36px; border-radius: 10px;
+        border: 2px solid rgba(255,255,255,.2); background: none;
+        cursor: pointer; padding: 2px;
+    }
+    .bg-photo-label {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 7px 12px; border-radius: 10px;
+        background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.2);
+        color: white; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .25s;
+    }
+    .bg-photo-label:hover { background: rgba(255,107,157,.2); border-color: var(--neon-pink); }
+    .bg-photo-label input[type=file] { display: none; }
+    .bg-reset-btn {
+        padding: 7px 12px; border-radius: 10px;
+        background: rgba(255,255,255,.07); border: 1.5px solid rgba(255,255,255,.15);
+        color: rgba(255,255,255,.7); font-size: 13px; font-weight: 600;
+        cursor: pointer; transition: all .25s; font-family: 'Outfit', sans-serif;
+    }
+    .bg-reset-btn:hover { background: rgba(255,255,255,.15); color: white; }
 
-    @media (max-width: 768px) {
+    .empty-state { text-align: center; padding: 50px 20px; color: rgba(255,255,255,.45); }
+    .empty-state-icon { font-size: 54px; margin-bottom: 14px; }
+    .empty-state-text { font-size: 15px; line-height: 1.6; }
+
+    @media (max-width: 680px) {
         body { padding: 10px; }
-        .header { padding: 16px 20px; }
-        .header-title { font-size: 22px; }
-        .profiles-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
-        .profile-avatar { width: 90px; height: 90px; font-size: 36px; }
-        .modal { max-width: 100%; border-radius: 20px 20px 0 0; max-height: 85vh; }
-        .modal-header, .modal-content, .modal-footer { padding: 16px 20px; }
-        .btn { padding: 10px 18px; font-size: 13px; }
+        .profiles-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+        .profile-avatar { width: 78px; height: 78px; font-size: 30px; }
+        .modal { border-radius: 20px 20px 0 0; max-height: 88vh; }
+        .modal-header, .modal-content, .modal-footer { padding: 14px 16px; }
     }
 </style>
 ```
@@ -282,17 +348,19 @@
 <body>
 
 ```
+<div id="bgLayer"></div>
+
 <div class="header">
-    <div class="header-title">📰 Mur</div>
+    <div class="header-title">📰 Mur BubbleChat</div>
     <div class="header-actions">
-        <button class="btn btn-secondary" onclick="window.location.href='chat.html'">💬 Chat</button>
-        <button class="btn btn-secondary" onclick="window.location.href='arcade.html'">🕹️ Arcade</button>
+        <button class="btn btn-secondary btn-sm" onclick="window.location.href='chat.html'">💬 Chat</button>
+        <button class="btn btn-secondary btn-sm" onclick="window.location.href='arcade.html'">🕹️ Arcade</button>
     </div>
 </div>
 
 <div class="tabs">
-    <div class="tab active" id="tabPublic">🌐 Mur général</div>
-    <div class="tab" id="tabFriends">👥 Mes amis</div>
+    <div class="tab active" id="tabCommun">🌐 Mur commun</div>
+    <div class="tab"        id="tabPerso" >🔒 Mur personnel</div>
 </div>
 
 <div class="profiles-grid" id="profilesGrid"></div>
@@ -300,10 +368,10 @@
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <div class="modal-header">
-            <div class="modal-header-avatar" id="modalAvatar">💬</div>
+            <div class="modal-header-avatar" id="modalAvatar">👤</div>
             <div class="modal-header-info">
                 <div class="modal-header-name" id="modalName">Utilisateur</div>
-                <div class="modal-header-status" id="modalStatus">Profil</div>
+                <div class="modal-header-status" id="modalStatus">Mur</div>
             </div>
             <div class="modal-close" onclick="closeModal()">×</div>
         </div>
@@ -330,119 +398,148 @@
         fingerprint = Math.random().toString(36).slice(2) + Date.now().toString(36);
         localStorage.setItem('browserFingerprint', fingerprint);
     }
-    let currentUniqueId  = currentUserPrenom + '_' + fingerprint;
-    let currentView      = 'public';
-    let currentModalUser = null;
+    const currentUniqueId = currentUserPrenom + '_' + fingerprint;
+    let currentView       = 'commun';
+    let currentModalUser  = null;
 
-    // ── TABS ──────────────────────────────────────────────
-    document.getElementById('tabPublic').addEventListener('click', function () {
-        currentView = 'public';
+    // Présets de fond
+    const BG_PRESETS = [
+        { id:'default', style:'linear-gradient(135deg,#667eea,#764ba2)' },
+        { id:'dark',    style:'linear-gradient(135deg,#0f0f1a,#1a1a2e)' },
+        { id:'light',   style:'linear-gradient(135deg,#e8eaf6,#fce4ec)' },
+        { id:'sunset',  style:'linear-gradient(135deg,#ff6b6b,#feca57)' },
+        { id:'ocean',   style:'linear-gradient(135deg,#00b4d8,#0077b6)' },
+        { id:'forest',  style:'linear-gradient(135deg,#2d6a4f,#1b4332)' },
+    ];
+
+    // ── ARRIÈRE-FOND ─────────────────────────────────────
+    async function loadGlobalBg() {
+        try {
+            const { data } = await supabase
+                .from('wall_settings').select('bg_value,bg_type')
+                .eq('key','global_bg').maybeSingle();
+            if (data) applyBg(data.bg_type, data.bg_value, false);
+        } catch(e) {}
+    }
+
+    async function saveGlobalBg(type, value) {
+        try {
+            await supabase.from('wall_settings').upsert(
+                { key:'global_bg', bg_type:type, bg_value:value, updated_by:currentUniqueId },
+                { onConflict:'key' }
+            );
+        } catch(e) { console.warn('wall_settings:', e.message); }
+    }
+
+    function applyBg(type, value, save=true) {
+        const layer = document.getElementById('bgLayer');
+        if (type === 'image') {
+            layer.style.background = `url('${value}') center/cover no-repeat`;
+            layer.classList.add('has-image');
+        } else {
+            layer.style.background = value;
+            layer.classList.remove('has-image');
+        }
+        if (save) saveGlobalBg(type, value);
+    }
+
+    window.selectPreset = function(id, style) {
+        document.querySelectorAll('.bg-preset').forEach(e => e.classList.remove('selected'));
+        const el = document.querySelector(`[data-bg-id="${id}"]`);
+        if (el) el.classList.add('selected');
+        applyBg('gradient', style);
+    };
+    window.resetBg = function() { applyBg('gradient','linear-gradient(135deg,#667eea,#764ba2)'); };
+
+    // ── TABS ─────────────────────────────────────────────
+    document.getElementById('tabCommun').addEventListener('click', function() {
+        currentView = 'commun';
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        loadProfiles();
+        this.classList.add('active'); loadProfiles();
     });
-    document.getElementById('tabFriends').addEventListener('click', function () {
-        currentView = 'friends';
+    document.getElementById('tabPerso').addEventListener('click', function() {
+        currentView = 'perso';
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        loadProfiles();
+        this.classList.add('active'); loadProfiles();
     });
 
-    // ── CHARGER PROFILS ───────────────────────────────────
+    // ── PROFILS ───────────────────────────────────────────
     async function loadProfiles() {
         const grid = document.getElementById('profilesGrid');
         grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">Chargement...</div></div>';
         try {
-            const { data: profiles, error: pErr } = await supabase
-                .from('profiles')
-                .select('unique_id, prenom, photo_url, is_online')
+            const { data: profiles, error } = await supabase
+                .from('profiles').select('unique_id,prenom,photo_url,is_online')
                 .neq('unique_id', currentUniqueId)
-                .order('is_online', { ascending: false })
-                .order('prenom',    { ascending: true });
-
-            if (pErr) throw pErr;
+                .order('is_online',{ascending:false}).order('prenom',{ascending:true});
+            if (error) throw error;
             if (!profiles || profiles.length === 0) {
                 grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">Aucun utilisateur trouvé</div></div>';
                 return;
             }
-
             const ids = profiles.map(p => p.unique_id);
-            const { data: postsRows } = await supabase
-                .from('wall_posts').select('wall_owner_id')
-                .in('wall_owner_id', ids).eq('is_public', currentView === 'public');
-
+            const { data: postsRows } = await supabase.from('wall_posts').select('wall_owner_id')
+                .in('wall_owner_id', ids).eq('is_public', currentView === 'commun');
             const countsMap = {};
-            (postsRows || []).forEach(r => {
-                countsMap[r.wall_owner_id] = (countsMap[r.wall_owner_id] || 0) + 1;
-            });
-
+            (postsRows||[]).forEach(r => { countsMap[r.wall_owner_id] = (countsMap[r.wall_owner_id]||0)+1; });
             grid.innerHTML = '';
-            profiles.forEach(profile => {
-                const count = countsMap[profile.unique_id] || 0;
+            profiles.forEach(p => {
+                const count = countsMap[p.unique_id] || 0;
                 const card  = document.createElement('div');
                 card.className = 'profile-card';
-                card.onclick   = () => openModal(profile);
-                const av = profile.photo_url
-                    ? `<img src="${esc(profile.photo_url)}" alt="${esc(profile.prenom)}">`
-                    : esc(profile.prenom[0].toUpperCase());
+                card.onclick   = () => openModal(p);
+                const av = p.photo_url ? `<img src="${esc(p.photo_url)}" alt="${esc(p.prenom)}">` : esc(p.prenom[0].toUpperCase());
                 card.innerHTML = `
-                    <div class="profile-avatar">
-                        ${av}
-                        <div class="status-indicator ${profile.is_online ? 'online' : 'offline'}"></div>
-                    </div>
-                    <div class="profile-name">${esc(profile.prenom)}</div>
-                    <div class="profile-posts-count">${count} publication${count > 1 ? 's' : ''}</div>
-                `;
+                    <div class="profile-avatar">${av}<div class="status-dot ${p.is_online?'online':'offline'}"></div></div>
+                    <div class="profile-name">${esc(p.prenom)}</div>
+                    <div class="profile-count">${count} publication${count>1?'s':''}</div>`;
                 grid.appendChild(card);
             });
-        } catch (err) {
-            console.error('Erreur profils:', err);
-            grid.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Erreur de chargement<br><small style="font-size:12px;opacity:.6">${esc(err.message)}</small></div></div>`;
+        } catch(err) {
+            console.error(err);
+            grid.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Erreur<br><small>${esc(err.message)}</small></div></div>`;
         }
     }
 
-    // ── OUVRIR MODAL ──────────────────────────────────────
+    // ── MODAL ────────────────────────────────────────────
     async function openModal(user) {
         currentModalUser = user;
-        const av = user.photo_url
-            ? `<img src="${esc(user.photo_url)}" alt="${esc(user.prenom)}">`
-            : esc(user.prenom[0].toUpperCase());
+        const isPerso = currentView === 'perso';
+        const isMe    = user.unique_id === currentUniqueId;
+
+        const av = user.photo_url ? `<img src="${esc(user.photo_url)}" alt="${esc(user.prenom)}">` : esc(user.prenom[0].toUpperCase());
         document.getElementById('modalAvatar').innerHTML   = av;
         document.getElementById('modalName').textContent   = user.prenom;
-        document.getElementById('modalStatus').textContent = currentView === 'public' ? 'Mur public' : 'Mur personnel';
+        document.getElementById('modalStatus').textContent = isPerso ? 'Mur personnel' : 'Mur commun';
 
-        const composerHTML = currentView === 'public' ? `
+        // Panneau fond : seulement sur mur perso ET si c'est son propre profil
+        const bgHTML = (isPerso && isMe) ? buildBgPanel() : '';
+
+        // Composer : seulement sur mur commun
+        const composerHTML = !isPerso ? `
             <div class="post-composer">
-                <textarea class="post-composer-input" id="postInput"
-                    placeholder="Écrire sur le mur de ${esc(user.prenom)}…"></textarea>
-
-                <!-- FIX PHOTO : prévisualisation + suppression -->
+                <textarea class="post-composer-input" id="postInput" placeholder="Écrire sur le mur de ${esc(user.prenom)}…"></textarea>
                 <div class="image-preview-wrap" id="imagePreviewWrap">
                     <img id="imagePreviewImg" src="" alt="Aperçu">
-                    <button class="image-preview-remove" onclick="removeImage()" title="Supprimer l'image">×</button>
+                    <button class="image-preview-remove" onclick="window.removeImage()">×</button>
                 </div>
-
                 <div class="post-composer-actions">
                     <label class="photo-btn-label" title="Ajouter une photo">
-                        📷
-                        <input type="file" id="postImageInput" accept="image/*">
+                        📷<input type="file" id="postImageInput" accept="image/*">
                     </label>
-                    <button class="btn btn-primary" id="publishBtn" onclick="window.publishPost()" style="flex:1">
-                        📤 Publier
-                    </button>
+                    <button class="btn btn-primary" id="publishBtn" onclick="window.publishPost()" style="flex:1">📤 Publier</button>
                 </div>
                 <div class="publish-error" id="publishError"></div>
-            </div>
-        ` : '';
+            </div>` : '';
 
-        document.getElementById('modalContent').innerHTML = composerHTML +
+        document.getElementById('modalContent').innerHTML = bgHTML + composerHTML +
             '<div id="postsContainer"><div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-text">Chargement…</div></div></div>';
 
-        // Écouter le changement de fichier pour la prévisualisation
-        if (currentView === 'public') {
-            document.getElementById('postImageInput').addEventListener('change', function () {
-                const file = this.files[0];
-                if (!file) return;
+        // Preview photo
+        const imgInput = document.getElementById('postImageInput');
+        if (imgInput) {
+            imgInput.addEventListener('change', function() {
+                const file = this.files[0]; if (!file) return;
                 const reader = new FileReader();
                 reader.onload = e => {
                     document.getElementById('imagePreviewImg').src = e.target.result;
@@ -452,122 +549,129 @@
             });
         }
 
+        // Setup panneau fond
+        if (isPerso && isMe) setupBgPanel();
+
         document.getElementById('modalOverlay').classList.add('open');
         document.body.style.overflow = 'hidden';
         await loadPosts(user.unique_id);
     }
 
-    window.removeImage = function () {
-        document.getElementById('postImageInput').value = '';
-        document.getElementById('imagePreviewImg').src  = '';
-        document.getElementById('imagePreviewWrap').style.display = 'none';
-    };
+    function buildBgPanel() {
+        const presetsHTML = BG_PRESETS.map(p =>
+            `<div class="bg-preset" title="${p.id}" data-bg-id="${p.id}" style="background:${p.style}" onclick="window.selectPreset('${p.id}','${p.style}')"></div>`
+        ).join('');
+        return `<div class="bg-panel">
+            <div class="bg-panel-title">🎨 Arrière-fond <span style="font-size:11px;opacity:.55;font-weight:400">(visible par tous)</span></div>
+            <div class="bg-options">
+                ${presetsHTML}
+                <div class="bg-sep"></div>
+                <input type="color" id="bgColorPicker" value="#667eea" title="Couleur personnalisée">
+                <label class="bg-photo-label">🖼️ Photo<input type="file" id="bgPhotoInput" accept="image/*"></label>
+                <button class="bg-reset-btn" onclick="window.resetBg()">↺ Défaut</button>
+            </div>
+        </div>`;
+    }
 
-    window.closeModal = function () {
+    function setupBgPanel() {
+        const cp = document.getElementById('bgColorPicker');
+        if (cp) cp.addEventListener('input', function() { applyBg('color', this.value); });
+        const pp = document.getElementById('bgPhotoInput');
+        if (pp) pp.addEventListener('change', async function() {
+            const file = this.files[0]; if (!file) return;
+            const fn = `bg_${Date.now()}.${file.name.split('.').pop()}`;
+            const { error } = await supabase.storage.from('chat-files').upload(fn, file, { contentType: file.type });
+            if (!error) {
+                const { data: u } = supabase.storage.from('chat-files').getPublicUrl(fn);
+                applyBg('image', u.publicUrl);
+            }
+        });
+    }
+
+    window.closeModal = function() {
         document.getElementById('modalOverlay').classList.remove('open');
         document.body.style.overflow = '';
         currentModalUser = null;
     };
-    window.goToChat = function () {
+    window.goToChat = function() {
         if (!currentModalUser) return;
         localStorage.setItem('openPrivateChat', currentModalUser.unique_id);
         window.location.href = 'chat.html';
     };
 
-    // ── CHARGER POSTS ─────────────────────────────────────
+    // ── POSTS ────────────────────────────────────────────
     async function loadPosts(ownerId) {
         const container = document.getElementById('postsContainer');
         if (!container) return;
         try {
-            const { data: posts, error } = await supabase
-                .from('wall_posts').select('*')
+            const { data: posts, error } = await supabase.from('wall_posts').select('*')
                 .eq('wall_owner_id', ownerId)
-                .eq('is_public', currentView === 'public')
+                .eq('is_public', currentView === 'commun')
                 .order('created_at', { ascending: false });
-
             if (error) throw error;
             if (!posts || posts.length === 0) {
                 container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-text">Aucune publication</div></div>';
                 return;
             }
-
             const postIds = posts.map(p => p.id);
             const [{ data: allLikes }, { data: allComments }] = await Promise.all([
                 supabase.from('wall_likes').select('*').in('post_id', postIds),
                 supabase.from('wall_comments').select('*').in('post_id', postIds)
             ]);
-
             container.innerHTML = '';
             posts.forEach(post => {
-                const likes    = (allLikes    || []).filter(l => l.post_id === post.id);
-                const comments = (allComments || []).filter(c => c.post_id === post.id);
+                const likes    = (allLikes   ||[]).filter(l => l.post_id === post.id);
+                const comments = (allComments||[]).filter(c => c.post_id === post.id);
                 container.appendChild(renderPost(post, likes, comments));
             });
-        } catch (err) {
-            console.error('Erreur posts:', err);
-            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Erreur<br><small style="font-size:12px;opacity:.6">${esc(err.message)}</small></div></div>`;
+        } catch(err) {
+            console.error(err);
+            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Erreur<br><small>${esc(err.message)}</small></div></div>`;
         }
     }
 
-    // ── RENDER POST ───────────────────────────────────────
     function renderPost(post, likes, comments) {
         const el = document.createElement('div');
         el.className = 'post';
         el.dataset.postId = post.id;
-        const av = post.author_photo
-            ? `<img src="${esc(post.author_photo)}" alt="${esc(post.author_name)}">`
-            : esc((post.author_name || '?')[0].toUpperCase());
-        const imgHTML = post.image_url
-            ? `<img src="${esc(post.image_url)}" alt="Image" class="post-image">`
-            : '';
+        const av = post.author_photo ? `<img src="${esc(post.author_photo)}" alt="${esc(post.author_name)}">` : esc((post.author_name||'?')[0].toUpperCase());
+        const imgHTML = post.image_url ? `<img src="${esc(post.image_url)}" alt="Image" class="post-image" onerror="this.style.display='none'">` : '';
         const isLiked = likes.some(l => l.user_id === currentUniqueId);
-
         el.innerHTML = `
             <div class="post-header">
                 <div class="post-avatar">${av}</div>
-                <div class="post-author-info">
-                    <div class="post-author-name">${esc(post.author_name)}</div>
-                    <div class="post-time">${formatTime(post.created_at)}</div>
-                </div>
+                <div><div class="post-author-name">${esc(post.author_name)}</div><div class="post-time">${formatTime(post.created_at)}</div></div>
             </div>
             <div class="post-content">${esc(post.content)}</div>
             ${imgHTML}
             <div class="post-actions">
-                <div class="post-action ${isLiked ? 'liked' : ''}" onclick="window.toggleLike(${post.id})">
-                    <span class="post-action-icon">${isLiked ? '❤️' : '🤍'}</span>
-                    <span id="likesCount-${post.id}">${likes.length}</span>
+                <div class="post-action ${isLiked?'liked':''}" onclick="window.toggleLike(${post.id})">
+                    <span>${isLiked?'❤️':'🤍'}</span><span id="lk-${post.id}">${likes.length}</span>
                 </div>
                 <div class="post-action" onclick="window.toggleComments(${post.id})">
-                    <span class="post-action-icon">💬</span>
-                    <span id="commentsCount-${post.id}">${comments.length}</span>
+                    <span>💬</span><span id="cm-${post.id}">${comments.length}</span>
                 </div>
             </div>
             <div class="comments-section" id="comments-${post.id}" style="display:none;">
                 <div id="commentsList-${post.id}"></div>
-                <!-- FIX : bouton envoyer commentaire -->
                 <div class="comment-composer">
-                    <input type="text" class="comment-input" id="commentInput-${post.id}"
-                        placeholder="Écrire un commentaire…"
+                    <input type="text" class="comment-input" id="ci-${post.id}" placeholder="Écrire un commentaire…"
                         onkeypress="if(event.key==='Enter') window.postComment(${post.id})">
-                    <button class="comment-send-btn" id="commentBtn-${post.id}"
-                        onclick="window.postComment(${post.id})" title="Envoyer">
-                        ➤
-                    </button>
+                    <button class="comment-send-btn" id="cb-${post.id}" onclick="window.postComment(${post.id})">➤</button>
                 </div>
-            </div>
-        `;
+            </div>`;
         return el;
     }
 
-    // ── PUBLIER POST ──────────────────────────────────────
-    window.publishPost = async function () {
+    // ── PUBLIER ──────────────────────────────────────────
+    window.publishPost = async function() {
         const input      = document.getElementById('postInput');
         const content    = input ? input.value.trim() : '';
         const imageInput = document.getElementById('postImageInput');
         const errorDiv   = document.getElementById('publishError');
         const publishBtn = document.getElementById('publishBtn');
 
-        if (errorDiv) { errorDiv.style.display = 'none'; errorDiv.textContent = ''; }
+        if (errorDiv) { errorDiv.style.display = 'none'; }
         if (!content) { alert('Écrivez quelque chose !'); return; }
         if (!currentModalUser) return;
         if (publishBtn) { publishBtn.disabled = true; publishBtn.textContent = '⏳ Publication…'; }
@@ -575,13 +679,20 @@
         try {
             let imageUrl = null;
 
-            // Upload image
+            // FIX PHOTO : upload binaire direct depuis le File object
             if (imageInput && imageInput.files && imageInput.files[0]) {
-                const file     = imageInput.files[0];
-                const fileName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
-                const { error: upErr } = await supabase.storage.from('chat-files').upload(fileName, file);
-                if (!upErr) {
-                    const { data: urlData } = supabase.storage.from('chat-files').getPublicUrl(fileName);
+                const file = imageInput.files[0];
+                const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
+                const fn   = `wall_${Date.now()}.${ext}`;
+
+                const { error: upErr } = await supabase.storage
+                    .from('chat-files')
+                    .upload(fn, file, { contentType: file.type, upsert: false });
+
+                if (upErr) {
+                    console.warn('Upload photo échoué:', upErr.message);
+                } else {
+                    const { data: urlData } = supabase.storage.from('chat-files').getPublicUrl(fn);
                     imageUrl = urlData.publicUrl;
                 }
             }
@@ -591,65 +702,64 @@
                 wall_owner_id: currentModalUser.unique_id,
                 author_name:   currentUserPrenom,
                 author_photo:  currentUserPhoto || null,
-                content:       content,
+                content,
                 image_url:     imageUrl,
-                is_public:     true
+                is_public:     currentView === 'commun'
             });
-
             if (insertErr) throw insertErr;
 
             input.value = '';
             window.removeImage();
             await loadPosts(currentModalUser.unique_id);
 
-        } catch (err) {
-            console.error('Erreur publication:', err);
-            if (errorDiv) { errorDiv.textContent = '❌ ' + (err.message || 'Erreur'); errorDiv.style.display = 'block'; }
+        } catch(err) {
+            console.error(err);
+            if (errorDiv) { errorDiv.textContent = '❌ ' + (err.message||'Erreur'); errorDiv.style.display = 'block'; }
         } finally {
             if (publishBtn) { publishBtn.disabled = false; publishBtn.innerHTML = '📤 Publier'; }
         }
     };
 
-    // ── TOGGLE LIKE ───────────────────────────────────────
-    window.toggleLike = async function (postId) {
+    window.removeImage = function() {
+        const inp  = document.getElementById('postImageInput');
+        const wrap = document.getElementById('imagePreviewWrap');
+        const img  = document.getElementById('imagePreviewImg');
+        if (inp)  inp.value = '';
+        if (img)  img.src   = '';
+        if (wrap) wrap.style.display = 'none';
+    };
+
+    // ── LIKE ─────────────────────────────────────────────
+    window.toggleLike = async function(postId) {
         try {
-            const { data: existing } = await supabase
-                .from('wall_likes').select('id')
-                .eq('post_id', postId).eq('user_id', currentUniqueId)
-                .maybeSingle();
-            if (existing) {
-                await supabase.from('wall_likes').delete().eq('id', existing.id);
-            } else {
-                await supabase.from('wall_likes').insert({ post_id: postId, user_id: currentUniqueId, user_name: currentUserPrenom });
-            }
+            const { data: ex } = await supabase.from('wall_likes').select('id')
+                .eq('post_id',postId).eq('user_id',currentUniqueId).maybeSingle();
+            if (ex) { await supabase.from('wall_likes').delete().eq('id',ex.id); }
+            else    { await supabase.from('wall_likes').insert({ post_id:postId, user_id:currentUniqueId, user_name:currentUserPrenom }); }
             if (currentModalUser) await loadPosts(currentModalUser.unique_id);
-        } catch (err) { console.error('Erreur like:', err); }
+        } catch(err) { console.error(err); }
     };
 
-    // ── TOGGLE COMMENTS ───────────────────────────────────
-    window.toggleComments = async function (postId) {
-        const section = document.getElementById('comments-' + postId);
-        const visible = section.style.display !== 'none';
-        section.style.display = visible ? 'none' : 'block';
-        if (!visible) await loadComments(postId);
+    // ── COMMENTAIRES ─────────────────────────────────────
+    window.toggleComments = async function(postId) {
+        const sec = document.getElementById('comments-'+postId);
+        const vis = sec.style.display !== 'none';
+        sec.style.display = vis ? 'none' : 'block';
+        if (!vis) await loadComments(postId);
     };
 
-    // ── CHARGER COMMENTAIRES ──────────────────────────────
     async function loadComments(postId) {
-        const container = document.getElementById('commentsList-' + postId);
+        const container = document.getElementById('commentsList-'+postId);
         if (!container) return;
         try {
-            const { data: comments, error } = await supabase
-                .from('wall_comments').select('*')
-                .eq('post_id', postId).order('created_at', { ascending: true });
+            const { data: comments, error } = await supabase.from('wall_comments').select('*')
+                .eq('post_id',postId).order('created_at',{ascending:true});
             if (error) throw error;
             container.innerHTML = '';
-            (comments || []).forEach(c => {
+            (comments||[]).forEach(c => {
                 const el = document.createElement('div');
                 el.className = 'comment';
-                const av = c.author_photo
-                    ? `<img src="${esc(c.author_photo)}" alt="${esc(c.author_name)}">`
-                    : esc((c.author_name || '?')[0].toUpperCase());
+                const av = c.author_photo ? `<img src="${esc(c.author_photo)}" alt="${esc(c.author_name)}">` : esc((c.author_name||'?')[0].toUpperCase());
                 el.innerHTML = `
                     <div class="comment-avatar">${av}</div>
                     <div class="comment-content">
@@ -659,60 +769,49 @@
                     </div>`;
                 container.appendChild(el);
             });
-        } catch (err) { console.error('Erreur commentaires:', err); }
+        } catch(err) { console.error(err); }
     }
 
-    // ── POSTER COMMENTAIRE ────────────────────────────────
-    window.postComment = async function (postId) {
-        const input   = document.getElementById('commentInput-' + postId);
-        const btn     = document.getElementById('commentBtn-' + postId);
+    window.postComment = async function(postId) {
+        const input   = document.getElementById('ci-'+postId);
+        const btn     = document.getElementById('cb-'+postId);
         const content = input ? input.value.trim() : '';
         if (!content) return;
         if (btn) btn.disabled = true;
-
         try {
             const { error } = await supabase.from('wall_comments').insert({
-                post_id:      postId,
-                author_id:    currentUniqueId,
-                author_name:  currentUserPrenom,
-                author_photo: currentUserPhoto || null,
-                content
+                post_id:postId, author_id:currentUniqueId,
+                author_name:currentUserPrenom, author_photo:currentUserPhoto||null, content
             });
             if (error) throw error;
             if (input) input.value = '';
             await loadComments(postId);
-            const cnt = document.getElementById('commentsCount-' + postId);
-            if (cnt) cnt.textContent = parseInt(cnt.textContent || '0') + 1;
-        } catch (err) {
-            console.error('Erreur commentaire:', err);
-        } finally {
-            if (btn) btn.disabled = false;
-        }
+            const cnt = document.getElementById('cm-'+postId);
+            if (cnt) cnt.textContent = parseInt(cnt.textContent||'0')+1;
+        } catch(err) { console.error(err); }
+        finally { if (btn) btn.disabled = false; }
     };
 
-    // ── UTILS ─────────────────────────────────────────────
+    // ── UTILS ────────────────────────────────────────────
     function esc(str) {
-        return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
     function formatTime(iso) {
         if (!iso) return '';
-        const d = new Date(iso), diff = Date.now() - d;
-        const m = Math.floor(diff/60000), h = Math.floor(diff/3600000), j = Math.floor(diff/86400000);
-        if (m < 1)  return 'À l\'instant';
-        if (m < 60) return m + ' min';
-        if (h < 24) return h + ' h';
-        if (j < 7)  return j + ' j';
-        return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'short' });
+        const d=new Date(iso), diff=Date.now()-d;
+        const m=Math.floor(diff/60000), h=Math.floor(diff/3600000), j=Math.floor(diff/86400000);
+        if (m<1)  return 'À l\'instant';
+        if (m<60) return m+' min';
+        if (h<24) return h+' h';
+        if (j<7)  return j+' j';
+        return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
     }
 
-    // ── INIT ──────────────────────────────────────────────
+    // ── INIT ─────────────────────────────────────────────
+    loadGlobalBg();
     loadProfiles();
-    document.getElementById('modalOverlay').addEventListener('click', e => {
-        if (e.target === e.currentTarget) window.closeModal();
-    });
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') window.closeModal();
-    });
+    document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target===e.currentTarget) window.closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key==='Escape') window.closeModal(); });
 </script>
 ```
 
