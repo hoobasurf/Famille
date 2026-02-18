@@ -316,7 +316,6 @@
 </head>
 <body>
 
-```
 <div id="bgLayer"></div>
 
 <div class="header">
@@ -390,6 +389,10 @@
     const currentUniqueId = currentUserPrenom + '_' + fingerprint;
     let currentView = 'commun';
     let currentModalUser = null;
+
+    // 📸 Stockage temporaire image en mémoire
+    let communImageBlob = null;
+    let persoImageBlob = null;
 
     // BG presets
     const BG_PRESETS = [
@@ -483,71 +486,90 @@
         }
     }
 
-    // Preview photo commun
-    document.getElementById('communImgInput').addEventListener('change', function() {
-        const file = this.files[0]; if (!file) return;
-        const reader = new FileReader();
-        reader.onload = e => {
-            document.getElementById('communImgPreviewImg').src = e.target.result;
-            document.getElementById('communImgPreview').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
+    // 📸 FIX IPHONE : Stocker le blob en mémoire au moment du changement
+    document.getElementById('communImgInput').addEventListener('change', async function() {
+        const file = this.files[0];
+        if (!file) {
+            communImageBlob = null;
+            return;
+        }
+        
+        // Lire en base64 pour aperçu
+        const base64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+
+        // Afficher aperçu
+        document.getElementById('communImgPreviewImg').src = base64;
+        document.getElementById('communImgPreview').style.display = 'block';
+
+        // Convertir en blob et GARDER EN MÉMOIRE
+        const response = await fetch(base64);
+        communImageBlob = await response.blob();
+        console.log('✅ Image prête:', communImageBlob.size, 'bytes');
     });
 
     window.removeCommunImage = function() {
         document.getElementById('communImgInput').value = '';
         document.getElementById('communImgPreviewImg').src = '';
         document.getElementById('communImgPreview').style.display = 'none';
+        communImageBlob = null;
     };
 
-    // ── PUBLISH COMMUN (avec base64 au lieu de File direct) ─
+    // ── PUBLISH COMMUN (utilise le blob en mémoire) ─
     window.publishCommunPost = async function() {
         const input = document.getElementById('communInput');
         const content = input ? input.value.trim() : '';
-        const imageInput = document.getElementById('communImgInput');
         const errorDiv = document.getElementById('communError');
         const publishBtn = document.getElementById('communPublishBtn');
+
+        console.log('🚀 START publishCommunPost');
 
         if (errorDiv) errorDiv.style.display = 'none';
         if (!content) { alert('Écrivez quelque chose !'); return; }
         if (publishBtn) { publishBtn.disabled = true; publishBtn.textContent = '⏳ Envoi…'; }
 
+        let imageUrl = null;
+
         try {
-            let imageUrl = null;
+            // ÉTAPE 1 : Upload image si présente
+            if (communImageBlob) {
+                console.log('📸 ÉTAPE 1: Upload image');
+                console.log('Blob type:', communImageBlob.type);
+                console.log('Blob size:', communImageBlob.size);
 
-            // FIX IPHONE : conversion en base64 puis blob upload
-            if (imageInput && imageInput.files && imageInput.files[0]) {
-                const file = imageInput.files[0];
-                
-                // Lire en base64
-                const base64 = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
+                try {
+                    const ext = communImageBlob.type.split('/')[1] || 'jpg';
+                    const fn = `commun_${Date.now()}.${ext}`;
+                    console.log('Filename:', fn);
 
-                // Convertir base64 en Blob
-                const response = await fetch(base64);
-                const blob = await response.blob();
+                    const uploadResult = await supabase.storage
+                        .from('chat-files')
+                        .upload(fn, communImageBlob, { contentType: communImageBlob.type });
 
-                const ext = file.type.split('/')[1] || 'jpg';
-                const fn = `commun_${Date.now()}.${ext}`;
+                    console.log('Upload result:', uploadResult);
 
-                const { error: upErr } = await supabase.storage
-                    .from('chat-files')
-                    .upload(fn, blob, { contentType: file.type });
+                    if (uploadResult.error) {
+                        console.error('❌ Upload error:', uploadResult.error);
+                        throw new Error('Upload failed: ' + (uploadResult.error.message || JSON.stringify(uploadResult.error)));
+                    }
 
-                if (!upErr) {
                     const { data: urlData } = supabase.storage.from('chat-files').getPublicUrl(fn);
                     imageUrl = urlData.publicUrl;
-                    console.log('✅ Image uploadée:', imageUrl);
-                } else {
-                    console.warn('⚠️ Upload:', upErr.message);
+                    console.log('✅ Image URL:', imageUrl);
+
+                } catch (uploadErr) {
+                    console.error('❌ UPLOAD EXCEPTION:', uploadErr);
+                    throw new Error('Erreur upload: ' + uploadErr.message);
                 }
             }
 
-            const { error: insertErr } = await supabase.from('wall_posts').insert({
+            // ÉTAPE 2 : Insert post
+            console.log('💾 ÉTAPE 2: Insert post');
+            const postData = {
                 author_id: currentUniqueId,
                 wall_owner_id: 'COMMUN',
                 author_name: currentUserPrenom,
@@ -555,21 +577,50 @@
                 content,
                 image_url: imageUrl,
                 is_public: true
-            });
-            if (insertErr) throw insertErr;
+            };
+            console.log('Post data:', postData);
 
+            try {
+                const insertResult = await supabase.from('wall_posts').insert(postData);
+                console.log('Insert result:', insertResult);
+
+                if (insertResult.error) {
+                    console.error('❌ Insert error:', insertResult.error);
+                    throw new Error('Insert failed: ' + (insertResult.error.message || JSON.stringify(insertResult.error)));
+                }
+
+                console.log('✅ Post inserted');
+
+            } catch (insertErr) {
+                console.error('❌ INSERT EXCEPTION:', insertErr);
+                throw new Error('Erreur insertion: ' + insertErr.message);
+            }
+
+            // ÉTAPE 3 : Cleanup & reload
+            console.log('🧹 ÉTAPE 3: Cleanup');
             input.value = '';
             window.removeCommunImage();
             await loadCommunWall();
+            console.log('✅ SUCCESS - All done');
 
         } catch(err) {
-            console.error('Erreur:', err);
+            console.error('❌❌❌ MAIN CATCH:', err);
+            console.error('Error type:', typeof err);
+            console.error('Error constructor:', err.constructor.name);
+            console.error('Error message:', err.message);
+            console.error('Error stack:', err.stack);
+            
             if (errorDiv) {
-                errorDiv.textContent = '❌ ' + (err.message||'Erreur');
+                const errMsg = err.message || String(err);
+                errorDiv.textContent = '❌ ' + errMsg;
                 errorDiv.style.display = 'block';
             }
         } finally {
-            if (publishBtn) { publishBtn.disabled = false; publishBtn.innerHTML = '📤 Publier'; }
+            if (publishBtn) { 
+                publishBtn.disabled = false; 
+                publishBtn.innerHTML = '📤 Publier'; 
+            }
+            console.log('🏁 END publishCommunPost');
         }
     };
 
@@ -612,6 +663,7 @@
     // ── MODAL PERSO ──────────────────────────────────────
     async function openPersoModal(user) {
         currentModalUser = user;
+        persoImageBlob = null; // Reset
         const isMe = user.unique_id === currentUniqueId;
 
         const av = user.photo_url ? `<img src="${esc(user.photo_url)}">` : esc(user.prenom[0].toUpperCase());
@@ -623,310 +675,316 @@
         const composerHTML = isMe ? `
             <div class="post-composer">
                 <textarea class="post-composer-input" id="persoInput" placeholder="Votre mur…"></textarea>
-                <div class="image-preview-wrap" id="persoImgPreview">
-                    <img id="persoImgPreviewImg" src="">
-                    <button class="image-preview-remove" onclick="window.removePersoImage()">×</button>
-                </div>
-                <div class="post-composer-actions">
-                    <label class="photo-btn-label">📷<input type="file" id="persoImgInput" accept="image/*"></label>
-                    <button class="btn btn-primary" id="persoPublishBtn" onclick="window.publishPersoPost()" style="flex:1">📤 Publier</button>
-                </div>
-                <div class="publish-error" id="persoError"></div>
-            </div>` : '';
 
-        document.getElementById('modalContent').innerHTML = bgHTML + composerHTML +
-            '<div id="persoPostsContainer"><div class="empty-state"><div class="empty-state-icon">⏳</div></div></div>';
+```
+            <div class="image-preview-wrap" id="persoImgPreview">
+                <img id="persoImgPreviewImg" src="">
+                <button class="image-preview-remove" onclick="window.removePersoImage()">×</button>
+            </div>
+            <div class="post-composer-actions">
+                <label class="photo-btn-label">📷<input type="file" id="persoImgInput" accept="image/*"></label>
+                <button class="btn btn-primary" id="persoPublishBtn" onclick="window.publishPersoPost()" style="flex:1">📤 Publier</button>
+            </div>
+            <div class="publish-error" id="persoError"></div>
+        </div>` : '';
 
-        if (isMe) {
-            document.getElementById('persoImgInput').addEventListener('change', function() {
-                const file = this.files[0]; if (!file) return;
-                const reader = new FileReader();
-                reader.onload = e => {
-                    document.getElementById('persoImgPreviewImg').src = e.target.result;
-                    document.getElementById('persoImgPreview').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            });
-            setupBgPanel();
-        }
+    document.getElementById('modalContent').innerHTML = bgHTML + composerHTML +
+        '<div id="persoPostsContainer"><div class="empty-state"><div class="empty-state-icon">⏳</div></div></div>';
 
-        document.getElementById('modalOverlay').classList.add('open');
-        document.body.style.overflow = 'hidden';
-        await loadPersoWall(user.unique_id);
-    }
-
-    async function loadPersoWall(ownerId) {
-        const container = document.getElementById('persoPostsContainer');
-        if (!container) return;
-        try {
-            const { data: posts, error } = await supabase.from('wall_posts').select('*')
-                .eq('wall_owner_id', ownerId).eq('is_public', false)
-                .order('created_at', { ascending: false });
-            if (error) throw error;
-            if (!posts || posts.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-text">Aucune publication</div></div>';
+    if (isMe) {
+        // 📸 FIX IPHONE perso
+        document.getElementById('persoImgInput').addEventListener('change', async function() {
+            const file = this.files[0];
+            if (!file) {
+                persoImageBlob = null;
                 return;
             }
-            const postIds = posts.map(p => p.id);
-            const [{ data: allLikes }, { data: allComments }] = await Promise.all([
-                supabase.from('wall_likes').select('*').in('post_id', postIds),
-                supabase.from('wall_comments').select('*').in('post_id', postIds)
-            ]);
-            container.innerHTML = '';
-            posts.forEach(post => {
-                const likes = (allLikes||[]).filter(l => l.post_id === post.id);
-                const comments = (allComments||[]).filter(c => c.post_id === post.id);
-                container.appendChild(renderPost(post, likes, comments, 'perso'));
-            });
-        } catch(err) {
-            console.error(err);
-            container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div></div>';
-        }
-    }
-
-    window.removePersoImage = function() {
-        document.getElementById('persoImgInput').value = '';
-        document.getElementById('persoImgPreviewImg').src = '';
-        document.getElementById('persoImgPreview').style.display = 'none';
-    };
-
-    window.publishPersoPost = async function() {
-        const input = document.getElementById('persoInput');
-        const content = input ? input.value.trim() : '';
-        const imageInput = document.getElementById('persoImgInput');
-        const errorDiv = document.getElementById('persoError');
-        const publishBtn = document.getElementById('persoPublishBtn');
-
-        if (errorDiv) errorDiv.style.display = 'none';
-        if (!content) { alert('Écrivez quelque chose !'); return; }
-        if (!currentModalUser) return;
-        if (publishBtn) { publishBtn.disabled = true; publishBtn.textContent = '⏳ Envoi…'; }
-
-        try {
-            let imageUrl = null;
-
-            if (imageInput && imageInput.files && imageInput.files[0]) {
-                const file = imageInput.files[0];
-                const base64 = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-                const response = await fetch(base64);
-                const blob = await response.blob();
-                const ext = file.type.split('/')[1] || 'jpg';
-                const fn = `perso_${Date.now()}.${ext}`;
-
-                const { error: upErr } = await supabase.storage
-                    .from('chat-files')
-                    .upload(fn, blob, { contentType: file.type });
-
-                if (!upErr) {
-                    const { data: urlData } = supabase.storage.from('chat-files').getPublicUrl(fn);
-                    imageUrl = urlData.publicUrl;
-                    console.log('✅ Image:', imageUrl);
-                } else {
-                    console.warn('⚠️ Upload:', upErr.message);
-                }
-            }
-
-            const { error: insertErr } = await supabase.from('wall_posts').insert({
-                author_id: currentUniqueId,
-                wall_owner_id: currentModalUser.unique_id,
-                author_name: currentUserPrenom,
-                author_photo: currentUserPhoto || null,
-                content,
-                image_url: imageUrl,
-                is_public: false
-            });
-            if (insertErr) throw insertErr;
-
-            input.value = '';
-            window.removePersoImage();
-            await loadPersoWall(currentModalUser.unique_id);
-
-        } catch(err) {
-            console.error(err);
-            if (errorDiv) {
-                errorDiv.textContent = '❌ ' + (err.message||'Erreur');
-                errorDiv.style.display = 'block';
-            }
-        } finally {
-            if (publishBtn) { publishBtn.disabled = false; publishBtn.innerHTML = '📤 Publier'; }
-        }
-    };
-
-    function buildBgPanel() {
-        const presetsHTML = BG_PRESETS.map(p =>
-            `<div class="bg-preset" data-bg-id="${p.id}" style="background:${p.style}" onclick="window.selectPreset('${p.id}','${p.style}')"></div>`
-        ).join('');
-        return `<div class="bg-panel">
-            <div class="bg-panel-title">🎨 Arrière-fond</div>
-            <div class="bg-options">
-                ${presetsHTML}
-                <div class="bg-sep"></div>
-                <input type="color" id="bgColorPicker" value="#667eea">
-                <label class="bg-photo-label">🖼️ Photo<input type="file" id="bgPhotoInput" accept="image/*"></label>
-                <button class="bg-reset-btn" onclick="window.resetBg()">↺ Défaut</button>
-            </div>
-        </div>`;
-    }
-
-    function setupBgPanel() {
-        const cp = document.getElementById('bgColorPicker');
-        if (cp) cp.addEventListener('input', function() { applyBg('color', this.value); });
-        const pp = document.getElementById('bgPhotoInput');
-        if (pp) pp.addEventListener('change', async function() {
-            const file = this.files[0]; if (!file) return;
-            const base64 = await new Promise(r => {
+            const base64 = await new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = () => r(reader.result);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
+            document.getElementById('persoImgPreviewImg').src = base64;
+            document.getElementById('persoImgPreview').style.display = 'block';
             const response = await fetch(base64);
-            const blob = await response.blob();
-            const fn = `bg_${Date.now()}.jpg`;
-            const { error } = await supabase.storage.from('chat-files').upload(fn, blob);
-            if (!error) {
-                const { data: u } = supabase.storage.from('chat-files').getPublicUrl(fn);
-                applyBg('image', u.publicUrl);
-            }
+            persoImageBlob = await response.blob();
+            console.log('✅ Image perso prête:', persoImageBlob.size, 'bytes');
         });
+        setupBgPanel();
     }
 
-    window.closeModal = function() {
-        document.getElementById('modalOverlay').classList.remove('open');
-        document.body.style.overflow = '';
-        currentModalUser = null;
-    };
-    window.goToChat = function() {
-        if (!currentModalUser) return;
-        localStorage.setItem('openPrivateChat', currentModalUser.unique_id);
-        window.location.href = 'chat.html';
-    };
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    await loadPersoWall(user.unique_id);
+}
 
-    // ── RENDER POST ──────────────────────────────────────
-    function renderPost(post, likes, comments, context) {
-        const el = document.createElement('div');
-        el.className = 'post';
-        const av = post.author_photo ? `<img src="${esc(post.author_photo)}">` : esc((post.author_name||'?')[0].toUpperCase());
-        const imgHTML = post.image_url ? `<img src="${esc(post.image_url)}" class="post-image" onerror="this.style.display='none'">` : '';
-        const isLiked = likes.some(l => l.user_id === currentUniqueId);
-        const likersNames = likes.map(l => l.user_name).join(', ');
-        const likesListHTML = likes.length > 0 ? `<div class="likes-list">Aimé par : ${esc(likersNames)}</div>` : '';
+async function loadPersoWall(ownerId) {
+    const container = document.getElementById('persoPostsContainer');
+    if (!container) return;
+    try {
+        const { data: posts, error } = await supabase.from('wall_posts').select('*')
+            .eq('wall_owner_id', ownerId).eq('is_public', false)
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        if (!posts || posts.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-text">Aucune publication</div></div>';
+            return;
+        }
+        const postIds = posts.map(p => p.id);
+        const [{ data: allLikes }, { data: allComments }] = await Promise.all([
+            supabase.from('wall_likes').select('*').in('post_id', postIds),
+            supabase.from('wall_comments').select('*').in('post_id', postIds)
+        ]);
+        container.innerHTML = '';
+        posts.forEach(post => {
+            const likes = (allLikes||[]).filter(l => l.post_id === post.id);
+            const comments = (allComments||[]).filter(c => c.post_id === post.id);
+            container.appendChild(renderPost(post, likes, comments, 'perso'));
+        });
+    } catch(err) {
+        console.error(err);
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div></div>';
+    }
+}
 
-        el.innerHTML = `
-            <div class="post-header">
-                <div class="post-avatar">${av}</div>
-                <div><div class="post-author-name">${esc(post.author_name)}</div><div class="post-time">${formatTime(post.created_at)}</div></div>
+window.removePersoImage = function() {
+    document.getElementById('persoImgInput').value = '';
+    document.getElementById('persoImgPreviewImg').src = '';
+    document.getElementById('persoImgPreview').style.display = 'none';
+    persoImageBlob = null;
+};
+
+window.publishPersoPost = async function() {
+    const input = document.getElementById('persoInput');
+    const content = input ? input.value.trim() : '';
+    const errorDiv = document.getElementById('persoError');
+    const publishBtn = document.getElementById('persoPublishBtn');
+
+    if (errorDiv) errorDiv.style.display = 'none';
+    if (!content) { alert('Écrivez quelque chose !'); return; }
+    if (!currentModalUser) return;
+    if (publishBtn) { publishBtn.disabled = true; publishBtn.textContent = '⏳ Envoi…'; }
+
+    try {
+        let imageUrl = null;
+
+        if (persoImageBlob) {
+            const ext = persoImageBlob.type.split('/')[1] || 'jpg';
+            const fn = `perso_${Date.now()}.${ext}`;
+
+            const { error: upErr } = await supabase.storage
+                .from('chat-files')
+                .upload(fn, persoImageBlob, { contentType: persoImageBlob.type });
+
+            if (!upErr) {
+                const { data: urlData } = supabase.storage.from('chat-files').getPublicUrl(fn);
+                imageUrl = urlData.publicUrl;
+                console.log('✅ Image:', imageUrl);
+            } else {
+                console.warn('⚠️ Upload:', upErr.message);
+            }
+        }
+
+        const { error: insertErr } = await supabase.from('wall_posts').insert({
+            author_id: currentUniqueId,
+            wall_owner_id: currentModalUser.unique_id,
+            author_name: currentUserPrenom,
+            author_photo: currentUserPhoto || null,
+            content,
+            image_url: imageUrl,
+            is_public: false
+        });
+        if (insertErr) throw insertErr;
+
+        input.value = '';
+        window.removePersoImage();
+        await loadPersoWall(currentModalUser.unique_id);
+
+    } catch(err) {
+        console.error(err);
+        if (errorDiv) {
+            const errMsg = err?.message || err?.error_description || err?.msg || String(err);
+            errorDiv.textContent = '❌ ' + errMsg;
+            errorDiv.style.display = 'block';
+        }
+    } finally {
+        if (publishBtn) { publishBtn.disabled = false; publishBtn.innerHTML = '📤 Publier'; }
+    }
+};
+
+function buildBgPanel() {
+    const presetsHTML = BG_PRESETS.map(p =>
+        `<div class="bg-preset" data-bg-id="${p.id}" style="background:${p.style}" onclick="window.selectPreset('${p.id}','${p.style}')"></div>`
+    ).join('');
+    return `<div class="bg-panel">
+        <div class="bg-panel-title">🎨 Arrière-fond</div>
+        <div class="bg-options">
+            ${presetsHTML}
+            <div class="bg-sep"></div>
+            <input type="color" id="bgColorPicker" value="#667eea">
+            <label class="bg-photo-label">🖼️ Photo<input type="file" id="bgPhotoInput" accept="image/*"></label>
+            <button class="bg-reset-btn" onclick="window.resetBg()">↺ Défaut</button>
+        </div>
+    </div>`;
+}
+
+function setupBgPanel() {
+    const cp = document.getElementById('bgColorPicker');
+    if (cp) cp.addEventListener('input', function() { applyBg('color', this.value); });
+    const pp = document.getElementById('bgPhotoInput');
+    if (pp) pp.addEventListener('change', async function() {
+        const file = this.files[0]; if (!file) return;
+        const base64 = await new Promise(r => {
+            const reader = new FileReader();
+            reader.onload = () => r(reader.result);
+            reader.readAsDataURL(file);
+        });
+        const response = await fetch(base64);
+        const blob = await response.blob();
+        const fn = `bg_${Date.now()}.jpg`;
+        const { error } = await supabase.storage.from('chat-files').upload(fn, blob);
+        if (!error) {
+            const { data: u } = supabase.storage.from('chat-files').getPublicUrl(fn);
+            applyBg('image', u.publicUrl);
+        }
+    });
+}
+
+window.closeModal = function() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    currentModalUser = null;
+    persoImageBlob = null;
+};
+window.goToChat = function() {
+    if (!currentModalUser) return;
+    localStorage.setItem('openPrivateChat', currentModalUser.unique_id);
+    window.location.href = 'chat.html';
+};
+
+// ── RENDER POST ──────────────────────────────────────
+function renderPost(post, likes, comments, context) {
+    const el = document.createElement('div');
+    el.className = 'post';
+    const av = post.author_photo ? `<img src="${esc(post.author_photo)}">` : esc((post.author_name||'?')[0].toUpperCase());
+    const imgHTML = post.image_url ? `<img src="${esc(post.image_url)}" class="post-image" onerror="this.style.display='none'">` : '';
+    const isLiked = likes.some(l => l.user_id === currentUniqueId);
+    const likersNames = likes.map(l => l.user_name).join(', ');
+    const likesListHTML = likes.length > 0 ? `<div class="likes-list">Aimé par : ${esc(likersNames)}</div>` : '';
+
+    el.innerHTML = `
+        <div class="post-header">
+            <div class="post-avatar">${av}</div>
+            <div><div class="post-author-name">${esc(post.author_name)}</div><div class="post-time">${formatTime(post.created_at)}</div></div>
+        </div>
+        <div class="post-content">${esc(post.content)}</div>
+        ${imgHTML}
+        <div class="post-actions">
+            <div class="post-action ${isLiked?'liked':''}" onclick="window.toggleLike(${post.id},'${context}')">
+                <span>${isLiked?'❤️':'🤍'}</span><span id="lk-${post.id}">${likes.length}</span>
             </div>
-            <div class="post-content">${esc(post.content)}</div>
-            ${imgHTML}
-            <div class="post-actions">
-                <div class="post-action ${isLiked?'liked':''}" onclick="window.toggleLike(${post.id},'${context}')">
-                    <span>${isLiked?'❤️':'🤍'}</span><span id="lk-${post.id}">${likes.length}</span>
-                </div>
-                <div class="post-action" onclick="window.toggleComments(${post.id})">
-                    <span>💬</span><span id="cm-${post.id}">${comments.length}</span>
-                </div>
+            <div class="post-action" onclick="window.toggleComments(${post.id})">
+                <span>💬</span><span id="cm-${post.id}">${comments.length}</span>
             </div>
-            ${likesListHTML}
-            <div class="comments-section" id="comments-${post.id}" style="display:none;">
-                <div id="commentsList-${post.id}"></div>
-                <div class="comment-composer">
-                    <input type="text" class="comment-input" id="ci-${post.id}" placeholder="Commenter…"
-                        onkeypress="if(event.key==='Enter') window.postComment(${post.id},'${context}')">
-                    <button class="comment-send-btn" id="cb-${post.id}" onclick="window.postComment(${post.id},'${context}')">➤</button>
-                </div>
-            </div>`;
-        return el;
-    }
+        </div>
+        ${likesListHTML}
+        <div class="comments-section" id="comments-${post.id}" style="display:none;">
+            <div id="commentsList-${post.id}"></div>
+            <div class="comment-composer">
+                <input type="text" class="comment-input" id="ci-${post.id}" placeholder="Commenter…"
+                    onkeypress="if(event.key==='Enter') window.postComment(${post.id},'${context}')">
+                <button class="comment-send-btn" id="cb-${post.id}" onclick="window.postComment(${post.id},'${context}')">➤</button>
+            </div>
+        </div>`;
+    return el;
+}
 
-    // ── LIKE ─────────────────────────────────────────────
-    window.toggleLike = async function(postId, context) {
-        try {
-            const { data: ex } = await supabase.from('wall_likes').select('id')
-                .eq('post_id',postId).eq('user_id',currentUniqueId).maybeSingle();
-            if (ex) { await supabase.from('wall_likes').delete().eq('id',ex.id); }
-            else { await supabase.from('wall_likes').insert({ post_id:postId, user_id:currentUniqueId, user_name:currentUserPrenom }); }
-            if (context === 'commun') await loadCommunWall();
-            else if (currentModalUser) await loadPersoWall(currentModalUser.unique_id);
-        } catch(err) { console.error(err); }
-    };
+// ── LIKE ─────────────────────────────────────────────
+window.toggleLike = async function(postId, context) {
+    try {
+        const { data: ex } = await supabase.from('wall_likes').select('id')
+            .eq('post_id',postId).eq('user_id',currentUniqueId).maybeSingle();
+        if (ex) { await supabase.from('wall_likes').delete().eq('id',ex.id); }
+        else { await supabase.from('wall_likes').insert({ post_id:postId, user_id:currentUniqueId, user_name:currentUserPrenom }); }
+        if (context === 'commun') await loadCommunWall();
+        else if (currentModalUser) await loadPersoWall(currentModalUser.unique_id);
+    } catch(err) { console.error(err); }
+};
 
-    // ── COMMENTS ─────────────────────────────────────────
-    window.toggleComments = async function(postId) {
-        const sec = document.getElementById('comments-'+postId);
-        const vis = sec.style.display !== 'none';
-        sec.style.display = vis ? 'none' : 'block';
-        if (!vis) await loadComments(postId);
-    };
+// ── COMMENTS ─────────────────────────────────────────
+window.toggleComments = async function(postId) {
+    const sec = document.getElementById('comments-'+postId);
+    const vis = sec.style.display !== 'none';
+    sec.style.display = vis ? 'none' : 'block';
+    if (!vis) await loadComments(postId);
+};
 
-    async function loadComments(postId) {
-        const container = document.getElementById('commentsList-'+postId);
-        if (!container) return;
-        try {
-            const { data: comments, error } = await supabase.from('wall_comments').select('*')
-                .eq('post_id',postId).order('created_at',{ascending:true});
-            if (error) throw error;
-            container.innerHTML = '';
-            (comments||[]).forEach(c => {
-                const el = document.createElement('div');
-                el.className = 'comment';
-                const av = c.author_photo ? `<img src="${esc(c.author_photo)}">` : esc((c.author_name||'?')[0].toUpperCase());
-                el.innerHTML = `
-                    <div class="comment-avatar">${av}</div>
-                    <div class="comment-content">
-                        <div class="comment-author">${esc(c.author_name)}</div>
-                        <div class="comment-text">${esc(c.content)}</div>
-                        <div class="comment-time">${formatTime(c.created_at)}</div>
-                    </div>`;
-                container.appendChild(el);
-            });
-        } catch(err) { console.error(err); }
-    }
+async function loadComments(postId) {
+    const container = document.getElementById('commentsList-'+postId);
+    if (!container) return;
+    try {
+        const { data: comments, error } = await supabase.from('wall_comments').select('*')
+            .eq('post_id',postId).order('created_at',{ascending:true});
+        if (error) throw error;
+        container.innerHTML = '';
+        (comments||[]).forEach(c => {
+            const el = document.createElement('div');
+            el.className = 'comment';
+            const av = c.author_photo ? `<img src="${esc(c.author_photo)}">` : esc((c.author_name||'?')[0].toUpperCase());
+            el.innerHTML = `
+                <div class="comment-avatar">${av}</div>
+                <div class="comment-content">
+                    <div class="comment-author">${esc(c.author_name)}</div>
+                    <div class="comment-text">${esc(c.content)}</div>
+                    <div class="comment-time">${formatTime(c.created_at)}</div>
+                </div>`;
+            container.appendChild(el);
+        });
+    } catch(err) { console.error(err); }
+}
 
-    window.postComment = async function(postId, context) {
-        const input = document.getElementById('ci-'+postId);
-        const btn = document.getElementById('cb-'+postId);
-        const content = input ? input.value.trim() : '';
-        if (!content) return;
-        if (btn) btn.disabled = true;
-        try {
-            const { error } = await supabase.from('wall_comments').insert({
-                post_id:postId, author_id:currentUniqueId,
-                author_name:currentUserPrenom, author_photo:currentUserPhoto||null, content
-            });
-            if (error) throw error;
-            if (input) input.value = '';
-            await loadComments(postId);
-            const cnt = document.getElementById('cm-'+postId);
-            if (cnt) cnt.textContent = parseInt(cnt.textContent||'0')+1;
-        } catch(err) { console.error(err); }
-        finally { if (btn) btn.disabled = false; }
-    };
+window.postComment = async function(postId, context) {
+    const input = document.getElementById('ci-'+postId);
+    const btn = document.getElementById('cb-'+postId);
+    const content = input ? input.value.trim() : '';
+    if (!content) return;
+    if (btn) btn.disabled = true;
+    try {
+        const { error } = await supabase.from('wall_comments').insert({
+            post_id:postId, author_id:currentUniqueId,
+            author_name:currentUserPrenom, author_photo:currentUserPhoto||null, content
+        });
+        if (error) throw error;
+        if (input) input.value = '';
+        await loadComments(postId);
+        const cnt = document.getElementById('cm-'+postId);
+        if (cnt) cnt.textContent = parseInt(cnt.textContent||'0')+1;
+    } catch(err) { console.error(err); }
+    finally { if (btn) btn.disabled = false; }
+};
 
-    function esc(str) {
-        return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-    function formatTime(iso) {
-        if (!iso) return '';
-        const d=new Date(iso), diff=Date.now()-d;
-        const m=Math.floor(diff/60000), h=Math.floor(diff/3600000), j=Math.floor(diff/86400000);
-        if (m<1) return 'À l\'instant';
-        if (m<60) return m+' min';
-        if (h<24) return h+' h';
-        if (j<7) return j+' j';
-        return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
-    }
+function esc(str) {
+    return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function formatTime(iso) {
+    if (!iso) return '';
+    const d=new Date(iso), diff=Date.now()-d;
+    const m=Math.floor(diff/60000), h=Math.floor(diff/3600000), j=Math.floor(diff/86400000);
+    if (m<1) return 'À l\'instant';
+    if (m<60) return m+' min';
+    if (h<24) return h+' h';
+    if (j<7) return j+' j';
+    return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+}
 
-    loadGlobalBg();
-    loadCommunWall();
-    document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target===e.currentTarget) window.closeModal(); });
-    document.addEventListener('keydown', e => { if (e.key==='Escape') window.closeModal(); });
-</script>
+loadGlobalBg();
+loadCommunWall();
+document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target===e.currentTarget) window.closeModal(); });
+document.addEventListener('keydown', e => { if (e.key==='Escape') window.closeModal(); });
 ```
+
+</script>
 
 </body>
 </html>
