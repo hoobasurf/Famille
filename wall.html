@@ -487,30 +487,38 @@
     }
 
     // 📸 FIX IPHONE : Stocker le blob en mémoire au moment du changement
-    document.getElementById('communImgInput').addEventListener('change', async function() {
-        const file = this.files[0];
-        if (!file) {
-            communImageBlob = null;
-            return;
-        }
-        
-        // Lire en base64 pour aperçu
-        const base64 = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
+    try {
+        document.getElementById('communImgInput').addEventListener('change', async function() {
+            const file = this.files[0];
+            if (!file) {
+                communImageBlob = null;
+                return;
+            }
+            
+            try {
+                // Lire en base64 pour aperçu
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+
+                // Afficher aperçu
+                document.getElementById('communImgPreviewImg').src = base64;
+                document.getElementById('communImgPreview').style.display = 'block';
+
+                // Convertir en blob et GARDER EN MÉMOIRE
+                const response = await fetch(base64);
+                communImageBlob = await response.blob();
+                console.log('✅ Image prête:', communImageBlob.size, 'bytes');
+            } catch(err) {
+                console.error('Erreur preview image:', err);
+            }
         });
-
-        // Afficher aperçu
-        document.getElementById('communImgPreviewImg').src = base64;
-        document.getElementById('communImgPreview').style.display = 'block';
-
-        // Convertir en blob et GARDER EN MÉMOIRE
-        const response = await fetch(base64);
-        communImageBlob = await response.blob();
-        console.log('✅ Image prête:', communImageBlob.size, 'bytes');
-    });
+    } catch(err) {
+        console.error('Erreur listener image:', err);
+    }
 
     window.removeCommunImage = function() {
         document.getElementById('communImgInput').value = '';
