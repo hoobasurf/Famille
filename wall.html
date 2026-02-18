@@ -356,7 +356,7 @@ if (!fingerprint) {
 const currentUniqueId = currentUserPrenom + '_' + fingerprint;
 let currentModalUser = null;
 
-// Stockage blob images
+// ✅ CORRIGÉ : On stocke directement le File (qui est déjà un Blob), de manière synchrone
 let communImageBlob = null;
 let persoImageBlob = null;
 
@@ -377,19 +377,22 @@ window.switchToPerso = function() {
     loadPersoProfiles();
 };
 
-// IMAGE HANDLING
-window.handleCommunImage = async function(input) {
+// ✅ CORRIGÉ : Assignation synchrone du File directement (File hérite de Blob)
+window.handleCommunImage = function(input) {
     const file = input.files[0];
     if (!file) {
         communImageBlob = null;
         return;
     }
+
+    // On stocke directement le File — pas besoin de fetch() asynchrone
+    communImageBlob = file;
+
+    // Aperçu visuel via FileReader (lecture asynchrone pour l'affichage seulement)
     const reader = new FileReader();
-    reader.onload = async function(e) {
+    reader.onload = function(e) {
         document.getElementById('communImgPreviewImg').src = e.target.result;
         document.getElementById('communImgPreview').style.display = 'block';
-        const resp = await fetch(e.target.result);
-        communImageBlob = await resp.blob();
     };
     reader.readAsDataURL(file);
 };
@@ -414,11 +417,17 @@ window.publishCommunPost = async function() {
 
     try {
         let imageUrl = null;
+
         if (communImageBlob) {
             const ext = communImageBlob.type.split('/')[1] || 'jpg';
             const fn = `commun_${Date.now()}.${ext}`;
-            const { error: upErr } = await supabase.storage.from('chat-files').upload(fn, communImageBlob, { contentType: communImageBlob.type });
-            if (!upErr) {
+            const { error: upErr } = await supabase.storage
+                .from('chat-files')
+                .upload(fn, communImageBlob, { contentType: communImageBlob.type });
+
+            if (upErr) {
+                console.error('Erreur upload image :', upErr);
+            } else {
                 const { data: urlData } = supabase.storage.from('chat-files').getPublicUrl(fn);
                 imageUrl = urlData.publicUrl;
             }
