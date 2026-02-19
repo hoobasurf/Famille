@@ -460,15 +460,13 @@ window.setCommunBg = async function(el) {
 
 window.uploadCommunBg = async function(input) {
     const file = input.files[0]; if (!file) return;
-    const fn = `bg_commun_${currentUniqueId}_${Date.now()}.${file.type.split('/')[1]||'jpg'}`;
-    const { error } = await supabase.storage.from('chat-files').upload(fn, file, { contentType: file.type, upsert: true });
-    if (error) { alert('Erreur upload fond'); return; }
-    const { data: u } = supabase.storage.from('chat-files').getPublicUrl(fn);
-    applyBg(u.publicUrl, 'image');
+    const url = await uploadToImgBB(file);
+    if (!url) { alert('Erreur upload fond'); return; }
+    applyBg(url, 'image');
     markSwatch('communBgSwatches', null);
-    localStorage.setItem('communBgValue', u.publicUrl);
+    localStorage.setItem('communBgValue', url);
     localStorage.setItem('communBgType',  'image');
-    await supabase.from('user_wall_prefs').upsert({ unique_id: currentUniqueId, bg_type: 'image', bg_value: u.publicUrl, updated_at: new Date().toISOString() });
+    await supabase.from('user_wall_prefs').upsert({ unique_id: currentUniqueId, bg_type: 'image', bg_value: url, updated_at: new Date().toISOString() });
 };
 
 // ══════════════════════════════════════════════════
@@ -491,13 +489,11 @@ window.setPersonalBg = async function(el) {
 
 window.uploadPersonalBg = async function(input) {
     const file = input.files[0]; if (!file) return;
-    const fn = `bg_perso_${currentUniqueId}_${Date.now()}.${file.type.split('/')[1]||'jpg'}`;
-    const { error } = await supabase.storage.from('chat-files').upload(fn, file, { contentType: file.type, upsert: true });
-    if (error) { alert('Erreur upload fond'); return; }
-    const { data: u } = supabase.storage.from('chat-files').getPublicUrl(fn);
-    applyBg(u.publicUrl, 'image');
+    const url = await uploadToImgBB(file);
+    if (!url) { alert('Erreur upload fond'); return; }
+    applyBg(url, 'image');
     markSwatch('modalBgSwatches', null);
-    await supabase.from('profiles').update({ wall_bg_type: 'image', wall_bg_value: u.publicUrl }).eq('unique_id', currentUniqueId);
+    await supabase.from('profiles').update({ wall_bg_type: 'image', wall_bg_value: url }).eq('unique_id', currentUniqueId);
 };
 
 function applyBg(value, type) {
@@ -569,13 +565,28 @@ window.removeModalImage = function() {
     modalImageBlob = null;
 };
 
+// ══════════════════════════════════════════════════
+// IMGBB — Upload gratuit et illimité (remplace Supabase Storage)
+// Clé API ImgBB : à remplacer par votre propre clé sur https://api.imgbb.com/
+// ══════════════════════════════════════════════════
+const IMGBB_API_KEY = 'dbd9cc12a3d83f29974db5059ac4c08c';
+
+async function uploadToImgBB(fileOrBlob) {
+    const formData = new FormData();
+    formData.append('image', fileOrBlob);
+    try {
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+            method: 'POST',
+            body: formData
+        });
+        const json = await res.json();
+        if (!json.success) { console.error('ImgBB error:', json); return null; }
+        return json.data.url;
+    } catch(e) { console.error('ImgBB upload failed:', e); return null; }
+}
+
 async function uploadImage(blob, prefix) {
-    const ext = blob.type.split('/')[1] || 'jpg';
-    const fn  = `${prefix}_${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from('chat-files').upload(fn, blob, { contentType: blob.type });
-    if (error) { console.error('Upload image:', error); return null; }
-    const { data: u } = supabase.storage.from('chat-files').getPublicUrl(fn);
-    return u.publicUrl;
+    return await uploadToImgBB(blob);
 }
 
 // ══════════════════════════════════════════════════
